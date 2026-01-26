@@ -34,6 +34,7 @@ function CalendarView() {
     const [events, setEvents] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedJob, setSelectedJob] = useState(null);
+	const [selectedDate, setSelectedDate] = useState(null);
     
     const calendarRef = useRef(null);
     const theme = useTheme();
@@ -93,9 +94,10 @@ function CalendarView() {
     }, []);
 
     const handleDateClick = (arg) => {
-        setSelectedJob(null);
-        setIsModalOpen(true);
-    };
+		setSelectedJob(null);
+		setSelectedDate(arg.dateStr); // YYYY-MM-DD
+		setIsModalOpen(true);
+	};
 
     const handleEventClick = (info) => {
         setSelectedJob(info.event.extendedProps);
@@ -487,11 +489,12 @@ function CalendarView() {
             </Box>
 
             <JobModal 
-                open={isModalOpen} 
-                onClose={() => setIsModalOpen(false)} 
-                onJobAdded={fetchJobs} 
-                jobToEdit={selectedJob} 
-            />
+				open={isModalOpen} 
+				onClose={() => setIsModalOpen(false)} 
+				onJobAdded={fetchJobs} 
+				jobToEdit={selectedJob}
+				selectedDate={selectedDate}
+			/>
         </Paper>
     );
 }

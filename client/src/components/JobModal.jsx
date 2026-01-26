@@ -42,7 +42,7 @@ const QUICK_ITEMS = [
 const PIANI = Array.from({ length: 16 }, (_, i) => i);
 const ASCENSORE_OPTS = ["SI", "NO"];
 
-function JobModal({ open, onClose, onJobAdded, jobToEdit }) {
+function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
     const lastFocusedRef = useRef(null);
     // 1. STATI DEL FORM
     const [formData, setFormData] = useState({
@@ -127,95 +127,100 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit }) {
 
     // --- POPOLAMENTO INTELLIGENTE DEL FORM (FIX CRUCIALE) ---
     useEffect(() => {
-        if (jobToEdit) {
-            // --- 1. GESTIONE DATE ---
-            let startObj;
-            if (jobToEdit.start) {
-                startObj = new Date(jobToEdit.start);
-            } else if (jobToEdit.date) {
-                const time = jobToEdit.time || '09:00';
-                startObj = new Date(`${jobToEdit.date}T${time}`);
-            } else {
-                startObj = new Date();
-            }
+		if (jobToEdit) {
+			// ===== MODIFICA LAVORO ESISTENTE =====
+			let startObj;
+			if (jobToEdit.start) {
+				startObj = new Date(jobToEdit.start);
+			} else if (jobToEdit.date) {
+				const time = jobToEdit.time || '09:00';
+				startObj = new Date(`${jobToEdit.date}T${time}`);
+			} else {
+				startObj = new Date();
+			}
 
-            let endObj;
-            if (jobToEdit.end) {
-                endObj = new Date(jobToEdit.end);
-            } else if (jobToEdit.end_date) {
-                 const timeStr = jobToEdit.end_time || '10:00';
-                 endObj = new Date(`${jobToEdit.end_date}T${timeStr}`);
-            } else {
-                endObj = new Date(startObj.getTime() + 60 * 60 * 1000); 
-            }
+			let endObj;
+			if (jobToEdit.end) {
+				endObj = new Date(jobToEdit.end);
+			} else if (jobToEdit.end_date) {
+				const timeStr = jobToEdit.end_time || '10:00';
+				endObj = new Date(`${jobToEdit.end_date}T${timeStr}`);
+			} else {
+				endObj = new Date(startObj.getTime() + 60 * 60 * 1000);
+			}
 
-            // --- 2. RECUPERO VALORI ---
-            const source = jobToEdit.extendedProps || jobToEdit;
+			const source = jobToEdit.extendedProps || jobToEdit;
 
-            const getVal = (keys) => {
-                for (const key of keys) {
-                    if (source[key] !== undefined && source[key] !== null && source[key] !== '') return source[key];
-                    if (jobToEdit[key] !== undefined && jobToEdit[key] !== null && jobToEdit[key] !== '') return jobToEdit[key];
-                }
-                return '';
-            };
+			const getVal = (keys) => {
+				for (const key of keys) {
+					if (source[key] !== undefined && source[key] !== null && source[key] !== '') return source[key];
+					if (jobToEdit[key] !== undefined && jobToEdit[key] !== null && jobToEdit[key] !== '') return jobToEdit[key];
+				}
+				return '';
+			};
 
-            // --- CORREZIONE CRITICA: CONVERSIONE BOOLEANO -> TESTO "SI"/"NO" ---
-            // Il DB ci dà true/false o 1/0, ma la Select vuole "SI" o "NO"
-            const formatAscensoreForUI = (val) => {
-                if (val === undefined || val === null) return 'NO';
-                const s = String(val).toLowerCase();
-                // Se è true, 1, sì, yes -> Restituisci "SI" (che corrisponde al valore della Select)
-                return (s === 'true' || s === '1' || s === 'sì' || s === 'si' || s === 'yes') ? 'SI' : 'NO';
-            };
+			const formatAscensoreForUI = (val) => {
+				if (val === undefined || val === null) return 'NO';
+				const s = String(val).toLowerCase();
+				return (s === 'true' || s === '1' || s === 'sì' || s === 'si' || s === 'yes') ? 'SI' : 'NO';
+			};
 
-            // Pulizia note
-            let rawNotes = getVal(['notes', 'note']) || '';
-            const cleanNotes = rawNotes.replace(/--- LOGISTICA ---[\s\S]*$/, '').trim();
+			let rawNotes = getVal(['notes', 'note']) || '';
+			const cleanNotes = rawNotes.replace(/--- LOGISTICA ---[\s\S]*$/, '').trim();
 
-            setFormData({
-                title: jobToEdit.title || '',
-                cliente_nome: getVal(['cliente_nome', 'cliente_nome', 'cliente_nome', 'title']),
-                phone: getVal(['phone', 'telefono']),
-                email: getVal(['email', 'mail']),
-                da_indirizzo: getVal(['da_indirizzo', 'da_indirizzo', 'partenza']),
-                a_indirizzo: getVal(['a_indirizzo', 'a_indirizzo', 'destinazione']),
-                
-                items: getVal(['items', 'inventario']),
-                notes: cleanNotes, 
-                
-                // --- QUI APPLICHIAMO LA CONVERSIONE ---
-                piano_partenza: getVal(['piano_partenza']) || '0',
-                ascensore_partenza: formatAscensoreForUI(getVal(['ascensore_partenza'])), // <--- ORA È CORRETTO
-                piano_arrivo: getVal(['piano_arrivo']) || '0',
-                ascensore_arrivo: formatAscensoreForUI(getVal(['ascensore_arrivo'])),     // <--- ORA È CORRETTO
+			setFormData({
+				title: jobToEdit.title || '',
+				cliente_nome: getVal(['cliente_nome', 'title']),
+				phone: getVal(['phone', 'telefono']),
+				email: getVal(['email', 'mail']),
+				da_indirizzo: getVal(['da_indirizzo', 'partenza']),
+				a_indirizzo: getVal(['a_indirizzo', 'destinazione']),
+				items: getVal(['items', 'inventario']),
+				notes: cleanNotes,
 
-                price: getVal(['price', 'prezzo', 'costo']),
-                deposit: getVal(['deposit', 'acconto', 'caparra']),
+				piano_partenza: getVal(['piano_partenza']) || '0',
+				ascensore_partenza: formatAscensoreForUI(getVal(['ascensore_partenza'])),
+				piano_arrivo: getVal(['piano_arrivo']) || '0',
+				ascensore_arrivo: formatAscensoreForUI(getVal(['ascensore_arrivo'])),
 
-                startDate: startObj.toLocaleDateString('en-CA'), 
-                startTime: startObj.toTimeString().slice(0, 5),  
-                endDate: endObj.toLocaleDateString('en-CA'),
-                endTime: endObj.toTimeString().slice(0, 5)
-            });
-        } else {
-            // NUOVO LAVORO
-            const now = new Date();
-            setFormData({
-                title: '', cliente_nome: '', phone: '', email: '', 
-                da_indirizzo: '', a_indirizzo: '', items: '', notes: '',
-                price: '', deposit: '', 
-                piano_partenza: '0',
-                ascensore_partenza: 'NO',
-                piano_arrivo: '0',
-                ascensore_arrivo: 'NO',
-                startDate: now.toLocaleDateString('en-CA'),
-                startTime: '09:00',
-                endDate: now.toLocaleDateString('en-CA'), 
-                endTime: '10:00' 
-            });
-        }
-    }, [jobToEdit, open]);
+				price: getVal(['price', 'prezzo']),
+				deposit: getVal(['deposit', 'acconto']),
+
+				startDate: startObj.toLocaleDateString('en-CA'),
+				startTime: startObj.toTimeString().slice(0, 5),
+				endDate: endObj.toLocaleDateString('en-CA'),
+				endTime: endObj.toTimeString().slice(0, 5)
+			});
+
+		} else {
+			// ===== NUOVO LAVORO =====
+			const baseDate = selectedDate || new Date().toLocaleDateString('en-CA');
+
+			setFormData({
+				title: '',
+				cliente_nome: '',
+				phone: '',
+				email: '',
+				da_indirizzo: '',
+				a_indirizzo: '',
+				items: '',
+				notes: '',
+				price: '',
+				deposit: '',
+
+				piano_partenza: '0',
+				ascensore_partenza: 'NO',
+				piano_arrivo: '0',
+				ascensore_arrivo: 'NO',
+
+				startDate: baseDate,
+				startTime: '09:00',
+				endDate: baseDate,
+				endTime: '10:00'
+			});
+		}
+	}, [jobToEdit, open, selectedDate]);
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
