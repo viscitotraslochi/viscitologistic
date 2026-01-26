@@ -19,17 +19,6 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// --- CONFIGURA IL TRASPORTATORE EMAIL ---
-const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587, // oppure 587 per STARTTLS
-    secure: true, // true = TLS/SSL
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS, // password per app
-    },
-});
-
 // ==========================================
 // 1. AUTENTICAZIONE & UTENTI
 // ==========================================
@@ -479,6 +468,29 @@ app.delete('/vehicles/:id', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Errore cancellazione veicolo" });
+  }
+});
+
+// ==========================================
+// 5. Email Sender
+// ==========================================
+
+const inviaEmail = require('./email');
+
+app.post('/contatto', async (req, res) => {
+  const { nome, email, messaggio } = req.body;
+
+  try {
+    await inviaEmail(
+      process.env.EMAIL_DESTINATARIO,
+      `Nuovo messaggio da ${nome}`,
+      `<p>Email: ${email}</p><p>Messaggio: ${messaggio}</p>`
+    );
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Errore invio email' });
   }
 });
 
