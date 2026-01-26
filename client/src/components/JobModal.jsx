@@ -223,43 +223,40 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+		e.preventDefault();
 
-        // 1. Conversione Ascensore (Interfaccia "SI" -> Database true)
-        const hasElevatorStart = formData.ascensore_partenza === 'SI';
-        const hasElevatorEnd = formData.ascensore_arrivo === 'SI';
+		// 1. Converti "SI"/"NO" del form in booleani per il backend (che usa normalizeBool)
+		// Nota: index.js accetta anche "SI", ma inviare true/false è più pulito.
+		const hasElevatorStart = formData.ascensore_partenza === 'SI'; 
+		const hasElevatorEnd = formData.ascensore_arrivo === 'SI';
 
-        // 2. Costruzione Oggetto Dati (ALLINEATO AL BACKEND)
-        const jobData = {
-            // Dati Cliente
-            cliente_nome: formData.cliente_nome || formData.title || 'Nuovo Cliente', 
-            phone: formData.phone,
-            email: formData.email,
-
-            // Indirizzi
-            da_indirizzo: formData.da_indirizzo,
-            a_indirizzo: formData.a_indirizzo,
-
-            // Date e Orari (Fondamentali per il calendario)
-            date: formData.startDate,
-            time: formData.startTime,
-            end_date: formData.endDate,
-            end_time: formData.endTime,
-
-            // Logistica (Nuovi campi separati)
-            piano_partenza: formData.piano_partenza,
-            ascensore_partenza: hasElevatorStart,
-            piano_arrivo: formData.piano_arrivo,
-            ascensore_arrivo: hasElevatorEnd,
-
-            // Inventario e Note
-            items: formData.items,
-            notes: formData.notes, // Passiamo solo le note pulite
-
-            // Economia
-            price: formData.price || 0,
-            deposit: formData.deposit || 0
-        };
+		// 2. Costruisci l'oggetto con le CHIAVI ESATTE che index.js si aspetta
+		const jobData = {
+			cliente_nome: formData.cliente_nome || formData.title, // Fallback se usi title
+			phone: formData.phone,
+			email: formData.email,
+			
+			da_indirizzo: formData.da_indirizzo,
+			a_indirizzo: formData.a_indirizzo,
+			
+			// Nomi variabili backend (date) <-> stato frontend (startDate)
+			date: formData.startDate,       
+			time: formData.startTime,
+			end_date: formData.endDate,
+			end_time: formData.endTime,
+			
+			price: formData.price,
+			deposit: formData.deposit,
+			
+			piano_partenza: formData.piano_partenza,
+			ascensore_partenza: hasElevatorStart, // invia true/false
+			
+			piano_arrivo: formData.piano_arrivo,
+			ascensore_arrivo: hasElevatorEnd,   // invia true/false
+			
+			items: formData.items,
+			notes: formData.notes
+		};
 
         try {
             if (jobToEdit && jobToEdit.id && typeof jobToEdit.id === 'number') {

@@ -53,24 +53,36 @@ function CalendarView() {
     }, [isMobile]);
 
     const fetchJobs = async () => {
-		try {
-			const response = await api.get('/jobs');
-			
-			// Mappiamo i dati del DB (snake_case) per FullCalendar
-			const formattedEvents = response.data.map(job => ({
-				id: job.id,
-				// Il titolo nel calendario sarà il nome cliente
-				title: job.cliente_nome || 'Cliente Sconosciuto', 
-				
-				// Uniamo data e ora per FullCalendar
-				start: `${job.date}T${job.time}`,
-				// Se c'è una fine, la mettiamo, altrimenti null (default 1h)
-				end: (job.end_date && job.end_time) ? `${job.end_date}T${job.end_time}` : null,
+    try {
+        const response = await api.get('/jobs');
+        
+        const formattedEvents = response.data.map(job => {
+            // FIX: Assicuriamoci che job.date sia una stringa YYYY-MM-DD
+            // Se PostgreSQL restituisce un oggetto Date, prendiamo la parte ISO
+            let dateStr = job.date;
+            if (job.date && typeof job.date === 'object') {
+                dateStr = new Date(job.date).toISOString().split('T')[0];
+            }
+            
+            // Stessa cosa per end_date se esiste
+            let endDateStr = job.end_date;
+            if (job.end_date && typeof job.end_date === 'object') {
+                endDateStr = new Date(job.end_date).toISOString().split('T')[0];
+            }
 
-				// Props estese per il Modal (passiamo tutto l'oggetto job grezzo)
-				extendedProps: {
-					...job, 
-					// Mappatura esplicita per sicurezza
+            return {
+                id: job.id,
+                title: job.cliente_nome || 'Cliente Sconosciuto',
+                
+                // Ora usiamo la stringa pulita
+                start: `${dateStr}T${job.time}`,
+                end: (endDateStr && job.end_time) ? `${endDateStr}T${job.end_time}` : null,
+
+                extendedProps: {
+                    ...job,
+                    // Sovrascriviamo le date nell'extendedProps per il form di modifica
+                    date: dateStr, 
+                    end_date: endDateStr,
 					piano_partenza: job.piano_partenza,
                     ascensore_partenza: job.ascensore_partenza,
                     piano_arrivo: job.piano_arrivo,
