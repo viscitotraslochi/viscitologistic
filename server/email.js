@@ -1,31 +1,27 @@
-// email.js
-const formData = require('form-data');
+// server/email.js
+require('dotenv').config();
+const formData = require('form-data');   // necessario per mailgun.js
 const Mailgun = require('mailgun.js');
 
 const mailgun = new Mailgun(formData);
 const mg = mailgun.client({
   username: 'api',
-  key: process.env.MAILGUN_API_KEY, // API Key di Mailgun
-  url: 'https://api.mailgun.net'     // URL base dell’API
+  key: process.env.MAILGUN_API_KEY,   // la tua API Key di Mailgun
 });
 
-/**
- * Invia un’email tramite Mailgun
- * @param {string} to - destinatario
- * @param {string} subject - oggetto email
- * @param {string} html - corpo HTML
- */
 async function inviaEmail(to, subject, html) {
   try {
-    const info = await mg.messages.create(process.env.MAILGUN_DOMAIN, {
-      from: `"ViscitoLogistic" <no-reply@${process.env.MAILGUN_DOMAIN}>`,
+    const messageData = {
+      from: `Viscito Logistic <${process.env.MAILGUN_SENDER}>`,
       to,
       subject,
       html
-    });
-    console.log("✅ Email inviata:", info.id);
+    };
+
+    const result = await mg.messages.create(process.env.MAILGUN_DOMAIN, messageData);
+    console.log('✅ Email inviata:', result);
   } catch (err) {
-    console.error("❌ Errore invio email:", err);
+    console.error('❌ Errore invio email:', err);
   }
 }
 
