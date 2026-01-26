@@ -104,9 +104,9 @@ function Home() {
 		inventario: '',
 		// NUOVI CAMPI
 		piano_partenza: '0',
-		ascensore_partenza: 'NO',
+		ascensore_partenza: false,  // default NO
 		piano_arrivo: '0',
-		ascensore_arrivo: 'NO'
+		ascensore_arrivo: false,    // default NO
 	});
   
   
