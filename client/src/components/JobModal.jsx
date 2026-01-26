@@ -237,9 +237,9 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 			price: formData.price || 0,
 			deposit: formData.deposit || false,
 			piano_partenza: formData.piano_partenza || 0,
-			ascensore_partenza: formData.ascensore_partenza,
 			piano_arrivo: formData.piano_arrivo || 0,
-			ascensore_arrivo: formData.ascensore_arrivo,
+			ascensore_partenza: formData.ascensore_partenza === 'SI',
+			ascensore_arrivo: formData.ascensore_arrivo === 'SI',
 			items: formData.items || '',
 			notes: formData.notes || ''
 		};

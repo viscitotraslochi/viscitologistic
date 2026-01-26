@@ -166,8 +166,11 @@ app.put('/jobs/:id', async (req, res) => {
       [
         cliente_nome, phone, email, da_indirizzo, a_indirizzo, 
         date, time, end_date, end_time, price, deposit, 
-        piano_partenza, ascensore_partenza, piano_arrivo, 
-        ascensore_arrivo, items, notes, id
+        piano_partenza, 
+        normalizeBool(ascensore_partenza), // <--- AGGIUNTO normalizeBool
+        piano_arrivo, 
+        normalizeBool(ascensore_arrivo),   // <--- AGGIUNTO normalizeBool
+        items, notes, id
       ]
     );
     res.json({ message: "Lavoro aggiornato" });
