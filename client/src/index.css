@@ -1,0 +1,198 @@
+/* client/src/index.css */
+
+:root {
+  font-family: 'Roboto', Helvetica, Arial, sans-serif;
+  --fc-button-bg-color: #1976d2;
+  --fc-button-border-color: #1976d2;
+  --fc-button-hover-bg-color: #115293;
+  --fc-button-hover-border-color: #115293;
+  --fc-button-active-bg-color: #115293;
+  --fc-button-active-border-color: #115293;
+}
+
+body {
+  margin: 0;
+  background-color: #f4f6f8; /* Un grigio chiarissimo per lo sfondo pagina */
+}
+
+/* --- 1. STILI GENERALI FULLCALENDAR --- */
+
+/* Titolo del mese più moderno */
+.fc .fc-toolbar-title {
+  font-size: 1.5rem !important;
+  font-weight: 800 !important;
+  color: #102a43;
+  letter-spacing: -0.5px;
+}
+
+/* Header della tabella (lun, mar, mer...) */
+.fc-col-header-cell-cushion {
+  color: #555;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 8px !important;
+}
+
+/* Numeri dei giorni nella griglia */
+.fc-daygrid-day-number {
+  color: #666;
+  font-weight: 500;
+  text-decoration: none !important;
+  padding: 4px 8px !important;
+  font-size: 0.9rem;
+}
+
+/* Rimuovi bordi blu brutti quando clicchi sui bottoni */
+.fc-button:focus {
+  box-shadow: none !important;
+}
+
+/* Reset generale degli eventi per lasciare il controllo a React/MUI */
+.fc-event {
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+
+
+/* --- 2. FIX DESKTOP (VISTA MESE/SETTIMANA) --- */
+.fc-event-main {
+    padding: 0 !important;
+    color: inherit !important;
+  }
+  .fc-daygrid-event {
+    white-space: normal !important; /* Permette al testo di andare a capo se necessario */
+  }
+
+/* Rende la cella del giorno capace di adattarsi */
+.fc-daygrid-day-frame {
+  overflow: hidden !important; /* Evita che escano fuori */
+}
+
+/* Opzionale: Se vuoi che le celle del calendario siano più alte per ospitare più card */
+.fc-daygrid-day-bottom {
+  margin-top: 5px;
+}
+
+/* Effetto Hover: quando passi sopra la nostra card custom */
+.fc-daygrid-event:hover div:first-child {
+   /* Nota: questo selettore punta al primo div dentro l'evento (la nostra card) */
+   /* Possiamo scurire leggermente il bordo o l'ombra */
+   box-shadow: 0 4px 6px rgba(0,0,0,0.15) !important;
+   transform: translateY(-1px); /* Effetto "sollevamento" leggero */
+}
+
+/* Assicuriamo che il testo dell'evento in settimana sia leggibile */
+.fc-v-event {
+    background-color: transparent !important;
+    border: none !important;
+  }
+
+/* Rimuove l'effetto "pop-up" e zoom di default che rompeva il layout */
+.fc-daygrid-event:hover {
+  z-index: auto !important; 
+  transform: none !important; /* Disabilita lo zoom */
+  background-color: transparent !important;
+}
+
+
+/* --- 3. FIX LISTA (GENERALE) --- */
+
+/* 1. Nascondi le colonne "Orario" e "Pallino" della lista */
+.fc-list-event-time { display: none !important; }
+.fc-list-event-graphic { display: none !important; }
+
+/* 2. Resetta la cella del "Titolo" (dove viene iniettato il tuo componente) */
+.fc-list-event-title { padding: 0 !important; border: none !important; }
+
+/* 3. Rimuovi lo stile "hover" grigio di default sulle righe */
+.fc-list-event:hover td {
+    background-color: transparent !important;
+}
+
+/* 4. Opzionale: Rimuovi i bordi della riga per un look "pulito" */
+.fc-list-event td {
+    border-color: transparent !important;
+}
+
+/* ==============================================
+   FIX CALENDARIO LIST-VIEW (Desktop & Mobile)
+   ============================================== */
+
+/* 1. HEADER DELLA DATA (Sticky) */
+.fc .fc-list-sticky .fc-list-day > * {
+    position: sticky !important;
+    top: 0 !important;
+    
+    /* MODIFICA QUI: Abbassato da 9999 a 100 */
+    /* 100 è sufficiente per stare sopra le card (che sono a 1), 
+       ma abbastanza basso da stare SOTTO il modale (che è a 1300) */
+    z-index: 100 !important; 
+    
+    background-color: #f1f5f9 !important; 
+    border-bottom: 1px solid #ddd !important;
+}
+
+/* 2. CARD DELL'EVENTO */
+.fc .fc-list-event {
+    position: relative !important;
+    z-index: 1 !important; 
+}
+
+/* 3. CARD MATERIAL UI (dentro l'evento) */
+.fc .fc-list-event .MuiPaper-root {
+    z-index: 1 !important;
+    position: relative !important;
+}
+
+/* 4. FIX OPZIONALE: Se il modale finisce ancora sotto (raro), forziamo il modale in alto */
+.MuiModal-root {
+    z-index: 99999 !important;
+}
+
+/* --- 4. FIX MOBILE SPECIFICI --- */
+@media (max-width: 600px) {
+    
+    /* A. FIX STRUTTURALE LISTA */
+    .fc-list-table, 
+    .fc-list-table tbody, 
+    .fc-list-table tr, 
+    .fc-list-table td {
+        display: block !important;
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    td.fc-list-event-time,
+    td.fc-list-event-graphic {
+        display: none !important;
+        height: 0 !important; /* Forza altezza zero per sicurezza */
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+    }
+    /* ----------------------------- */
+
+    /* B. FIX DATA TROPPO GRANDE */
+    .fc-list-day-cushion {
+        padding: 8px 12px !important;
+        background-color: #f0f4f8 !important;
+        display: flex !important;
+        align-items: center !important;
+        min-height: 40px !important;
+    }
+    
+    .fc-list-day-text {
+        font-size: 0.95rem !important;
+        font-weight: 700 !important;
+        color: #102a43 !important;
+        text-transform: capitalize;
+    }
+    
+    .fc-list-day-side-text {
+        font-size: 0.85rem !important;
+        opacity: 0.8;
+        font-weight: 500;
+    }
+}
