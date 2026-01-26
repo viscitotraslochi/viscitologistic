@@ -596,22 +596,23 @@ function Home() {
 								  <FormControl fullWidth size="small">
 									  <InputLabel id="ascensore-partenza-label">Ascensore</InputLabel>
 									  <Select
-										  labelId="ascensore-partenza-label"
-										  id="ascensore_partenza"
-										  name="ascensore_partenza"
-										  value={formData.ascensore_partenza}
-										  label="Ascensore"
-										  onChange={handleChange}
-										>
-										  <MenuItem value="" disabled>Seleziona</MenuItem>
-										  {ASCENSORE_OPTS.map((opt) => (
-											<MenuItem key={opt} value={opt === "SI"}>
-											  {opt}
-											</MenuItem>
-										  ))}
-										</Select>
-
+										labelId="ascensore-partenza-label"
+										id="ascensore_partenza"
+										name="ascensore_partenza"
+										value={formData.ascensore_partenza} // deve essere booleano
+										label="Ascensore"
+										onChange={(e) =>
+										  setFormData({
+											...formData,
+											ascensore_partenza: e.target.value === true || e.target.value === 'true'
+										  })
+										}
+									  >
+										<MenuItem value={true}>SI</MenuItem>
+										<MenuItem value={false}>NO</MenuItem>
+									  </Select>
 									</FormControl>
+
 
 								</Box>
 
@@ -655,24 +656,21 @@ function Home() {
 								  <FormControl fullWidth size="small">
 									  <InputLabel id="ascensore-arrivo-label">Ascensore</InputLabel>
 									  <Select
-										  labelId="ascensore-arrivo-label"
-										  id="ascensore_arrivo"
-										  name="ascensore_arrivo"
-										  value={formData.ascensore_arrivo}
-										  label="Ascensore"
-										  onChange={handleChange}
-										>
-										  {/* Placeholder visibile ma non selezionabile */}
-										  <MenuItem value="" disabled>
-											Seleziona
-										  </MenuItem>
-
-										  {ASCENSORE_OPTS.map((opt) => (
-											<MenuItem key={opt} value={opt === "SI"}>
-											  {opt}
-											</MenuItem>
-										  ))}
-										</Select>
+										labelId="ascensore-arrivo-label"
+										id="ascensore_arrivo"
+										name="ascensore_arrivo"
+										value={formData.ascensore_arrivo}
+										label="Ascensore"
+										onChange={(e) =>
+										  setFormData({
+											...formData,
+											ascensore_arrivo: e.target.value === true || e.target.value === 'true'
+										  })
+										}
+									  >
+										<MenuItem value={true}>SI</MenuItem>
+										<MenuItem value={false}>NO</MenuItem>
+									  </Select>
 									</FormControl>
 
 								</Box>
