@@ -21,11 +21,13 @@ app.use(express.json());
 
 // --- CONFIGURA IL TRASPORTATORE EMAIL ---
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER, 
-    pass: process.env.EMAIL_PASS  
-  }
+    host: "smtp.gmail.com",
+    port: 465, // oppure 587 per STARTTLS
+    secure: true, // true = TLS/SSL
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS, // password per app
+    },
 });
 
 // ==========================================
