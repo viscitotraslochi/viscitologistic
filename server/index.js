@@ -213,13 +213,14 @@ app.delete('/jobs/:id', async (req, res) => {
 // GET: Tutti i lead
 app.get('/leads', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM leads ORDER BY data_creazione DESC');
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Errore recupero leads" });
-  }
-});
+    const result = await pool.query(`
+  SELECT
+    *,
+    TO_CHAR(data_trasloco, 'DD-MM-YYYY') AS data_trasloco,
+    TO_CHAR(ora_trasloco, 'HH24:MI') AS ora_trasloco
+  FROM leads
+  ORDER BY data_creazione DESC
+`);
 
 // POST: Crea nuovo lead + invia email
 app.post('/leads', async (req, res) => {
