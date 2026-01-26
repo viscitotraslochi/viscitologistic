@@ -356,4 +356,16 @@ app.post('/contatto', async (req, res) => {
   }
 });
 
+const axios = require('axios');
+
+setInterval(() => {
+  const host = process.env.RENDER_EXTERNAL_HOSTNAME 
+               ? `${process.env.RENDER_EXTERNAL_HOSTNAME}.onrender.com` 
+               : 'viscito-backend.onrender.com'; 
+
+  axios.get(`https://${host}/jobs`)
+    .then(() => console.log('Auto-ping: Backend mantenuto sveglio'))
+    .catch((err) => console.error('Auto-ping fallito:', err.message));
+}, 840000); // 14 minuti
+
 app.listen(port, () => console.log(`Server avviato sulla porta ${port}`));
