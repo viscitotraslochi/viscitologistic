@@ -104,10 +104,11 @@ function Home() {
 		inventario: '',
 		// NUOVI CAMPI
 		piano_partenza: '0',
-		ascensore_partenza: false,  // default NO
+		ascensore_partenza: "", 
 		piano_arrivo: '0',
-		ascensore_arrivo: false,    // default NO
+		ascensore_arrivo: "",  
 	});
+
   
   
   
@@ -175,10 +176,14 @@ function Home() {
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   // --- HANDLERS ---
-  const handleChange = (e) => { 
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+  const handleChange = (e) => {
+	  const { name, value, type } = e.target;
+	  
+	  setFormData(prev => ({
+		...prev,
+		[name]: (name.includes("ascensore")) ? value === "true" : value
+	  }));
+	};
 
   const handleCheckboxChange = (item) => {
     setQuantities(prev => ({
@@ -293,14 +298,23 @@ function Home() {
         });
 
         // Reset Form
-        setFormData({
-            nome: '', telefono: '', email: '',
-            da_indirizzo: '', a_indirizzo: '',
-            piano_partenza: 0, ascensore_partenza: 'NO',
-            piano_arrivo: 0, ascensore_arrivo: 'NO',
-            startDate: '', startTime: '', 
-            items: [], inventario: '', note: '' 
-        });
+		setFormData({
+			nome: '',
+			telefono: '',
+			email: '',
+			da_indirizzo: '',
+			a_indirizzo: '',
+			piano_partenza: '0',
+			ascensore_partenza: false,  // default NO
+			piano_arrivo: '0',
+			ascensore_arrivo: false,    // default NO
+			startDate: '',
+			startTime: '', 
+			items: [],
+			inventario: '',
+			note: '' 
+		});
+
         
         // Se usi setInventoryList per pulire le icone visive
         if (typeof setInventoryList === 'function') setInventoryList([]); 
@@ -582,19 +596,21 @@ function Home() {
 								  <FormControl fullWidth size="small">
 									  <InputLabel id="ascensore-partenza-label">Ascensore</InputLabel>
 									  <Select
-										labelId="ascensore-partenza-label"
-										id="ascensore_partenza"
-										name="ascensore_partenza"
-										value={formData.ascensore_partenza}
-										label="Ascensore"
-										onChange={handleChange}
-									  >
-										{ASCENSORE_OPTS.map((opt) => (
-										  <MenuItem key={opt.label} value={opt.value}>
-											{opt.label}
-										  </MenuItem>
-										))}
-									  </Select>
+										  labelId="ascensore-partenza-label"
+										  id="ascensore_partenza"
+										  name="ascensore_partenza"
+										  value={formData.ascensore_partenza}
+										  label="Ascensore"
+										  onChange={handleChange}
+										>
+										  <MenuItem value="" disabled>Seleziona</MenuItem>
+										  {ASCENSORE_OPTS.map((opt) => (
+											<MenuItem key={opt} value={opt === "SI"}>
+											  {opt}
+											</MenuItem>
+										  ))}
+										</Select>
+
 									</FormControl>
 
 								</Box>
@@ -639,19 +655,24 @@ function Home() {
 								  <FormControl fullWidth size="small">
 									  <InputLabel id="ascensore-arrivo-label">Ascensore</InputLabel>
 									  <Select
-										labelId="ascensore-arrivo-label"
-										id="ascensore_arrivo"
-										name="ascensore_arrivo"
-										value={formData.ascensore_arrivo}
-										label="Ascensore"
-										onChange={handleChange}
-									  >
-										{ASCENSORE_OPTS.map((opt) => (
-										  <MenuItem key={opt.label} value={opt.value}>
-											{opt.label}
+										  labelId="ascensore-arrivo-label"
+										  id="ascensore_arrivo"
+										  name="ascensore_arrivo"
+										  value={formData.ascensore_arrivo}
+										  label="Ascensore"
+										  onChange={handleChange}
+										>
+										  {/* Placeholder visibile ma non selezionabile */}
+										  <MenuItem value="" disabled>
+											Seleziona
 										  </MenuItem>
-										))}
-									  </Select>
+
+										  {ASCENSORE_OPTS.map((opt) => (
+											<MenuItem key={opt} value={opt === "SI"}>
+											  {opt}
+											</MenuItem>
+										  ))}
+										</Select>
 									</FormControl>
 
 								</Box>
