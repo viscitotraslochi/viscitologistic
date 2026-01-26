@@ -255,15 +255,13 @@ function Home() {
     }
 
     // 2. UNIONE INVENTARIO: Mettiamo insieme la lista visuale E il testo scritto nel campo "Inventario"
-    // Questo andrà nella colonna 'items' del database
     let finalInventory = visualListString;
-    if (formData.inventario) {
-        if (finalInventory) finalInventory += " | "; // Separatore se c'è già roba
-        finalInventory += `Extra: ${formData.inventario}`;
-    }
+	if (formData.inventario) {
+		if (finalInventory) finalInventory += " | "; 
+		finalInventory += formData.inventario;      
+	}
 
     // 3. NOTE PULITE: Qui ci va SOLO il messaggio del cliente
-    // Questo andrà nella colonna 'note' del database
     const finalNotes = formData.note || ''; 
 
     // 4. Oggetto dati SEPARATO

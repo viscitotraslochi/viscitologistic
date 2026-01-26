@@ -116,19 +116,18 @@ function LeadsView() {
         };
 
         // --- HELPER 2: Formattazione Data (DD/MM/YYYY) ---
-        // (Questa è la parte che mancava nel tuo snippet per avere la data italiana)
         const formatDataIT = (dateStr) => {
-            if (!dateStr) return 'Non specificata';
-            // Se la data arriva come YYYY-MM-DD
-            if (dateStr.includes('-')) {
-                const parts = dateStr.split('-');
-                // Invertiamo: Giorno/Mese/Anno
-                if (parts.length === 3) {
-                    return `${parts[2]}/${parts[1]}/${parts[0]}`;
-                }
-            }
-            return dateStr; 
-        };
+			if (!dateStr) return 'Non specificata';
+
+			const d = new Date(dateStr);
+
+			if (isNaN(d)) {
+
+				return dateStr;
+			}
+
+			return d.toLocaleDateString('it-IT');
+		};
 
         // --- DATI DIRETTI ---
         const pPart = lead.piano_partenza;
