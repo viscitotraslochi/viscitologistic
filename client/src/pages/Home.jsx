@@ -580,22 +580,23 @@ function Home() {
 								  </FormControl>
 
 								  <FormControl fullWidth size="small">
-									<InputLabel id="ascensore-partenza-label">Ascensore</InputLabel>
-									<Select
-									  labelId="ascensore-partenza-label"
-									  id="ascensore_partenza"
-									  name="ascensore_partenza"
-									  value={formData.ascensore_partenza}
-									  label="Ascensore"
-									  onChange={handleChange}
-									>
-									  {ASCENSORE_OPTS.map((opt) => (
-										<MenuItem key={opt} value={opt}>
-										  {opt}
-										</MenuItem>
-									  ))}
-									</Select>
-								  </FormControl>
+									  <InputLabel id="ascensore-partenza-label">Ascensore</InputLabel>
+									  <Select
+										labelId="ascensore-partenza-label"
+										id="ascensore_partenza"
+										name="ascensore_partenza"
+										value={formData.ascensore_partenza}
+										label="Ascensore"
+										onChange={handleChange}
+									  >
+										{ASCENSORE_OPTS.map((opt) => (
+										  <MenuItem key={opt.label} value={opt.value}>
+											{opt.label}
+										  </MenuItem>
+										))}
+									  </Select>
+									</FormControl>
+
 								</Box>
 
 							</Grid>
@@ -636,22 +637,23 @@ function Home() {
 								  </FormControl>
 
 								  <FormControl fullWidth size="small">
-									<InputLabel id="ascensore-arrivo-label">Ascensore</InputLabel>
-									<Select
-									  labelId="ascensore-arrivo-label"
-									  id="ascensore_arrivo"
-									  name="ascensore_arrivo"
-									  value={formData.ascensore_arrivo}
-									  label="Ascensore"
-									  onChange={handleChange}
-									>
-									  {ASCENSORE_OPTS.map((opt) => (
-										<MenuItem key={opt} value={opt}>
-										  {opt}
-										</MenuItem>
-									  ))}
-									</Select>
-								  </FormControl>
+									  <InputLabel id="ascensore-arrivo-label">Ascensore</InputLabel>
+									  <Select
+										labelId="ascensore-arrivo-label"
+										id="ascensore_arrivo"
+										name="ascensore_arrivo"
+										value={formData.ascensore_arrivo}
+										label="Ascensore"
+										onChange={handleChange}
+									  >
+										{ASCENSORE_OPTS.map((opt) => (
+										  <MenuItem key={opt.label} value={opt.value}>
+											{opt.label}
+										  </MenuItem>
+										))}
+									  </Select>
+									</FormControl>
+
 								</Box>
 
 							</Grid>
