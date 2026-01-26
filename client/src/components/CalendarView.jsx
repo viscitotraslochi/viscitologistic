@@ -57,24 +57,28 @@ function CalendarView() {
 			const response = await api.get('/jobs');
 			const formattedEvents = response.data.map(job => {
 				
-				// Trasforma l'oggetto Date di Postgres in stringa YYYY-MM-DD
-				let dateStr = job.date;
-				if (job.date && typeof job.date === 'object') {
-					dateStr = new Date(job.date).toISOString().split('T')[0];
-				}
+				// Funzione interna per formattare senza errori di fuso orario
+				const formatToISODate = (dateInput) => {
+					if (!dateInput) return null;
+					const d = new Date(dateInput);
+					// sv-SE restituisce YYYY-MM-DD, evitando i problemi di toISOString()
+					return d.toLocaleDateString('sv-SE'); 
+				};
+
+				const dateStr = formatToISODate(job.date);
+				const endDateStr = job.end_date ? formatToISODate(job.end_date) : null;
 
 				return {
 					id: job.id,
-					// Usa cliente_nome come titolo nel calendario
 					title: job.cliente_nome || 'Lavoro', 
-					// Combina date e time nel formato ISO richiesto da FullCalendar
+					// FullCalendar vuole: YYYY-MM-DDTHH:mm:ss
 					start: `${dateStr}T${job.time}`,
-					// Se hai end_date e end_time
-					end: (job.end_date && job.end_time) ? `${new Date(job.end_date).toISOString().split('T')[0]}T${job.end_time}` : null,
+					end: (endDateStr && job.end_time) ? `${endDateStr}T${job.end_time}` : null,
 					
 					extendedProps: { 
 						...job,
-						date: dateStr // Assicurati che passi la stringa al modale per l'editing
+						date: dateStr, // Fondamentale per il form del modale
+						end_date: endDateStr
 					},
 					backgroundColor: job.deposit ? '#2e7d32' : '#1976d2'
 				};

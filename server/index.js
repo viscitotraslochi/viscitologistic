@@ -156,40 +156,24 @@ app.put('/jobs/:id', async (req, res) => {
   } = req.body;
 
   try {
-    const updateJob = await pool.query(
-      `UPDATE jobs SET
-        cliente_nome=$1, phone=$2, email=$3,
-        da_indirizzo=$4, a_indirizzo=$5,
-        date=$6, time=$7, end_date=$8, end_time=$9,
-        price=$10, deposit=$11,
-        piano_partenza=$12, ascensore_partenza=$13,
-        piano_arrivo=$14, ascensore_arrivo=$15,
-        items=$16, notes=$17
-      WHERE id=$18 RETURNING *`,
+    await pool.query(
+      `UPDATE jobs SET 
+        cliente_nome=$1, phone=$2, email=$3, da_indirizzo=$4, a_indirizzo=$5, 
+        date=$6, time=$7, end_date=$8, end_time=$9, price=$10, deposit=$11, 
+        piano_partenza=$12, ascensore_partenza=$13, piano_arrivo=$14, 
+        ascensore_arrivo=$15, items=$16, notes=$17 
+      WHERE id=$18`,
       [
-        cliente_nome, phone, email,
-        da_indirizzo, a_indirizzo,
-        date, time,
-        end_date || date,
-        end_time || null,
-        price || 0, deposit || 0,
-        piano_partenza || null,
-        normalizeBool(ascensore_partenza),
-        piano_arrivo || null,
-        normalizeBool(ascensore_arrivo),
-        items || '',
-        notes || '',
-        id
+        cliente_nome, phone, email, da_indirizzo, a_indirizzo, 
+        date, time, end_date, end_time, price, deposit, 
+        piano_partenza, ascensore_partenza, piano_arrivo, 
+        ascensore_arrivo, items, notes, id
       ]
     );
-
-    if(updateJob.rows.length === 0) return res.status(404).json({ error: "Lavoro non trovato" });
-
-    res.json(updateJob.rows[0]);
-
+    res.json({ message: "Lavoro aggiornato" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Errore aggiornamento lavoro" });
+    res.status(500).json({ error: "Errore database" });
   }
 });
 

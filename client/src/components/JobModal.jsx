@@ -223,38 +223,38 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 
 
     const handleSubmit = async () => {
-		// Mappiamo lo stato del form (formData) ai nomi del database
-		const jobData = {
-			cliente_nome: formData.cliente_nome || formData.title, // usa il nome corretto
-			phone: formData.phone,
-			email: formData.email,
-			da_indirizzo: formData.da_indirizzo,
-			a_indirizzo: formData.a_indirizzo,
-			date: formData.date || formData.startDate, // IMPORTANTE: deve essere 'date'
-			time: formData.time || formData.startTime, // IMPORTANTE: deve essere 'time'
-			end_date: formData.end_date || formData.endDate,
-			end_time: formData.end_time || formData.endTime,
-			price: formData.price,
-			deposit: formData.deposit,
-			piano_partenza: formData.piano_partenza,
+		// Normalizziamo l'oggetto con i nomi esatti richiesti dal backend
+		const payload = {
+			cliente_nome: formData.cliente_nome || formData.title || '',
+			phone: formData.phone || '',
+			email: formData.email || '',
+			da_indirizzo: formData.da_indirizzo || '',
+			a_indirizzo: formData.a_indirizzo || '',
+			date: formData.date || formData.startDate, // Backend vuole 'date'
+			time: formData.time || formData.startTime, // Backend vuole 'time'
+			end_date: formData.end_date || formData.endDate || null,
+			end_time: formData.end_time || formData.endTime || null,
+			price: formData.price || 0,
+			deposit: formData.deposit || false,
+			piano_partenza: formData.piano_partenza || 0,
 			ascensore_partenza: formData.ascensore_partenza,
-			piano_arrivo: formData.piano_arrivo,
+			piano_arrivo: formData.piano_arrivo || 0,
 			ascensore_arrivo: formData.ascensore_arrivo,
-			items: formData.items,
-			notes: formData.notes
+			items: formData.items || '',
+			notes: formData.notes || ''
 		};
 
 		try {
 			if (jobToEdit && jobToEdit.id) {
-				await api.put(`/jobs/${jobToEdit.id}`, jobData);
+				await api.put(`/jobs/${jobToEdit.id}`, payload);
 			} else {
-				await api.post('/jobs', jobData);
+				await api.post('/jobs', payload);
 			}
-			onJobAdded(); // Ricarica il calendario
-			onClose();
+			onJobAdded(); // Ricarica la lista nel calendario
+			onClose();    // Chiudi il modale
 		} catch (error) {
-			console.error("Errore durante il salvataggio:", error);
-			alert("Errore nel salvataggio del lavoro");
+			console.error("Errore salvataggio:", error);
+			alert("Errore durante il salvataggio del lavoro.");
 		}
 	};
 
