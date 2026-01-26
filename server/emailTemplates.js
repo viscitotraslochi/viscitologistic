@@ -1,4 +1,16 @@
 // server/emailTemplates.js
+function formatDateIT(date) {
+  if (!date) return null;
+
+  const d = new Date(date);
+  if (isNaN(d)) return date;
+
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const year = d.getFullYear();
+
+  return `${day}-${month}-${year}`;
+}
 
 function preventivoEmailTemplate({
   cliente_nome,
@@ -15,6 +27,8 @@ function preventivoEmailTemplate({
   data_trasloco,
   ora_trasloco
 }) {
+
+  const dataFormattata = formatDateIT(data_trasloco);
 
   const ascPartenzaBadge = ascensore_partenza ? "✅ Ascensore" : "❌ No Ascensore";
   const ascArrivoBadge = ascensore_arrivo ? "✅ Ascensore" : "❌ No Ascensore";
@@ -54,7 +68,7 @@ function preventivoEmailTemplate({
               <td width="50%" align="center" style="border-right:1px solid #f1f5f9;">
                   <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:#64748b;text-transform:uppercase;">Data Richiesta</div>
                   <div style="font-size:16px;font-weight:800;color:#1e293b;margin-top:4px;">
-                      📅 ${data_trasloco || 'Non specificata'}
+                      📅 ${dataFormattata || 'Non specificata'}
                   </div>
               </td>
               <td width="50%" align="center">
