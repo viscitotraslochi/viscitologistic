@@ -222,61 +222,41 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 	}, [jobToEdit, open, selectedDate]);
 
 
-    const handleSubmit = async (e) => {
-		e.preventDefault();
-
-		// 1. Converti "SI"/"NO" del form in booleani per il backend (che usa normalizeBool)
-		// Nota: index.js accetta anche "SI", ma inviare true/false è più pulito.
-		const hasElevatorStart = formData.ascensore_partenza === 'SI'; 
-		const hasElevatorEnd = formData.ascensore_arrivo === 'SI';
-
-		// 2. Costruisci l'oggetto con le CHIAVI ESATTE che index.js si aspetta
+    const handleSubmit = async () => {
+		// Mappiamo lo stato del form (formData) ai nomi del database
 		const jobData = {
-			cliente_nome: formData.cliente_nome || formData.title, // Fallback se usi title
+			cliente_nome: formData.cliente_nome || formData.title, // usa il nome corretto
 			phone: formData.phone,
 			email: formData.email,
-			
 			da_indirizzo: formData.da_indirizzo,
 			a_indirizzo: formData.a_indirizzo,
-			
-			// Nomi variabili backend (date) <-> stato frontend (startDate)
-			date: formData.startDate,       
-			time: formData.startTime,
-			end_date: formData.endDate,
-			end_time: formData.endTime,
-			
+			date: formData.date || formData.startDate, // IMPORTANTE: deve essere 'date'
+			time: formData.time || formData.startTime, // IMPORTANTE: deve essere 'time'
+			end_date: formData.end_date || formData.endDate,
+			end_time: formData.end_time || formData.endTime,
 			price: formData.price,
 			deposit: formData.deposit,
-			
 			piano_partenza: formData.piano_partenza,
-			ascensore_partenza: hasElevatorStart, // invia true/false
-			
+			ascensore_partenza: formData.ascensore_partenza,
 			piano_arrivo: formData.piano_arrivo,
-			ascensore_arrivo: hasElevatorEnd,   // invia true/false
-			
+			ascensore_arrivo: formData.ascensore_arrivo,
 			items: formData.items,
 			notes: formData.notes
 		};
 
-        try {
-            if (jobToEdit && jobToEdit.id && typeof jobToEdit.id === 'number') {
-                // --- MODIFICA (PUT) ---
-                await api.put(`/jobs/${jobToEdit.id}`, jobData);
-            } else {
-                // --- CREAZIONE (POST) ---
-                await api.post('/jobs', jobData);
-            }
-
-            // Aggiorna la vista e chiudi
-            onJobAdded?.();
-            handleSafeClose();
-
-        } catch (error) {
-            console.error("Errore salvataggio:", error);
-            const msg = error.response?.data?.error || error.message || "Errore generico";
-            alert("Errore durante il salvataggio: " + msg);
-        }
-    };
+		try {
+			if (jobToEdit && jobToEdit.id) {
+				await api.put(`/jobs/${jobToEdit.id}`, jobData);
+			} else {
+				await api.post('/jobs', jobData);
+			}
+			onJobAdded(); // Ricarica il calendario
+			onClose();
+		} catch (error) {
+			console.error("Errore durante il salvataggio:", error);
+			alert("Errore nel salvataggio del lavoro");
+		}
+	};
 
     const handleDelete = async () => {
         if (!jobToEdit || !jobToEdit.id) return;

@@ -53,51 +53,35 @@ function CalendarView() {
     }, [isMobile]);
 
     const fetchJobs = async () => {
-    try {
-        const response = await api.get('/jobs');
-        
-        const formattedEvents = response.data.map(job => {
-            // FIX: Assicuriamoci che job.date sia una stringa YYYY-MM-DD
-            // Se PostgreSQL restituisce un oggetto Date, prendiamo la parte ISO
-            let dateStr = job.date;
-            if (job.date && typeof job.date === 'object') {
-                dateStr = new Date(job.date).toISOString().split('T')[0];
-            }
-            
-            // Stessa cosa per end_date se esiste
-            let endDateStr = job.end_date;
-            if (job.end_date && typeof job.end_date === 'object') {
-                endDateStr = new Date(job.end_date).toISOString().split('T')[0];
-            }
-
-            return {
-                id: job.id,
-                title: job.cliente_nome || 'Cliente Sconosciuto',
-                
-                // Ora usiamo la stringa pulita
-                start: `${dateStr}T${job.time}`,
-                end: (endDateStr && job.end_time) ? `${endDateStr}T${job.end_time}` : null,
-
-                extendedProps: {
-                    ...job,
-                    // Sovrascriviamo le date nell'extendedProps per il form di modifica
-                    date: dateStr, 
-                    end_date: endDateStr,
-					piano_partenza: job.piano_partenza,
-                    ascensore_partenza: job.ascensore_partenza,
-                    piano_arrivo: job.piano_arrivo,
-                    ascensore_arrivo: job.ascensore_arrivo,
-					
-					cliente_nome: job.cliente_nome 
-				},
+		try {
+			const response = await api.get('/jobs');
+			const formattedEvents = response.data.map(job => {
 				
-				// Colore diverso se è un preventivo o confermato (opzionale)
-				backgroundColor: job.deposit ? '#2e7d32' : '#1976d2'
-			}));
+				// Trasforma l'oggetto Date di Postgres in stringa YYYY-MM-DD
+				let dateStr = job.date;
+				if (job.date && typeof job.date === 'object') {
+					dateStr = new Date(job.date).toISOString().split('T')[0];
+				}
 
+				return {
+					id: job.id,
+					// Usa cliente_nome come titolo nel calendario
+					title: job.cliente_nome || 'Lavoro', 
+					// Combina date e time nel formato ISO richiesto da FullCalendar
+					start: `${dateStr}T${job.time}`,
+					// Se hai end_date e end_time
+					end: (job.end_date && job.end_time) ? `${new Date(job.end_date).toISOString().split('T')[0]}T${job.end_time}` : null,
+					
+					extendedProps: { 
+						...job,
+						date: dateStr // Assicurati che passi la stringa al modale per l'editing
+					},
+					backgroundColor: job.deposit ? '#2e7d32' : '#1976d2'
+				};
+			});
 			setEvents(formattedEvents);
 		} catch (error) {
-			console.error("Errore recupero lavori:", error);
+			console.error("Errore caricamento lavori:", error);
 		}
 	};
 
