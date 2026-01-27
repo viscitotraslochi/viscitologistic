@@ -115,9 +115,9 @@ const isValidPhoneIT = (phone) => {
   return /^\d{9,11}$/.test(p);
 };
 
-const validateContact = () => {
-  const phoneOk = isValidPhoneIT(formData.phone);
-  const emailOk = isValidEmail(formData.email);
+const validateContact = (fd, setErrors) => {
+  const phoneOk = isValidPhoneIT(fd.phone);
+  const emailOk = isValidEmail(fd.email);
 
   setErrors({
     phone: phoneOk ? '' : 'Telefono non valido (es: 3331234567 o +393331234567)',
@@ -126,7 +126,6 @@ const validateContact = () => {
 
   return phoneOk && emailOk;
 };
-
 
 function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
   const lastFocusedRef = useRef(null);
@@ -425,7 +424,7 @@ useEffect(() => {
       if (finalItems) finalItems += ' | ';
       finalItems += extra;
     }
-	if (!validateContact()) {
+	if (!validateContact(formData, setErrors)) {
 	  alert('Controlla Telefono/Email: alcuni dati non sono validi.');
 	  return;
 	}
