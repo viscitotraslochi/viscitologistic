@@ -40,40 +40,19 @@ function CalendarView() {
     const calendarRef = useRef(null);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-    // Vista corrente del calendario (serve per UI e logica responsive)
     const [currentView, setCurrentView] = useState(isMobile ? 'listWeek' : 'dayGridMonth');
 
-    // Cambia vista in modo sicuro (e aggiorna il layout)
-    const changeCalendarView = (viewType) => {
-        if (!calendarRef.current) return;
-        const api = calendarRef.current.getApi();
-        api.changeView(viewType);
-        setCurrentView(viewType);
-        // forza ricalcolo dimensioni (utile su rotazione)
-        requestAnimationFrame(() => {
-            try { api.updateSize(); } catch { /* no-op */ }
-        });
-    };
-
-    // --- 1) FIX ROTAZIONE / RESIZE MOBILE ---
-    // Su alcuni device (soprattutto iOS/Android) FullCalendar può "perdere" il layout quando cambia
-    // l'orientamento. Qui forziamo un updateSize dopo ogni cambio breakpoint e/o view.
+    // --- 1. GESTIONE CAMBIO VISTA AUTOMATICO ---
     useEffect(() => {
-        if (!calendarRef.current) return;
-        const api = calendarRef.current.getApi();
-        const raf = requestAnimationFrame(() => {
-            try {
-                api.updateSize();
-            } catch {
-                // no-op
+        if (calendarRef.current) {
+            const calendarApi = calendarRef.current.getApi();
+            if (isMobile) {
+                calendarApi.changeView('listWeek');
+            } else {
+                calendarApi.changeView('dayGridMonth');
             }
-        });
-        return () => cancelAnimationFrame(raf);
-    }, [isMobile, currentView]);
-
-    // Nota: NON forziamo più automaticamente "listWeek" su mobile.
-    // Prima lo facevamo e in combinazione con la rotazione (portrait/landscape)
-    // poteva creare un comportamento "buggato".
+        }
+    }, [isMobile]);
 
     const fetchJobs = async () => {
 		try {
@@ -169,7 +148,16 @@ function CalendarView() {
 
         // --- CASO 1: VISTA GRIGLIA (Mese e Settimana - Rimane compatta) ---
         if (view.type === 'dayGridMonth' || view.type === 'timeGridWeek') {
-            return (
+        
+    
+    const visibleEvents = (typeFilter === 'all')
+        ? events
+        : events.filter(e => {
+            const t = String(e.extendedProps?.job_type || e.extendedProps?.tipo_lavoro || e.extendedProps?.tipo || '').toLowerCase();
+            return t === typeFilter;
+        });
+
+    return (
                 <div style={{
                     backgroundColor: bgColor,
                     borderLeft: `4px solid ${mainColor}`,
@@ -522,34 +510,6 @@ function CalendarView() {
                         Nuovo Lavoro
                     </Button>
 
-                    {/* Selettore viste su mobile (evita il bug portrait/landscape e rende mese/settimana accessibili) */}
-                    {isMobile && (
-                        <ToggleButtonGroup
-                            value={currentView}
-                            exclusive
-                            onChange={(e, v) => {
-                                if (!v) return;
-                                changeCalendarView(v);
-                            }}
-                            size="small"
-                            fullWidth
-                            sx={{
-                                bgcolor: '#fff',
-                                borderRadius: 2,
-                                flexWrap: 'wrap',
-                                '& .MuiToggleButton-root': {
-                                    textTransform: 'none',
-                                    fontWeight: 800,
-                                    px: 1
-                                }
-                            }}
-                        >
-                            <ToggleButton value="dayGridMonth">Mese</ToggleButton>
-                            <ToggleButton value="timeGridWeek">Settimana</ToggleButton>
-                            <ToggleButton value="listWeek">Lista</ToggleButton>
-                        </ToggleButtonGroup>
-                    )}
-
                     {/* Filtro visibile solo in vista Lista */}
                     {String(currentView || '').startsWith('list') && (
                         <ToggleButtonGroup
@@ -611,15 +571,6 @@ function CalendarView() {
                     
                     events={filteredEvents}
                     height="100%"
-                    handleWindowResize={true}
-                    windowResize={() => {
-                        if (!calendarRef.current) return;
-                        try {
-                            calendarRef.current.getApi().updateSize();
-                        } catch {
-                            // no-op
-                        }
-                    }}
                     datesSet={(arg) => setCurrentView(arg.view.type)}
                     dateClick={handleDateClick}
                     eventClick={handleEventClick}
