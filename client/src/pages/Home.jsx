@@ -51,16 +51,63 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-// Lista oggetti standard
+const filter = createFilterOptions();
 
+// --- Pulsanti rapidi a vista ---
 const QUICK_ITEMS = [
-    "Scatole P", "Scatole M", "Scatole G", "Baule",
-    "Divano 2p", "Divano 3p", "Poltrona", 
-    "Letto Sing.", "Letto Matr.", "Materasso",
-    "Armadio 2a", "Armadio 6a", "Comò", "Comodino",
-    "Tavolo", "Sedie", "Scrivania", "Libreria",
-    "Lavatrice", "Frigo", "TV", "Specchio"
+    "Scatola", "Frigorifero", "Lavatrice", "Divano", "Tavolo", 
+    "Sedia", "Letto Matr.", "Letto Sing.", "Armadio", "Comodino", 
+    "Comò", "Televisore", "Lavastoviglie", "Poltrona", "Scarpiera"
 ];
+
+// --- Lista completa per Autocomplete ---
+const EXTENDED_ITEMS = [
+    ...new Set([
+        ...QUICK_ITEMS,
+        // --- CUCINA & ELETTRODOMESTICI ---
+        "Affettatrice", "Bollitore", "Bilancia da Cucina", "Cantinetta Vini", 
+        "Congelatore", "Contenitori Plastica", "Forno", "Frigorifero", 
+        "Lavastoviglie", "Macchina del Caffè", "Microonde", "Mixer", 
+        "Piano Cottura", "Posate", "Robot da Cucina", "Set Pentole", 
+        "Servizio Piatti", "Tostapane",
+
+        // --- SOGGIORNO & ZONA GIORNO ---
+        "Camino Elettrico", "Chaise Longue", "Credenza", "Divano 2 Posti", 
+        "Divano 3 Posti", "Divano Angolare", "Libreria", "Madia", 
+        "Mobile TV", "Orologio da Parete", "Piantana", "Poltrona", 
+        "Pouf", "Quadro", "Tappeto", "Tavolino Caffè", "Tavolo", 
+        "Televisore", "Tende", "Vaso", "Vetrina",
+
+        // --- CAMERA DA LETTO & NOTTE ---
+        "Armadio 2 Ante", "Armadio 4 Ante", "Armadio 6 Ante", "Cassettiera", 
+        "Comodino", "Comò", "Cuscini", "Lenzuola", "Letto a Castello", 
+        "Letto Matrimoniale", "Letto Singolo", "Materasso Matrimoniale", 
+        "Materasso Singolo", "Piumone", "Panca Scendiletto", "Settimino",
+
+        // --- BAGNO, LAVANDERIA & PULIZIA ---
+        "Asciugatrice", "Asciugacapelli", "Asse da Stiro", "Aspirapolvere", 
+        "Bilancia Pesapersone", "Cesto Biancheria", "Ferro da Stiro", 
+        "Lavatrice", "Mobile Bagno", "Robot Aspirapolvere", "Scopa e Mocio", 
+        "Specchio Bagno", "Stendibiancheria",
+
+        // --- STUDIO, UFFICIO & INGRESSO ---
+        "Appendiabiti", "Consolle Ingresso", "Libreria Pensile", "Monitor PC", 
+        "Scarpiera", "Scrivania", "Sedia Ufficio", "Specchio Lungo", "Stampante",
+
+        // --- SPORT, TEMPO LIBERO & VALIGIE ---
+        "Attrezzatura Sci", "Bicicletta", "Borsa Sportiva", "Panca Fitness", 
+        "Pesi e Manubri", "Tapis Roulant", "Valigia", "Zaino",
+
+        // --- GARAGE, ESTERNO & ATTREZZI ---
+        "Barbecue", "Cassetta degli Attrezzi", "Ombrellone", "Pianta da Esterno", 
+        "Scala", "Sedia da Giardino", "Tavolo da Esterno", "Tosaerba", "Trapano",
+
+        // --- IMBALLAGGIO & VARIE ---
+        "Condizionatore Portatile", "Pianta da Interno", "Scatola Libri", 
+        "Scatola Documenti", "Scatola", "Stufa Elettrica", "Ventilatore", 
+        "Umidificatore"
+    ])
+].sort((a, b) => a.localeCompare('it'));
 
 const PIANI = Array.from({ length: 16 }, (_, i) => i); // [0, 1, ... 15]
 const ASCENSORE_OPTS = ["SI", "NO"];
@@ -92,7 +139,7 @@ function Home() {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
 
-	// 1. Aggiorna lo stato iniziale
+	// Dentro la funzione Home()
 	const [formData, setFormData] = useState({
 		nome: '',
 		telefono: '',
@@ -100,32 +147,40 @@ function Home() {
 		da_indirizzo: '',
 		a_indirizzo: '',
 		note: '',
-		items: [],
-		inventario: '',
-		// NUOVI CAMPI
+		items: '', // Sarà la stringa finale "Scatola x5, Divano x1"
 		piano_partenza: '0',
-		ascensore_partenza: "", 
+		ascensore_partenza: 'NO', 
 		piano_arrivo: '0',
-		ascensore_arrivo: "",  
+		ascensore_arrivo: 'NO',  
 	});
 
-  
-  
-  
+	const [inventoryList, setInventoryList] = useState([]);
+
+	// Sincronizza inventoryList -> formData.items
+	useEffect(() => {
+		const textString = inventoryList.map(item => `${item.name} x${item.qty}`).join(', ');
+		setFormData(prev => ({ ...prev, items: textString }));
+	}, [inventoryList]);
+
   // --- NUOVA LOGICA INVENTARIO ---
     const [inventoryList, setInventoryList] = useState([]);
 
     // 1. Funzione per aggiungere
     const handleAddItem = (itemName) => {
-        setInventoryList(prev => {
-            const existing = prev.find(i => i.name === itemName);
-            if (existing) {
-                return prev.map(i => i.name === itemName ? { ...i, qty: i.qty + 1 } : i);
-            } else {
-                return [...prev, { name: itemName, qty: 1 }];
-            }
-        });
-    };
+		// Gestisce sia click su bottoni rapidi (stringa) che Autocomplete (oggetto)
+		const name = (typeof itemName === 'string' ? itemName : itemName?.label)?.trim();
+		if (!name) return;
+
+		setInventoryList(prev => {
+			const existing = prev.find(i => i.name.toLowerCase() === name.toLowerCase());
+			if (existing) {
+				return prev.map(i => i.name.toLowerCase() === name.toLowerCase() 
+					? { ...i, qty: i.qty + 1 } : i);
+			} else {
+				return [...prev, { name: name, qty: 1 }];
+			}
+		});
+	};
 
     // 2. Funzione per rimuovere
     const handleRemoveItem = (itemName) => {
@@ -244,90 +299,93 @@ function Home() {
     };
 
 	const handleSubmit = async (e) => {
-    e.preventDefault();
+		e.preventDefault();
 
-    // 1. Prepara la lista visuale (Icone selezionate)
-    let visualListString = '';
-    if (Array.isArray(formData.items) && formData.items.length > 0) {
-        visualListString = formData.items
-            .map(item => `${item.name} x${item.qty}`)
-            .join(', ');
-    }
+		// 1. Prepara la stringa dell'inventario grafico (inventoryList)
+		// Usiamo inventoryList che è lo stato aggiornato dai bottoni/icone
+		let visualListString = '';
+		if (inventoryList.length > 0) {
+			visualListString = inventoryList
+				.map(item => `${item.name} x${item.qty}`)
+				.join(', ');
+		}
 
-    // 2. UNIONE INVENTARIO: Mettiamo insieme la lista visuale E il testo scritto nel campo "Inventario"
-    let finalInventory = visualListString;
-	if (formData.inventario) {
-		if (finalInventory) finalInventory += " | "; 
-		finalInventory += formData.inventario;      
-	}
+		// 2. UNIONE INVENTARIO: Uniamo la lista delle icone con il testo libero del campo "Altro / Note Inventario"
+		// Usiamo il separatore " | " per chiarezza, come suggerito nella logica di JobModal
+		let finalInventory = visualListString;
+		if (formData.inventario && formData.inventario.trim() !== "") {
+			if (finalInventory) finalInventory += " | "; 
+			finalInventory += formData.inventario.trim();      
+		}
 
-    // 3. NOTE PULITE: Qui ci va SOLO il messaggio del cliente
-    const finalNotes = formData.note || ''; 
+		// 3. Costruzione dell'oggetto dati per il backend (/leads)
+		// Uso i nomi variabili mappati in index.js (cliente_nome, da_indirizzo, ecc.)
+		const dataToSend = {
+			cliente_nome: formData.nome,
+			telefono: formData.telefono,
+			email: formData.email,
+			da_indirizzo: formData.da_indirizzo,
+			a_indirizzo: formData.a_indirizzo,
+			piano_partenza: formData.piano_partenza,
+			// Inviamo il valore testuale "SI" o "NO" che verrà normalizzato dal backend
+			ascensore_partenza: formData.ascensore_partenza, 
+			piano_arrivo: formData.piano_arrivo,
+			ascensore_arrivo: formData.ascensore_arrivo,
+			
+			// L'inventario completo va nel campo 'items' del database
+			items: finalInventory, 
+			// Le note generali del cliente
+			note: formData.note || '',
 
-    // 4. Oggetto dati SEPARATO
-    const dataToSend = {
-        cliente_nome: formData.nome,
-        telefono: formData.telefono,
-        email: formData.email,
-        da_indirizzo: formData.da_indirizzo,
-        a_indirizzo: formData.a_indirizzo,
-        piano_partenza: formData.piano_partenza,
-        ascensore_partenza: formData.ascensore_partenza,
-        piano_arrivo: formData.piano_arrivo,
-        ascensore_arrivo: formData.ascensore_arrivo,
-        
-        // --- QUI AVVIENE LA MAGIA ---
-        items: finalInventory, // Va nella colonna 'items'
-        note: finalNotes,      // Va nella colonna 'note'
-        // ----------------------------
+			data_trasloco: formData.startDate,
+			ora_trasloco: formData.startTime
+		};
 
-        data_trasloco: formData.startDate,
-        ora_trasloco: formData.startTime
-    };
+		try {
+			// Invio al server tramite l'endpoint /leads
+			await api.post('/leads', dataToSend);
+			
+			setSnackbar({ 
+				open: true, 
+				severity: 'success', 
+				message: 'Richiesta inviata con successo! Verrai ricontattato a breve.' 
+			});
 
-    try {
-        // Invio al server
-        await api.post('/leads', dataToSend);
-        
-        setSnackbar({ 
-            open: true, 
-            severity: 'success', 
-            message: 'Richiesta inviata con successo!' 
-        });
+			// 4. RESET DEL FORM
+			setFormData({
+				nome: '',
+				telefono: '',
+				email: '',
+				da_indirizzo: '',
+				a_indirizzo: '',
+				piano_partenza: '0',
+				ascensore_partenza: 'NO', 
+				piano_arrivo: '0',
+				ascensore_arrivo: 'NO',   
+				startDate: '',
+				startTime: '', 
+				items: [],      // Reset lista oggetti interna
+				inventario: '', // Reset campo testo "Altro"
+				note: '' 
+			});
 
-        // Reset Form
-		setFormData({
-			nome: '',
-			telefono: '',
-			email: '',
-			da_indirizzo: '',
-			a_indirizzo: '',
-			piano_partenza: '0',
-			ascensore_partenza: false,  // default NO
-			piano_arrivo: '0',
-			ascensore_arrivo: false,    // default NO
-			startDate: '',
-			startTime: '', 
-			items: [],
-			inventario: '',
-			note: '' 
-		});
+			// Reset esplicito della lista inventario per pulire le icone nell'interfaccia
+			if (typeof setInventoryList === 'function') {
+				setInventoryList([]); 
+			}
 
-        
-        // Se usi setInventoryList per pulire le icone visive
-        if (typeof setInventoryList === 'function') setInventoryList([]); 
+			// Reindirizzamento opzionale dopo l'invio
+			setTimeout(() => navigate('/thank-you'), 2000);
 
-        setTimeout(() => navigate('/thank-you'), 1500);
-
-    } catch (error) {
-        console.error("Errore invio:", error);
-        setSnackbar({ 
-            open: true, 
-            severity: 'error', 
-            message: "Errore: " + (error.response?.data?.error || "Impossibile inviare")
-        });
-    }
-};
+		} catch (error) {
+			console.error("Errore invio preventivo:", error);
+			setSnackbar({ 
+				open: true, 
+				severity: 'error', 
+				message: "Errore durante l'invio: " + (error.response?.data?.error || "Connessione al server fallita")
+			});
+		}
+	};
 
   const scrollToForm = () => {
     document.getElementById('form-section').scrollIntoView({ behavior: 'smooth' });
