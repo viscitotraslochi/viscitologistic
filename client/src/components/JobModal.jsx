@@ -378,34 +378,38 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 							{/* --- NUOVO CAMPO AUTOCOMPLETE --- */}
 							<Autocomplete
 								freeSolo
-								disableClearable={false}
+								disableClearable
 								options={EXTENDED_ITEMS}
 								inputValue={inputValue}
 								onInputChange={(e, val) => setInputValue(val)}
 								onChange={(e, newValue) => {
-									if (newValue && typeof newValue === 'string') handleAddItem(newValue);
+									// Se selezioni un suggerimento dalla lista
+									if (newValue) handleAddItem(newValue);
 								}}
-								getOptionLabel={(option) => option} // fondamentale per freeSolo stringhe
-								filterOptions={(options, { inputValue }) =>
-									options.filter(option =>
-										option.toLowerCase().includes(inputValue.toLowerCase())
-									)
-								}
 								renderInput={(params) => (
 									<TextField
 										{...params}
 										label="Cerca o scrivi nuovo oggetto..."
 										variant="outlined"
 										size="small"
+										onKeyDown={(e) => {
+											// Blocca il comportamento predefinito di Invio (per non saltare al prossimo campo)
+											if (e.key === 'Enter') {
+												e.preventDefault();
+												e.stopPropagation();
+											}
+										}}
 										onKeyUp={(e) => {
+											// Quando rilasci Invio/Done, aggiungi l'oggetto digitato
 											if (e.key === 'Enter' && inputValue.trim() !== '') {
 												handleAddItem(inputValue);
-												setInputValue('');
+												setInputValue(''); // Resetta il campo
 											}
 										}}
 									/>
 								)}
 							/>
+
 
 							<Divider sx={{ my: 2 }} />
 
