@@ -115,27 +115,33 @@ const ASCENSORE_OPTS = ["SI", "NO"];
 
 function Home() {
 	const [suggestions, setSuggestions] = useState({ da: [], a: [] });
-	const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState({});
+    
+    const [mapOpen, setMapOpen] = useState(false);
+    const [currentField, setCurrentField] = useState(null);
 
-	const [errors, setErrors] = useState({}); 
-
+	// --- 1. Funzione per i suggerimenti degli indirizzi ---
 	const fetchSuggestions = async (query, field) => {
 		if (query.length < 3) {
-		  setSuggestions(prev => ({ ...prev, [field === 'da_indirizzo' ? 'da' : 'a']: [] }));
-		  return;
+			setSuggestions(prev => ({ ...prev, [field === 'da_indirizzo' ? 'da' : 'a']: [] }));
+			return;
 		}
 		try {
-		  // Usiamo ArcGIS World Geocoding Service (molto preciso e senza blocchi CORS)
-		  const response = await fetch(
-			`https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=json&singleLine=${encodeURIComponent(query)}&maxLocations=5`
-		  );
-		  const data = await response.json();
-		  // ArcGIS restituisce i risultati dentro "candidates"
-		  setSuggestions(prev => ({ ...prev, [field === 'da_indirizzo' ? 'da' : 'a']: data.candidates || [] }));
+			const response = await fetch(
+				`https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=json&singleLine=${encodeURIComponent(query)}&maxLocations=5`
+			);
+			const data = await response.json();
+			setSuggestions(prev => ({ ...prev, [field === 'da_indirizzo' ? 'da' : 'a']: data.candidates || [] }));
 		} catch (error) {
-		  console.error("Errore autocompletamento:", error);
+			console.error("Errore autocompletamento:", error);
 		}
-	  };
+	};
+	// --- 2. Funzione per aprire la mappa (VA MESSA FUORI, NON DENTRO FETCH) ---
+	const openMap = (field) => {
+		setCurrentField(field);
+		setMapOpen(true);
+	};
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
