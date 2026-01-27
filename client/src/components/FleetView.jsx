@@ -232,15 +232,20 @@ function FleetView() {
 			))}
 			
 			<Grid item xs={12}>
-			  <TextField
+			  <FormControl fullWidth variant="outlined">
+				<InputLabel
+				  id="alimentazione-label"
+				  shrink
+				>
+				  Alimentazione
+				</InputLabel>
+
+				<Select
+				  labelId="alimentazione-label"
 				  id="alimentazione"
 				  name="alimentazione"
-				  select
-				  label="Alimentazione"
-				  fullWidth
-				  variant="outlined"
 				  value={formData.alimentazione}
-				  InputLabelProps={{ shrink: true }}
+				  label="Alimentazione"
 				  autoComplete="new-password"
 				  onChange={(e) =>
 					setFormData({ ...formData, alimentazione: e.target.value })
@@ -251,9 +256,10 @@ function FleetView() {
 					  {opt}
 					</MenuItem>
 				  ))}
-				</TextField>
-
+				</Select>
+			  </FormControl>
 			</Grid>
+
 
 			<Grid item xs={12}>
 			  <TextField
