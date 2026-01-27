@@ -123,6 +123,8 @@ function Home() {
 	const [suggestions, setSuggestions] = useState({ da: [], a: [] });
 	const [loading, setLoading] = useState(false);
 
+	const [errors, setErrors] = useState({}); 
+
 	const fetchSuggestions = async (query, field) => {
 		if (query.length < 3) {
 		  setSuggestions(prev => ({ ...prev, [field === 'da_indirizzo' ? 'da' : 'a']: [] }));
@@ -147,7 +149,7 @@ function Home() {
 
 	// 1. Aggiorna lo stato iniziale
 	const [formData, setFormData] = useState({
-		nome: '',
+		cliente_nome: '',
 		telefono: '',
 		email: '',
 		da_indirizzo: '',
@@ -250,106 +252,57 @@ function Home() {
     }));
   };
 
-  const [errors, setErrors] = useState({}); // Assicurati di avere questo in alto nel componente
-
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
-		// --- VALIDAZIONE DEI CAMPI ---
+		// Reset errori precedenti
+		setErrors({});
 		const newErrors = {};
+
+		// REGEX
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		const phoneRegex = /^[0-9+ ]{6,15}$/; 
 
-		if (!formData.nome?.trim()) {
-			newErrors.nome = "Il nome è obbligatorio";
+		// CONTROLLI
+		if (!formData.cliente_nome?.trim()) {
+			newErrors.cliente_nome = "Il nome è obbligatorio";
 		}
-
 		if (formData.email && !emailRegex.test(formData.email)) {
-			newErrors.email = "L'email non è valida (es: nome@esempio.it)";
+			newErrors.email = "Email non valida (es. nome@dominio.it)";
 		}
-
 		if (!formData.telefono?.trim()) {
 			newErrors.telefono = "Il numero di telefono è obbligatorio";
 		} else if (!phoneRegex.test(formData.telefono)) {
-			newErrors.telefono = "Inserisci un numero valido (solo cifre, spazi o +)";
+			newErrors.telefono = "Inserisci un numero valido";
 		}
 
-		// Se ci sono errori, blocca l'invio e avvisa l'utente
 		if (Object.keys(newErrors).length > 0) {
 			setErrors(newErrors);
-			setSnackbar({ 
-				open: true, 
-				severity: 'error', 
-				message: 'Per favore, controlla i campi evidenziati in rosso.' 
-			});
-			return;
+			return; // Blocca l'invio
 		}
 
-		// Reset errori se tutto è ok
-		setErrors({});
-
-		// --- PREPARAZIONE DATI ---
-		let visualListString = inventoryList
-			.map(item => `${item.name} x${item.qty}`)
-			.join(', ');
-
-		let finalInventory = visualListString;
-		if (formData.inventario && formData.inventario !== visualListString) {
-			if (finalInventory) finalInventory += " | "; 
-			finalInventory += formData.inventario;      
-		}
-
+		// MAPPA I DATI PER L'API
 		const dataToSend = {
-			cliente_nome: formData.nome,
+			cliente_nome: formData.cliente_nome, // Assicurati che sia uguale a quello che si aspetta il backend
 			telefono: formData.telefono,
 			email: formData.email,
-			da_indirizzo: formData.da_indirizzo,
-			a_indirizzo: formData.a_indirizzo,
-			piano_partenza: formData.piano_partenza,
-			ascensore_partenza: formData.ascensore_partenza,
-			piano_arrivo: formData.piano_arrivo,
-			ascensore_arrivo: formData.ascensore_arrivo,
-			items: finalInventory,
-			note: formData.note || '',
-			data_trasloco: formData.startDate,
-			ora_trasloco: formData.startTime
+			// ... gli altri campi
 		};
 
 		try {
-			setLoading(true);
 			await api.post('/leads', dataToSend);
 			
-			// --- MESSAGGIO DI CONFERMA PERSONALIZZATO ---
+			// MESSAGGIO DI CONFERMA PERSONALIZZATO
 			setSnackbar({ 
 				open: true, 
 				severity: 'success', 
-				message: 'Grazie! Richiesta ricevuta. Un nostro consulente ti ricontatterà telefonicamente o tramite email entro 24 ore.' 
+				message: 'Richiesta inviata! Un nostro operatore ti contatterà telefonicamente entro 24 ore per il preventivo.' 
 			});
 
-			// Reset completo dello stato
-			setFormData({
-				nome: '', telefono: '', email: '',
-				da_indirizzo: '', a_indirizzo: '',
-				piano_partenza: '0', ascensore_partenza: false,
-				piano_arrivo: '0', ascensore_arrivo: false,
-				startDate: '', startTime: '', 
-				items: [], inventario: '', note: '' 
-			});
+			// RESET DEL FORM (Rinomina nome -> cliente_nome anche qui)
+			setFormData({ cliente_nome: '', telefono: '', email: '', ... });
 			setInventoryList([]);
-
-			// Reindirizzamento dopo 3.5 secondi per dare tempo di leggere lo snackbar
-			setTimeout(() => navigate('/thank-you'), 3500);
-
-		} catch (error) {
-			console.error("Errore invio:", error);
-			setSnackbar({ 
-				open: true, 
-				severity: 'error', 
-				message: "Si è verificato un problema durante l'invio. Riprova o chiamaci direttamente."
-			});
-		} finally {
-			setLoading(false);
-		}
+		} catch (error) { ... }
 	};
 
 		try {
@@ -616,11 +569,16 @@ function Home() {
 							</Typography>
 						</Box>
 						<Grid container spacing={3}>
-							<Grid size={{ xs: 12 }}>
+							<Grid size={{ xs: 12, md: 6 }}>
 								<TextField 
-									fullWidth required label="Nome e Cognome o Azienda" variant="outlined"
-									id="nome" name="nome" autoComplete="name"
-									value={formData.nome || ''} onChange={handleChange} 
+									fullWidth required 
+									label="Nome e Cognome o Azienda" 
+									variant="outlined"
+									id="nome" name="nome"
+									value={formData.nome || ''} 
+									onChange={handleChange}
+									error={!!errors.nome} // Diventa rosso se vuoto
+									helperText={errors.nome} // Scrive "Il nome è obbligatorio"
 									InputProps={{ startAdornment: <Box sx={{ mr: 1, color: 'action.active' }}><PersonIcon /></Box> }}
 								/>
 							</Grid>
@@ -635,19 +593,6 @@ function Home() {
 									error={!!errors.telefono} // Diventa rosso se c'è un errore
 									helperText={errors.telefono} // Mostra il messaggio specifico
 									InputProps={{ startAdornment: <Box sx={{ mr: 1, color: 'action.active' }}><PhoneIcon /></Box> }}
-								/>
-							</Grid>
-							<Grid size={{ xs: 12, md: 6 }}>
-								<TextField 
-									fullWidth required 
-									label="Nome e Cognome o Azienda" 
-									variant="outlined"
-									id="nome" name="nome"
-									value={formData.nome || ''} 
-									onChange={handleChange}
-									error={!!errors.nome} // Diventa rosso se vuoto
-									helperText={errors.nome} // Scrive "Il nome è obbligatorio"
-									InputProps={{ startAdornment: <Box sx={{ mr: 1, color: 'action.active' }}><PersonIcon /></Box> }}
 								/>
 							</Grid>
 						</Grid>
