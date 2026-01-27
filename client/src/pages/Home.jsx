@@ -51,6 +51,8 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
+const filter = createFilterOptions();
+
 // --- Pulsanti rapidi a vista ---
 const QUICK_ITEMS = [
     "Scatola", "Frigorifero", "Lavatrice", "Divano", "Tavolo", 
@@ -109,8 +111,6 @@ const EXTENDED_ITEMS = [
 
 const PIANI = Array.from({ length: 16 }, (_, i) => i); // [0, 1, ... 15]
 const ASCENSORE_OPTS = ["SI", "NO"];
-
-const filter = createFilterOptions();
 
 function Home() {
 	const [suggestions, setSuggestions] = useState({ da: [], a: [] });
