@@ -440,7 +440,7 @@ useEffect(() => {
               </Grid>
 
               <Grid size={{ xs: 6 }}>
-                <TextField type="date" fullWidth label="Data" name="date" InputLabelProps={{ shrink: true }} value={formData.date} onChange={handleChange} />
+                <TextField type="date" fullWidth label="Data Approssimativa" name="date" InputLabelProps={{ shrink: true }} value={formData.date} onChange={handleChange} />
               </Grid>
               <Grid size={{ xs: 6 }}>
                 <TextField type="time" fullWidth label="Orario" name="time" InputLabelProps={{ shrink: true }} value={formData.time} onChange={handleChange} />
