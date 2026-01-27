@@ -10,7 +10,7 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 import api from '../api/axiosConfig';
 import { 
-    Paper, Typography, Box, Button, useMediaQuery, useTheme, Tooltip, Chip, Divider, Card, CardContent
+    Paper, Typography, Box, Button, useMediaQuery, useTheme, Tooltip, Chip, Divider, Card, CardContent, ToggleButton, ToggleButtonGroup
 } from '@mui/material';
 
 // --- ICONE ---
@@ -35,6 +35,7 @@ function CalendarView() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedJob, setSelectedJob] = useState(null);
 	const [selectedDate, setSelectedDate] = useState(null);
+    const [typeFilter, setTypeFilter] = useState('all'); // all | sopralluogo | trasloco
     
     const calendarRef = useRef(null);
     const theme = useTheme();
@@ -80,7 +81,7 @@ function CalendarView() {
 						date: dateStr, // Fondamentale per il form del modale
 						end_date: endDateStr
 					},
-					backgroundColor: job.deposit ? '#2e7d32' : '#1976d2'
+					backgroundColor: job.deposit ? '#2e7d32' : (String(job.job_type || job.tipo_lavoro || job.tipo || '').toLowerCase() === 'sopralluogo' ? '#ffa000' : '#1976d2')
 				};
 			});
 			setEvents(formattedEvents);
@@ -112,8 +113,10 @@ function CalendarView() {
         const isCompleted = extendedProps.completato;
         
         // Colori base
-        const mainColor = isCompleted ? '#2e7d32' : '#1565c0';
-        const bgColor = isCompleted ? '#e8f5e9' : '#e3f2fd';
+        const jobType = String(extendedProps.job_type || extendedProps.tipo_lavoro || extendedProps.tipo || '').toLowerCase();
+        const baseColor = jobType === 'sopralluogo' ? '#ef6c00' : '#1565c0';
+        const mainColor = isCompleted ? '#2e7d32' : baseColor;
+        const bgColor = isCompleted ? '#e8f5e9' : (jobType === 'sopralluogo' ? '#fff3e0' : '#e3f2fd');
 
         // --- CALCOLO ORA E DURATA ---
         let durationLabel = '24h'; 
@@ -254,11 +257,25 @@ function CalendarView() {
                     {/* SEZIONE 2: INFO CLIENTE E LOGISTICA DETTAGLIATA */}
                     <Box sx={{ flex: 1, p: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
                             <Typography variant="h6" sx={{ fontWeight: 700, color: '#102a43', lineHeight: 1.2 }}>
                                 {eventInfo.event.title}
                             </Typography>
-                            
-                            <Box sx={{ display: 'flex', gap: 0.5 }}>
+                            {(() => {
+                                const t = String(extendedProps.job_type || extendedProps.tipo_lavoro || extendedProps.tipo || '').toLowerCase();
+                                if (!t) return null;
+                                const label = t === 'sopralluogo' ? 'Sopralluogo' : 'Trasloco';
+                                return (
+                                    <Chip
+                                        size="small"
+                                        label={label}
+                                        sx={{ fontWeight: 800, bgcolor: '#fff', border: `1px solid ${mainColor}40`, color: mainColor }}
+                                    />
+                                );
+                            })()}
+                        </Box>
+
+                        <Box sx={{ display: 'flex', gap: 0.5 }}>
                                 {extendedProps.items && (
                                     <Tooltip title="Inventario presente">
                                         <InventoryIcon sx={{ fontSize: 20, color: '#78909c' }} />
@@ -427,6 +444,10 @@ function CalendarView() {
         );
     };
 
+
+    const filteredEvents = typeFilter === 'all'
+        ? events
+        : events.filter(ev => String(ev.extendedProps?.job_type || ev.extendedProps?.tipo_lavoro || ev.extendedProps?.tipo || '').toLowerCase() === typeFilter);
     return (
         <Paper elevation={0} sx={{ p: 0, height: '85vh', display: 'flex', flexDirection: 'column', bgcolor: 'transparent' }}>
             
@@ -443,7 +464,19 @@ function CalendarView() {
                 >
                     Nuovo Lavoro
                 </Button>
-            </Box>
+            
+                <ToggleButtonGroup
+                    value={typeFilter}
+                    exclusive
+                    onChange={(e, v) => { if (v) setTypeFilter(v); }}
+                    size="small"
+                    sx={{ ml: 2, bgcolor: '#fff', borderRadius: 2, '& .MuiToggleButton-root': { textTransform: 'none', fontWeight: 700 } }}
+                >
+                    <ToggleButton value="all">Tutti</ToggleButton>
+                    <ToggleButton value="sopralluogo">Sopralluoghi</ToggleButton>
+                    <ToggleButton value="trasloco">Traslochi</ToggleButton>
+                </ToggleButtonGroup>
+</Box>
             
             {/* Contenitore Calendario */}
             <Box sx={{ 
@@ -475,7 +508,7 @@ function CalendarView() {
                         list: 'Lista' 
                     }}
                     
-                    events={events}
+                    events={filteredEvents}
                     height="100%"
                     dateClick={handleDateClick}
                     eventClick={handleEventClick}

@@ -18,6 +18,13 @@ app.use(express.json());
 
 // Utils
 const normalizeBool = val => ['true','1','yes','y','si','sì','on','checked'].includes(String(val).toLowerCase().trim());
+// Normalizza tipo lavoro: trasloco | sopralluogo
+const normalizeJobType = (val) => {
+  const v = String(val || '').toLowerCase().trim();
+  if (v === 'sopralluogo' || v === 'sopralluoghi') return 'sopralluogo';
+  if (v === 'trasloco' || v === 'traslochi') return 'trasloco';
+  return null;
+};
 
 // ==========================================
 // 1. AUTENTICAZIONE & UTENTI
@@ -81,9 +88,21 @@ app.put('/change-password', async (req, res) => {
 // 2. GESTIONE JOBS
 // ==========================================
 
-// GET: Tutti i lavori
+// GET: Tutti i lavori (con filtro opzionale per tipo)
 app.get('/jobs', async (req, res) => {
+  // accetta: ?type=trasloco|sopralluogo oppure ?job_type=...
+  const typeParam = req.query.type ?? req.query.job_type;
+  const jobType = normalizeJobType(typeParam);
+
   try {
+    if (jobType) {
+      const filtered = await pool.query(
+        'SELECT * FROM jobs WHERE job_type = $1 ORDER BY date ASC, time ASC',
+        [jobType]
+      );
+      return res.json(filtered.rows);
+    }
+
     const allJobs = await pool.query('SELECT * FROM jobs ORDER BY date ASC, time ASC');
     res.json(allJobs.rows);
   } catch (err) {
@@ -91,7 +110,6 @@ app.get('/jobs', async (req, res) => {
     res.status(500).json({ error: "Errore nel recupero dei lavori" });
   }
 });
-
 // POST: Crea nuovo lavoro
 app.post('/jobs', async (req, res) => {
   const {
@@ -102,7 +120,8 @@ app.post('/jobs', async (req, res) => {
     price, deposit,
     piano_partenza, ascensore_partenza,
     piano_arrivo, ascensore_arrivo,
-    items, notes
+    items, notes,
+    job_type
   } = req.body;
 
   if(!cliente_nome || !da_indirizzo || !a_indirizzo || !date) return res.status(400).json({ error: "Campi obbligatori mancanti" });
@@ -116,8 +135,9 @@ app.post('/jobs', async (req, res) => {
         price, deposit,
         piano_partenza, ascensore_partenza,
         piano_arrivo, ascensore_arrivo,
-        items, notes
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) RETURNING *`,
+        items, notes,
+        job_type
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18) RETURNING *`,
       [
         cliente_nome, phone, email,
         da_indirizzo, a_indirizzo,
@@ -130,7 +150,8 @@ app.post('/jobs', async (req, res) => {
         piano_arrivo || null,
         normalizeBool(ascensore_arrivo),
         items || '',
-        notes || ''
+        notes || '',
+        normalizeJobType(job_type) || 'trasloco'
       ]
     );
 
@@ -153,7 +174,8 @@ app.put('/jobs/:id', async (req, res) => {
     price, deposit,
     piano_partenza, ascensore_partenza,
     piano_arrivo, ascensore_arrivo,
-    items, notes
+    items, notes,
+    job_type
   } = req.body;
 
   try {
@@ -162,8 +184,8 @@ app.put('/jobs/:id', async (req, res) => {
         cliente_nome=$1, phone=$2, email=$3, da_indirizzo=$4, a_indirizzo=$5, 
         date=$6, time=$7, end_date=$8, end_time=$9, price=$10, deposit=$11, 
         piano_partenza=$12, ascensore_partenza=$13, piano_arrivo=$14, 
-        ascensore_arrivo=$15, items=$16, notes=$17 
-      WHERE id=$18`,
+        ascensore_arrivo=$15, items=$16, notes=$17, job_type=$18 
+      WHERE id=$19`,
       [
         cliente_nome, phone, email, da_indirizzo, a_indirizzo, 
         date, time, end_date, end_time, price, deposit, 
@@ -171,7 +193,8 @@ app.put('/jobs/:id', async (req, res) => {
         normalizeBool(ascensore_partenza), // <--- AGGIUNTO normalizeBool
         piano_arrivo, 
         normalizeBool(ascensore_arrivo),   // <--- AGGIUNTO normalizeBool
-        items, notes, id
+        items, notes,
+    normalizeJobType(job_type) || 'trasloco', id
       ]
     );
     res.json({ message: "Lavoro aggiornato" });

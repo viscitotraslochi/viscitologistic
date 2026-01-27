@@ -136,6 +136,7 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 
   const [formData, setFormData] = useState({
     cliente_nome: '',
+    job_type: 'trasloco', // 'trasloco' | 'sopralluogo'
     phone: '',
     email: '',
     da_indirizzo: '',
@@ -359,6 +360,7 @@ useEffect(() => {
 
       setFormData({
         cliente_nome: getVal(['cliente_nome', 'title']),
+        job_type: (getVal(['job_type', 'tipo_lavoro', 'tipo', 'type']) || 'trasloco'),
         phone: getVal(['phone', 'telefono']),
         email: getVal(['email', 'mail']),
         da_indirizzo: getVal(['da_indirizzo', 'partenza']),
@@ -382,6 +384,7 @@ useEffect(() => {
       setInventoryList([]);
       setFormData({
         cliente_nome: '',
+        job_type: 'trasloco',
         phone: '',
         email: '',
         da_indirizzo: '',
@@ -429,6 +432,7 @@ useEffect(() => {
 
     const payload = {
       cliente_nome: clean(formData.cliente_nome),
+      job_type: clean(formData.job_type) || 'trasloco',
       phone: clean(formData.phone),
       email: cleanOrNull(formData.email),
 
@@ -498,6 +502,22 @@ useEffect(() => {
         <Grid container spacing={2} sx={{ mt: 0.5 }}>
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField id="cliente_nome" label="Nome Cliente" name="cliente_nome" fullWidth required value={formData.cliente_nome} onChange={handleChange} />
+          </Grid>
+
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField
+              select
+              label="Tipo Lavoro"
+              name="job_type"
+              value={formData.job_type}
+              onChange={handleChange}
+              fullWidth
+              required
+              SelectProps={{ native: true }}
+            >
+              <option value="trasloco">Trasloco</option>
+              <option value="sopralluogo">Sopralluogo</option>
+            </TextField>
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <TextField
