@@ -214,13 +214,9 @@ function FleetView() {
 				  name={field.id}
 				  label={field.label}
 				  fullWidth
-				  required={field.required}
 				  variant="outlined"
 				  type={field.type || 'text'}
-				  InputLabelProps={{
-					shrink: field.type === 'date',
-					htmlFor: field.id
-				  }}
+				  InputLabelProps={{ shrink: true }}
 				  value={formData[field.id]}
 				  onChange={(e) =>
 					setFormData({
@@ -244,15 +240,19 @@ function FleetView() {
 				  fullWidth
 				  variant="outlined"
 				  value={formData.alimentazione}
-				  InputLabelProps={{ htmlFor: 'alimentazione' }}
+				  InputLabelProps={{ shrink: true }}
+				  autoComplete="new-password"
 				  onChange={(e) =>
 					setFormData({ ...formData, alimentazione: e.target.value })
 				  }
 				>
-				{['Diesel', 'Benzina', 'Metano', 'GPL', 'Elettrico', 'Ibrida'].map(opt => (
-				  <MenuItem key={opt} value={opt}>{opt}</MenuItem>
-				))}
-			  </TextField>
+				  {['Diesel', 'Benzina', 'Metano', 'GPL', 'Elettrico', 'Ibrida'].map(opt => (
+					<MenuItem key={opt} value={opt}>
+					  {opt}
+					</MenuItem>
+				  ))}
+				</TextField>
+
 			</Grid>
 
 			<Grid item xs={12}>
@@ -264,12 +264,14 @@ function FleetView() {
 				  rows={3}
 				  fullWidth
 				  variant="outlined"
-				  InputLabelProps={{ htmlFor: 'note' }}
+				  InputLabelProps={{ shrink: true }}
+				  autoComplete="new-password"
 				  value={formData.note}
 				  onChange={(e) =>
 					setFormData({ ...formData, note: e.target.value })
 				  }
 				/>
+
 			</Grid>
 		  </Grid>
 		</DialogContent>
