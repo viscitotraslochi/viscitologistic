@@ -77,23 +77,21 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 
     // --- GESTIONE INVENTARIO ---
     const handleAddItem = (itemName) => {
-		// Se itemName è un oggetto (capita con MUI), prendiamo la label o la stringa
-		const finalName = typeof itemName === 'string' ? itemName : itemName?.label;
+		if (!itemName || itemName.trim() === '') return;
 		
-		if (!finalName || finalName.trim() === '') return;
-		
-		const name = finalName.trim();
+		const name = itemName.trim();
 
 		setInventoryList(prev => {
 			const existing = prev.find(i => i.name.toLowerCase() === name.toLowerCase());
 			if (existing) {
 				return prev.map(i => i.name.toLowerCase() === name.toLowerCase() ? { ...i, qty: i.qty + 1 } : i);
 			} else {
-				setInventoryList([]);
 				return [...prev, { name: name, qty: 1 }];
 			}
 		});
-		setInputValue(''); // Reset dell'input dopo l'aggiunta
+
+		// Pulisce l'input e resetta il focus dell'autocomplete
+		setInputValue(''); 
 	};
 
     const handleRemoveItem = (itemName) => {
@@ -378,39 +376,37 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 							{/* --- NUOVO CAMPO AUTOCOMPLETE --- */}
 							<Autocomplete
 								freeSolo
-								disableClearable
+								// Questo permette di vedere i suggerimenti anche mentre scrivi
 								options={EXTENDED_ITEMS}
 								inputValue={inputValue}
 								onInputChange={(e, val) => setInputValue(val)}
+								// Gestisce il click sul suggerimento
 								onChange={(e, newValue) => {
-									// Se selezioni un suggerimento dalla lista
-									if (newValue) handleAddItem(newValue);
+									if (newValue) {
+										handleAddItem(newValue);
+									}
 								}}
+								// IMPORTANTE PER MOBILE: Impedisce che "Invio" passi al campo successivo
 								renderInput={(params) => (
-									<TextField
-										{...params}
-										label="Cerca o scrivi nuovo oggetto..."
-										variant="outlined"
-										size="small"
+									<TextField 
+										{...params} 
+										label="Cerca o scrivi nuovo oggetto..." 
+										variant="outlined" 
+										size="small" 
 										onKeyDown={(e) => {
-											// Blocca il comportamento predefinito di Invio (per non saltare al prossimo campo)
 											if (e.key === 'Enter') {
+												// Blocca il comportamento di default (passare al campo Note)
 												e.preventDefault();
 												e.stopPropagation();
-											}
-										}}
-										onKeyUp={(e) => {
-											// Quando rilasci Invio/Done, aggiungi l'oggetto digitato
-											if (e.key === 'Enter' && inputValue.trim() !== '') {
-												handleAddItem(inputValue);
-												setInputValue(''); // Resetta il campo
+												
+												if (inputValue && inputValue.trim() !== '') {
+													handleAddItem(inputValue);
+												}
 											}
 										}}
 									/>
 								)}
 							/>
-
-
 							<Divider sx={{ my: 2 }} />
 
 							<Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold', color: '#1976d2' }}>
