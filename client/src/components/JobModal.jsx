@@ -33,18 +33,53 @@ L.Marker.prototype.options.icon = DefaultIcon;
 // --- Pulsanti rapidi a vista ---
 const QUICK_ITEMS = [
     "Lavastoviglie", "Asciugatrice", "Forno", "Microonde", "Piano Cottura", 
-	"Divano Angolare", "Chaise Longue", "Pouf", "Tappeto", "Specchio Bagno", 
-	"Mobile Bagno", "Scarpiera", "Appendiabiti", "Bicicletta", "Tapis Roulant", 
+	"Divano", "Specchio Bagno", "Mobile Bagno", "Scarpiera", "Appendiabiti", "Bicicletta",
 	"Pesi", "Valigia", "Quadro", "Vaso", "Lampadario", "Pianta", "Scatola Libri"
 ];
 
 // --- Lista completa per Autocomplete ---
 const EXTENDED_ITEMS = [
-    ...QUICK_ITEMS,
-    "Specchio Bagno", "Mobile Bagno", "Scarpiera", "Appendiabiti",
-    "Bicicletta", "Tapis Roulant", "Pesi", "Valigia",
-    "Quadro", "Vaso", "Lampadario", "Pianta", "Scatola Libri"
-];
+    ...new Set([
+        ...QUICK_ITEMS,
+        // --- SOGGIORNO ---
+        "Divano Angolare", "Chaise Longue", "Pouf", "Tavolino Caffè", "Mobile TV", 
+        "Madia", "Vetrina", "Credenza", "Tappeto", "Quadro", "Vaso", "Lampadario", 
+        "Piantana", "Orologio da Parete", "Tende", "Camino Elettrico",
+
+        // --- CUCINA ---
+        "Lavastoviglie", "Forno", "Microonde", "Piano Cottura", "Macchina del Caffè", 
+        "Tostapane", "Bollitore", "Mixer", "Robot da Cucina", "Affettatrice", 
+        "Set Pentole", "Servizio Piatti", "Bicchieri", "Posate", "Contenitori Plastica", 
+        "Bilancia da Cucina", "Cantinetta Vini",
+
+        // --- CAMERA DA LETTO ---
+        "Letto a Castello", "Materasso Matrimoniale", "Materasso Singolo", "Armadio 4 Ante", 
+        "Cassettiera", "Settimino", "Piumone", "Cuscini", "Lenzuola", "Panca Scendiletto",
+
+        // --- BAGNO E LAVANDERIA ---
+        "Asciugatrice", "Mobile Bagno", "Specchio Bagno", "Cesto Biancheria", 
+        "Asse da Stiro", "Stendibiancheria", "Ferro da Stiro", "Aspirapolvere", 
+        "Robot Aspirapolvere", "Scopa e Mocio", "Asciugacapelli", "Bilancia Pesapersone",
+
+        // --- STUDIO E UFFICIO ---
+        "Sedia Ufficio", "Monitor PC", "Stampante", "Scrivania Grande", "Libreria Pensile",
+
+        // --- INGRESSO E DISIMPEGNO ---
+        "Scarpiera", "Appendiabiti", "Consolle Ingresso", "Specchio Lungo",
+
+        // --- SPORT E TEMPO LIBERO ---
+        "Bicicletta", "Tapis Roulant", "Pesi e Manubri", "Panca Fitness", "Valigia", 
+        "Zaino", "Borsa Sportiva", "Attrezzatura Sci",
+
+        // --- GARAGE E ESTERNO ---
+        "Scala", "Cassetta degli Attrezzi", "Trapano", "Tosaerba", "Tavolo da Esterno", 
+        "Sedia da Giardino", "Ombrellone", "Barbecue",
+
+        // --- VARIE ---
+        "Pianta da Interno", "Pianta da Esterno", "Scatola Libri", "Scatola Documenti", 
+        "Ventilatore", "Condizionatore Portatile", "Umidificatore", "Stufa Elettrica"
+    ])
+].sort((a, b) => a.localeCompare('it'));
 
 const filter = createFilterOptions();
 
