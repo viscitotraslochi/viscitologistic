@@ -110,30 +110,38 @@ const fetchAddressSuggestions = async (query) => {
   const q = (query ?? '').trim();
   if (q.length < 3) return [];
 
-  const url = `https://nominatim.openstreetmap.org/search
-    ?format=json
-    &addressdetails=1
-    &limit=6
-    &countrycodes=it
-    &accept-language=it
-    &q=${encodeURIComponent(q)}`.replace(/\s+/g, '');
+  const q1 = /italia/i.test(q) ? q : `${q}, Italia`;
 
-  const res = await fetch(url, {
-    headers: {
-      // richiesto da Nominatim (policy)
-      'Accept': 'application/json'
-    }
-  });
+  const makeUrl = (bounded) => `
+    https://nominatim.openstreetmap.org/search
+      ?format=json
+      &addressdetails=1
+      &limit=8
+      &countrycodes=it
+      &accept-language=it
+      ${bounded ? '&bounded=1&viewbox=6.6,47.1,18.8,36.6' : ''}
+      &q=${encodeURIComponent(q1)}
+  `.replace(/\s+/g, '');
 
-  const data = await res.json();
+  const run = async (bounded) => {
+    const res = await fetch(makeUrl(bounded), { headers: { Accept: 'application/json' } });
+    const data = await res.json();
+    return (data || []).map(item => ({
+      label: item.display_name,
+      value: item.display_name,
+      lat: item.lat,
+      lon: item.lon
+    }));
+  };
 
-  return (data || []).map(item => ({
-    label: item.display_name,   // testo mostrato
-    value: item.display_name,   // valore finale
-    lat: item.lat,
-    lon: item.lon
-  }));
+  // 1) prova con bias Italia
+  const first = await run(true);
+  if (first.length) return first;
+
+  // 2) fallback: senza bounded
+  return await run(false);
 };
+
 
 
 // --- aggiorna suggestions quando l’utente digita ---

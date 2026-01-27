@@ -8,11 +8,10 @@ export default function Home() {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const scrollToForm = () => {
-    const el = document.getElementById('quote-form');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+	  const el = document.getElementById('quote-form');
+	  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+	};
+
 
   return (
     <Box
@@ -31,7 +30,7 @@ export default function Home() {
       }}
     >
       {/* HERO */}
-      <HomeHero ScrollToForm={scrollToForm} />
+      <HomeHero scrollToForm={scrollToForm} />
 
       {/* SERVIZI */}
       <ServicesSection isMobile={isMobile} />

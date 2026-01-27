@@ -190,26 +190,38 @@ const fetchAddressSuggestions = async (query) => {
   const q = (query ?? '').trim();
   if (q.length < 3) return [];
 
-  const url = `
+  const q1 = /italia/i.test(q) ? q : `${q}, Italia`;
+
+  const makeUrl = (bounded) => `
     https://nominatim.openstreetmap.org/search
       ?format=json
       &addressdetails=1
-      &limit=6
+      &limit=8
       &countrycodes=it
       &accept-language=it
-      &q=${encodeURIComponent(q)}
+      ${bounded ? '&bounded=1&viewbox=6.6,47.1,18.8,36.6' : ''}
+      &q=${encodeURIComponent(q1)}
   `.replace(/\s+/g, '');
 
-  const res = await fetch(url, { headers: { Accept: 'application/json' } });
-  const data = await res.json();
+  const run = async (bounded) => {
+    const res = await fetch(makeUrl(bounded), { headers: { Accept: 'application/json' } });
+    const data = await res.json();
+    return (data || []).map(item => ({
+      label: item.display_name,
+      value: item.display_name,
+      lat: item.lat,
+      lon: item.lon
+    }));
+  };
 
-  return (data || []).map(item => ({
-    label: item.display_name,
-    value: item.display_name,
-    lat: item.lat,
-    lon: item.lon
-  }));
+  // 1) prova con bias Italia
+  const first = await run(true);
+  if (first.length) return first;
+
+  // 2) fallback: senza bounded
+  return await run(false);
 };
+
 
 // Aggiorna suggestions per "da_indirizzo"
 useEffect(() => {
