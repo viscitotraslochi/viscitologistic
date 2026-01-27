@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
     Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, IconButton, Box, 
-    Typography, Paper, Divider, Chip, Modal, Autocomplete
+    Typography, Paper, Divider, Chip, Modal, Autocomplete, createFilterOptions
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
 
@@ -45,6 +45,8 @@ const EXTENDED_ITEMS = [
     "Bicicletta", "Tapis Roulant", "Pesi", "Valigia",
     "Quadro", "Vaso", "Lampadario", "Pianta", "Scatola Libri"
 ];
+
+const filter = createFilterOptions();
 
 function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
     const lastFocusedRef = useRef(null);
@@ -378,24 +380,37 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 								<Autocomplete
 									freeSolo
 									disablePortal
-									// sx={{ flexGrow: 1 }} fa sì che la casella occupi tutto lo spazio rimasto
-									sx={{ flexGrow: 1 }} 
+									sx={{ flexGrow: 1 }}
 									options={EXTENDED_ITEMS}
 									inputValue={inputValue}
+									
+									// FORZA IL FILTRO: Questo dice a MUI di filtrare sempre in base a inputValue
+									filterOptions={(options, params) => {
+										const filtered = filter(options, params);
+										return filtered;
+									}}
+
 									onInputChange={(event, newInputValue) => {
 										setInputValue(newInputValue);
 									}}
+
 									onChange={(event, newValue) => {
 										if (newValue) {
 											handleAddItem(newValue);
 										}
 									}}
+
+									// Migliora la reattività
+									selectOnFocus
+									clearOnBlur
+									handleHomeEndKeys
+
 									renderInput={(params) => (
 										<TextField
 											{...params}
 											label="Cerca o scrivi oggetto..."
 											size="small"
-											fullWidth // Assicura che il campo di testo interno sia largo
+											fullWidth
 											onKeyDown={(e) => {
 												if (e.key === 'Enter') {
 													e.preventDefault();
