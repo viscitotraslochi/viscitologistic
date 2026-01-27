@@ -146,18 +146,13 @@ function Home() {
 		da_indirizzo: '',
 		a_indirizzo: '',
 		note: '',
-		items: '', // Sarà la stringa finale "Scatola x5, Divano x1"
+		inventario: '', // Sarà la stringa finale "Scatola x5, Divano x1"
 		piano_partenza: '0',
 		ascensore_partenza: 'NO', 
 		piano_arrivo: '0',
 		ascensore_arrivo: 'NO',  
 	});
 
-	// Sincronizza inventoryList -> formData.items
-	useEffect(() => {
-		const textString = inventoryList.map(item => `${item.name} x${item.qty}`).join(', ');
-		setFormData(prev => ({ ...prev, items: textString }));
-	}, [inventoryList]);
 
   // --- NUOVA LOGICA INVENTARIO ---
     const [inventoryList, setInventoryList] = useState([]);
@@ -191,39 +186,20 @@ function Home() {
         });
     };
 
-    // 3. EFFETTO DI SINCRONIZZAZIONE (QUESTO È QUELLO CHE MANCAVA)
     // Ogni volta che inventoryList cambia, aggiorna formData.inventario
-    useEffect(() => {
-        if (inventoryList.length > 0) {
-            // Trasforma la lista in testo (es: "Divano x1, Scatole x5")
-            const textString = inventoryList
-                .map(item => `${item.name} x${item.qty}`)
-                .join(', ');
-            
-            setFormData(prev => ({ ...prev, inventario: textString }));
-        }
-    }, [inventoryList]);
+	useEffect(() => {
+	  const textString = inventoryList
+		.map(item => `${item.name} x${item.qty}`)
+		.join(', ');
+
+	  setFormData(prev => ({ ...prev, inventario: textString }));
+	}, [inventoryList]);
     // --- FINE LOGICA INVENTARIO ---
 
-
-    // Sincronizza i bottoni col campo di testo
-    useEffect(() => {
-        const textString = inventoryList
-            .map(item => `${item.name} x${item.qty}`)
-            .join(', ');
-        // Mantiene eventuali note manuali se la lista è vuota, altrimenti sovrascrive
-        if (inventoryList.length > 0) {
-             setFormData(prev => ({ ...prev, inventario: textString }));
-        }
-    }, [inventoryList]);
-    // -------------------------------
   
   const [quantities, setQuantities] = useState(
     QUICK_ITEMS.reduce((acc, item) => ({ ...acc, [item]: 0 }), {})
   );
-  const [isOtherChecked, setIsOtherChecked] = useState(false);
-  const [customInput, setCustomInput] = useState('');
-  const [customItems, setCustomItems] = useState([]);
   
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
@@ -661,8 +637,8 @@ function Home() {
 										  })
 										}
 									  >
-										<MenuItem value={true}>SI</MenuItem>
-										<MenuItem value={false}>NO</MenuItem>
+										<MenuItem value="SI">SI</MenuItem>
+										<MenuItem value="NO">NO</MenuItem>
 									  </Select>
 									</FormControl>
 
@@ -721,8 +697,8 @@ function Home() {
 										  })
 										}
 									  >
-										<MenuItem value={true}>SI</MenuItem>
-										<MenuItem value={false}>NO</MenuItem>
+										<MenuItem value="SI">SI</MenuItem>
+										<MenuItem value="NO">NO</MenuItem>
 									  </Select>
 									</FormControl>
 
