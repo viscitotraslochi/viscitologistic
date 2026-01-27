@@ -136,30 +136,49 @@ function FleetView() {
                 </Box>
                 
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 2 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', bgcolor: '#f5f5f5', p: 1, borderRadius: 1 }}>
-                    <Typography variant="caption" fontWeight="bold">Assicurazione</Typography>
-                    <Chip 
-                      label={v.scadenza_assicurazione ? formatDate(v.scadenza_assicurazione) : 'MANCA'} 
+				  {/* Riga Assicurazione */}
+				  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: '#f5f5f5', p: 1, borderRadius: 1 }}>
+					<Typography variant="caption" fontWeight="bold">Assicurazione</Typography>
+					<Chip 
+					  label={v.scadenza_assicurazione ? formatDate(v.scadenza_assicurazione) : 'MANCA'} 
 					  color={getStatusColor(v.scadenza_assicurazione)} 
 					  size="small" 
-                    />
-                  </Box>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', bgcolor: '#f5f5f5', p: 1, borderRadius: 1 }}>
-                    <Typography variant="caption" fontWeight="bold">Revisione</Typography>
-                    <Chip 
-                      label={v.scadenza_revisione ? formatDate(v.scadenza_revisione) : 'MANCA'} 
+					/>
+				  </Box>
+
+				  {/* Riga Revisione */}
+				  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: '#f5f5f5', p: 1, borderRadius: 1 }}>
+					<Typography variant="caption" fontWeight="bold">Revisione</Typography>
+					<Chip 
+					  label={v.scadenza_revisione ? formatDate(v.scadenza_revisione) : 'MANCA'} 
 					  color={getStatusColor(v.scadenza_revisione)} 
-					  size="small"
-                    />
-                  </Box>
-                  <Typography variant="body2"><strong>KM:</strong> {Number(v.km_attuali).toLocaleString()}</Typography>
-                  {v.alimentazione && <Typography variant="caption"><strong>Carburante:</strong> {v.alimentazione}</Typography>}
-                  {v.note && (
-                    <Typography variant="caption" sx={{ bgcolor: '#fffde7', p: 1, borderRadius: 1, border: '1px dashed #ccc' }}>
-                      {v.note}
-                    </Typography>
-                  )}
-                </Box>
+					  size="small" 
+					/>
+				  </Box>
+
+				  {/* Riga KM - Stesso layout */}
+				  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: '#f5f5f5', p: 1, borderRadius: 1 }}>
+					<Typography variant="caption" fontWeight="bold">Chilometri</Typography>
+					<Typography variant="body2" fontWeight="medium">
+					  {v.km_attuali ? Number(v.km_attuali).toLocaleString() : 0} km
+					</Typography>
+				  </Box>
+
+				  {/* Riga Carburante - Stesso layout */}
+				  {v.alimentazione && (
+					<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: '#f5f5f5', p: 1, borderRadius: 1 }}>
+					  <Typography variant="caption" fontWeight="bold">Carburante</Typography>
+					  <Typography variant="body2">{v.alimentazione}</Typography>
+					</Box>
+				  )}
+
+				  {/* Note */}
+				  {v.note && (
+					<Typography variant="caption" sx={{ mt: 1, bgcolor: '#fffde7', p: 1, borderRadius: 1, border: '1px dashed #ccc' }}>
+					  {v.note}
+					</Typography>
+				  )}
+				</Box>
               </CardContent>
             </Card>
           </Grid>
@@ -178,68 +197,38 @@ function FleetView() {
         {!isMobile && <DialogTitle>{editingId ? 'Modifica Veicolo' : 'Aggiungi Veicolo'}</DialogTitle>}
         
         <DialogContent sx={{ pt: 2 }}>
-		  <Grid container spacing={2} sx={{ mt: 0.5 }}>
-			{/* Riga 1: Targa e Marca */}
-			<Grid item xs={12} sm={6}>
+		  <Grid container spacing={2}>
+			{[
+			  { id: 'targa', label: 'Targa', size: 6, required: true },
+			  { id: 'marca', label: 'Marca', size: 6 },
+			  { id: 'modello', label: 'Modello', size: 8, required: true },
+			  { id: 'anno', label: 'Anno', size: 4, type: 'number' },
+			  { id: 'telaio', label: 'N° Telaio', size: 12 },
+			  { id: 'km_attuali', label: 'Kilometri Attuali', size: 12, type: 'number' },
+			  { id: 'scadenza_assicurazione', label: 'Scadenza Assicurazione', size: 6, type: 'date' },
+			  { id: 'scadenza_revisione', label: 'Scadenza Revisione', size: 6, type: 'date' },
+			].map((field) => (
+			  <Grid item xs={12} sm={field.size} key={field.id}>
+				<TextField
+				  id={`input-${field.id}`} // Risolve errore label
+				  label={field.label}
+				  fullWidth
+				  required={field.required}
+				  variant="outlined"
+				  type={field.type || 'text'}
+				  InputLabelProps={field.type === 'date' ? { shrink: true } : undefined}
+				  value={formData[field.id]}
+				  onChange={(e) => setFormData({ 
+					...formData, 
+					[field.id]: field.id === 'targa' ? e.target.value.toUpperCase() : e.target.value 
+				  })}
+				/>
+			  </Grid>
+			))}
+			
+			<Grid item xs={12}>
 			  <TextField
-				id="v-targa"
-				label="Targa"
-				fullWidth
-				required
-				variant="outlined"
-				value={formData.targa}
-				onChange={(e) => setFormData({ ...formData, targa: e.target.value.toUpperCase() })}
-			  />
-			</Grid>
-			<Grid item xs={12} sm={6}>
-			  <TextField
-				id="v-marca"
-				label="Marca"
-				fullWidth
-				variant="outlined"
-				value={formData.marca}
-				onChange={(e) => setFormData({ ...formData, marca: e.target.value })}
-			  />
-			</Grid>
-
-			{/* Riga 2: Modello e Anno */}
-			<Grid item xs={12} sm={8}>
-			  <TextField
-				id="v-modello"
-				label="Modello"
-				fullWidth
-				required
-				variant="outlined"
-				value={formData.modello}
-				onChange={(e) => setFormData({ ...formData, modello: e.target.value })}
-			  />
-			</Grid>
-			<Grid item xs={12} sm={4}>
-			  <TextField
-				id="v-anno"
-				label="Anno"
-				type="number"
-				fullWidth
-				variant="outlined"
-				value={formData.anno}
-				onChange={(e) => setFormData({ ...formData, anno: e.target.value })}
-			  />
-			</Grid>
-
-			{/* Riga 3: Telaio e Carburante */}
-			<Grid item xs={12} sm={7}>
-			  <TextField
-				id="v-telaio"
-				label="N° Telaio"
-				fullWidth
-				variant="outlined"
-				value={formData.telaio}
-				onChange={(e) => setFormData({ ...formData, telaio: e.target.value })}
-			  />
-			</Grid>
-			<Grid item xs={12} sm={5}>
-			  <TextField
-				id="v-alimentazione"
+				id="input-alimentazione"
 				select
 				label="Alimentazione"
 				fullWidth
@@ -247,61 +236,20 @@ function FleetView() {
 				value={formData.alimentazione}
 				onChange={(e) => setFormData({ ...formData, alimentazione: e.target.value })}
 			  >
-				{['Diesel', 'Benzina', 'Metano', 'GPL', 'Elettrico', 'Ibrida'].map((opt) => (
+				{['Diesel', 'Benzina', 'Metano', 'GPL', 'Elettrico', 'Ibrida'].map(opt => (
 				  <MenuItem key={opt} value={opt}>{opt}</MenuItem>
 				))}
 			  </TextField>
 			</Grid>
 
-			{/* Riga 4: KM attuali */}
 			<Grid item xs={12}>
 			  <TextField
-				id="v-km"
-				label="Kilometri Attuali"
-				type="number"
-				fullWidth
-				variant="outlined"
-				value={formData.km_attuali}
-				onChange={(e) => setFormData({ ...formData, km_attuali: e.target.value })}
-			  />
-			</Grid>
-
-			{/* Riga 5: Date Scadenze */}
-			<Grid item xs={12} sm={6}>
-			  <TextField
-				id="v-assicurazione"
-				label="Scadenza Assicurazione"
-				type="date"
-				fullWidth
-				variant="outlined"
-				InputLabelProps={{ shrink: true }}
-				value={formData.scadenza_assicurazione}
-				onChange={(e) => setFormData({ ...formData, scadenza_assicurazione: e.target.value })}
-			  />
-			</Grid>
-			<Grid item xs={12} sm={6}>
-			  <TextField
-				id="v-revisione"
-				label="Scadenza Revisione"
-				type="date"
-				fullWidth
-				variant="outlined"
-				InputLabelProps={{ shrink: true }}
-				value={formData.scadenza_revisione}
-				onChange={(e) => setFormData({ ...formData, scadenza_revisione: e.target.value })}
-			  />
-			</Grid>
-
-			{/* Riga 6: Note */}
-			<Grid item xs={12}>
-			  <TextField
-				id="v-note"
+				id="input-note"
 				label="Note e Manutenzione"
 				multiline
 				rows={3}
 				fullWidth
 				variant="outlined"
-				placeholder="Inserisci dettagli su riparazioni o scadenze particolari..."
 				value={formData.note}
 				onChange={(e) => setFormData({ ...formData, note: e.target.value })}
 			  />
