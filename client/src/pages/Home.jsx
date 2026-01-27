@@ -51,12 +51,6 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-const [errors, setErrors] = useState({
-  email: false,
-  telefono: false,
-  nome: false
-});
-
 const filter = createFilterOptions();
 
 // --- Pulsanti rapidi a vista ---
@@ -805,6 +799,18 @@ function Home() {
       `}</style>
     </Box>
   );
+}
+
+function LocationMarker() {
+  const map = useMapEvents({
+    click(e) {
+      console.log("Posizione selezionata:", e.latlng);
+    },
+    locationfound(e) {
+      map.flyTo(e.latlng, map.getZoom());
+    },
+  });
+  return null;
 }
 
 export default Home;
