@@ -161,30 +161,22 @@ function Home() {
   
 	// --- NUOVA LOGICA INVENTARIO ---
     const [inventoryList, setInventoryList] = useState([]);
-
+	const [inputValue, setInputValue] = useState('');
+	
     // 1. Funzione per aggiungere
 	const handleAddItem = (itemName) => {
-		// Gestisce sia stringhe dirette che oggetti, e pulisce gli spazi
 		const name = (typeof itemName === 'string' ? itemName : itemName?.label)?.trim();
-		
 		if (!name) return;
 
 		setInventoryList(prev => {
-			// Usiamo toLowerCase() per evitare duplicati come "Sedia" e "sedia"
 			const existing = prev.find(i => i.name.toLowerCase() === name.toLowerCase());
 			if (existing) {
-				return prev.map(i => 
-					i.name.toLowerCase() === name.toLowerCase() 
-					? { ...i, qty: i.qty + 1 } 
-					: i
-				);
-			} else {
-				return [...prev, { name: name, qty: 1 }];
+				return prev.map(i => i.name.toLowerCase() === name.toLowerCase() ? { ...i, qty: i.qty + 1 } : i);
 			}
+			return [...prev, { name: name, qty: 1 }];
 		});
-
-		// IMPORTANTE: Resetta il campo di input dell'autocomplete
-		setInputValue(''); 
+		
+		setInputValue(''); // Reset del campo di testo
 	};
 
     // 2. Funzione per rimuovere
@@ -786,9 +778,12 @@ function Home() {
 								disablePortal
 								sx={{ flexGrow: 1 }}
 								options={EXTENDED_ITEMS}
-								inputValue={inputValue}
-								onInputChange={(e, val) => setInputValue(val)}
-								onChange={(e, newValue) => {
+								// Queste due righe sono fondamentali e causavano l'errore:
+								inputValue={inputValue} 
+								onInputChange={(event, newInputValue) => {
+									setInputValue(newInputValue);
+								}}
+								onChange={(event, newValue) => {
 									if (newValue) handleAddItem(newValue);
 								}}
 								filterOptions={(options, params) => filter(options, params)}
