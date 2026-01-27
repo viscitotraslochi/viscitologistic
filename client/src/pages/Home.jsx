@@ -6,7 +6,7 @@ import {
   AppBar, Toolbar, Typography, Button, Container, Box, Card, CardContent, 
   TextField, Paper, Snackbar, Alert, Checkbox, FormControlLabel, Select, MenuItem,
   IconButton, Chip, useTheme, useMediaQuery, List, ListItem, ListItemIcon, ListItemText,
-  Dialog, DialogContent, DialogTitle, Autocomplete, Divider, FormControl, InputLabel, createFilterOptions
+  Dialog, DialogContent, DialogTitle, Autocomplete, Divider, FormControl, InputLabel
 } from '@mui/material';
 
 import Grid from '@mui/material/Grid';
@@ -51,63 +51,16 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-const filter = createFilterOptions();
+// Lista oggetti standard
 
-// --- Pulsanti rapidi a vista ---
 const QUICK_ITEMS = [
-    "Scatola", "Frigorifero", "Lavatrice", "Divano", "Tavolo", 
-    "Sedia", "Letto Matr.", "Letto Sing.", "Armadio", "Comodino", 
-    "Comò", "Televisore", "Lavastoviglie", "Poltrona", "Scarpiera"
+    "Scatole P", "Scatole M", "Scatole G", "Baule",
+    "Divano 2p", "Divano 3p", "Poltrona", 
+    "Letto Sing.", "Letto Matr.", "Materasso",
+    "Armadio 2a", "Armadio 6a", "Comò", "Comodino",
+    "Tavolo", "Sedie", "Scrivania", "Libreria",
+    "Lavatrice", "Frigo", "TV", "Specchio"
 ];
-
-// --- Lista completa per Autocomplete ---
-const EXTENDED_ITEMS = [
-    ...new Set([
-        ...QUICK_ITEMS,
-        // --- CUCINA & ELETTRODOMESTICI ---
-        "Affettatrice", "Bollitore", "Bilancia da Cucina", "Cantinetta Vini", 
-        "Congelatore", "Contenitori Plastica", "Forno", "Frigorifero", 
-        "Lavastoviglie", "Macchina del Caffè", "Microonde", "Mixer", 
-        "Piano Cottura", "Posate", "Robot da Cucina", "Set Pentole", 
-        "Servizio Piatti", "Tostapane",
-
-        // --- SOGGIORNO & ZONA GIORNO ---
-        "Camino Elettrico", "Chaise Longue", "Credenza", "Divano 2 Posti", 
-        "Divano 3 Posti", "Divano Angolare", "Libreria", "Madia", 
-        "Mobile TV", "Orologio da Parete", "Piantana", "Poltrona", 
-        "Pouf", "Quadro", "Tappeto", "Tavolino Caffè", "Tavolo", 
-        "Televisore", "Tende", "Vaso", "Vetrina",
-
-        // --- CAMERA DA LETTO & NOTTE ---
-        "Armadio 2 Ante", "Armadio 4 Ante", "Armadio 6 Ante", "Cassettiera", 
-        "Comodino", "Comò", "Cuscini", "Lenzuola", "Letto a Castello", 
-        "Letto Matrimoniale", "Letto Singolo", "Materasso Matrimoniale", 
-        "Materasso Singolo", "Piumone", "Panca Scendiletto", "Settimino",
-
-        // --- BAGNO, LAVANDERIA & PULIZIA ---
-        "Asciugatrice", "Asciugacapelli", "Asse da Stiro", "Aspirapolvere", 
-        "Bilancia Pesapersone", "Cesto Biancheria", "Ferro da Stiro", 
-        "Lavatrice", "Mobile Bagno", "Robot Aspirapolvere", "Scopa e Mocio", 
-        "Specchio Bagno", "Stendibiancheria",
-
-        // --- STUDIO, UFFICIO & INGRESSO ---
-        "Appendiabiti", "Consolle Ingresso", "Libreria Pensile", "Monitor PC", 
-        "Scarpiera", "Scrivania", "Sedia Ufficio", "Specchio Lungo", "Stampante",
-
-        // --- SPORT, TEMPO LIBERO & VALIGIE ---
-        "Attrezzatura Sci", "Bicicletta", "Borsa Sportiva", "Panca Fitness", 
-        "Pesi e Manubri", "Tapis Roulant", "Valigia", "Zaino",
-
-        // --- GARAGE, ESTERNO & ATTREZZI ---
-        "Barbecue", "Cassetta degli Attrezzi", "Ombrellone", "Pianta da Esterno", 
-        "Scala", "Sedia da Giardino", "Tavolo da Esterno", "Tosaerba", "Trapano",
-
-        // --- IMBALLAGGIO & VARIE ---
-        "Condizionatore Portatile", "Pianta da Interno", "Scatola Libri", 
-        "Scatola Documenti", "Scatola", "Stufa Elettrica", "Ventilatore", 
-        "Umidificatore"
-    ])
-].sort((a, b) => a.localeCompare('it'));
 
 const PIANI = Array.from({ length: 16 }, (_, i) => i); // [0, 1, ... 15]
 const ASCENSORE_OPTS = ["SI", "NO"];
@@ -115,33 +68,25 @@ const ASCENSORE_OPTS = ["SI", "NO"];
 
 function Home() {
 	const [suggestions, setSuggestions] = useState({ da: [], a: [] });
-    const [loading, setLoading] = useState(false);
-    const [errors, setErrors] = useState({});
-    
-    const [mapOpen, setMapOpen] = useState(false);
-    const [currentField, setCurrentField] = useState(null);
+	const [loading, setLoading] = useState(false);
 
-	// --- 1. Funzione per i suggerimenti degli indirizzi ---
 	const fetchSuggestions = async (query, field) => {
 		if (query.length < 3) {
-			setSuggestions(prev => ({ ...prev, [field === 'da_indirizzo' ? 'da' : 'a']: [] }));
-			return;
+		  setSuggestions(prev => ({ ...prev, [field === 'da_indirizzo' ? 'da' : 'a']: [] }));
+		  return;
 		}
 		try {
-			const response = await fetch(
-				`https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=json&singleLine=${encodeURIComponent(query)}&maxLocations=5`
-			);
-			const data = await response.json();
-			setSuggestions(prev => ({ ...prev, [field === 'da_indirizzo' ? 'da' : 'a']: data.candidates || [] }));
+		  // Usiamo ArcGIS World Geocoding Service (molto preciso e senza blocchi CORS)
+		  const response = await fetch(
+			`https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=json&singleLine=${encodeURIComponent(query)}&maxLocations=5`
+		  );
+		  const data = await response.json();
+		  // ArcGIS restituisce i risultati dentro "candidates"
+		  setSuggestions(prev => ({ ...prev, [field === 'da_indirizzo' ? 'da' : 'a']: data.candidates || [] }));
 		} catch (error) {
-			console.error("Errore autocompletamento:", error);
+		  console.error("Errore autocompletamento:", error);
 		}
-	};
-	// --- 2. Funzione per aprire la mappa (VA MESSA FUORI, NON DENTRO FETCH) ---
-	const openMap = (field) => {
-		setCurrentField(field);
-		setMapOpen(true);
-	};
+	  };
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -149,7 +94,7 @@ function Home() {
 
 	// 1. Aggiorna lo stato iniziale
 	const [formData, setFormData] = useState({
-		cliente_nome: '',
+		nome: '',
 		telefono: '',
 		email: '',
 		da_indirizzo: '',
@@ -167,25 +112,20 @@ function Home() {
   
   
   
-	// --- NUOVA LOGICA INVENTARIO ---
+  // --- NUOVA LOGICA INVENTARIO ---
     const [inventoryList, setInventoryList] = useState([]);
-	const [inputValue, setInputValue] = useState('');
-	
-    // 1. Funzione per aggiungere
-	const handleAddItem = (itemName) => {
-		const name = (typeof itemName === 'string' ? itemName : itemName?.label)?.trim();
-		if (!name) return;
 
-		setInventoryList(prev => {
-			const existing = prev.find(i => i.name.toLowerCase() === name.toLowerCase());
-			if (existing) {
-				return prev.map(i => i.name.toLowerCase() === name.toLowerCase() ? { ...i, qty: i.qty + 1 } : i);
-			}
-			return [...prev, { name: name, qty: 1 }];
-		});
-		
-		setInputValue(''); // Reset del campo di testo
-	};
+    // 1. Funzione per aggiungere
+    const handleAddItem = (itemName) => {
+        setInventoryList(prev => {
+            const existing = prev.find(i => i.name === itemName);
+            if (existing) {
+                return prev.map(i => i.name === itemName ? { ...i, qty: i.qty + 1 } : i);
+            } else {
+                return [...prev, { name: itemName, qty: 1 }];
+            }
+        });
+    };
 
     // 2. Funzione per rimuovere
     const handleRemoveItem = (itemName) => {
@@ -252,50 +192,142 @@ function Home() {
     }));
   };
 
+  const handleQuantityChange = (item, value) => {
+    setQuantities(prev => ({ ...prev, [item]: value }));
+  };
+
+  const handleAddCustomItem = () => {
+    if (customInput.trim()) {
+      setCustomItems([...customItems, customInput.trim()]);
+      setCustomInput('');
+    }
+  };
+
+  const handleDeleteCustomItem = (itemToDelete) => {
+    setCustomItems(customItems.filter(item => item !== itemToDelete));
+  };
+
+	// --- STATO PER LA MAPPA ---
+    const [mapOpen, setMapOpen] = useState(false);
+    const [currentField, setCurrentField] = useState(null); // 'da_indirizzo' o 'a_indirizzo'
+
+    function LocationMarker() {
+		useMapEvents({
+			click: async (e) => {
+				const { lat, lng } = e.latlng;
+				try {
+					// ArcGIS richiede longitudine,latitudine
+					const response = await fetch(
+						`https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode?f=json&location=${lng},${lat}`
+					);
+					const data = await response.json();
+					
+					// L'indirizzo completo si trova in data.address.Match_addr
+					const address = data.address?.Match_addr || "Indirizzo non trovato";
+
+					if (currentField) {
+						setFormData(prev => ({ ...prev, [currentField]: address }));
+						setMapOpen(false);
+						setSuggestions({ da: [], a: [] }); // Pulisce i suggerimenti
+					}
+				} catch (error) {
+					console.error("Errore mappa:", error);
+				}
+			},
+		});
+		return null;
+	  }
+
+    const openMap = (field) => {
+        setCurrentField(field);
+        setMapOpen(true);
+    };
+
 	const handleSubmit = async (e) => {
-	  e.preventDefault();
-	  setErrors({});
-	  setLoading(true);
+    e.preventDefault();
 
-	  const newErrors = {};
-	  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-	  const phoneRegex = /^[0-9+ ]{6,15}$/;
+    // 1. Prepara la lista visuale (Icone selezionate)
+    let visualListString = '';
+    if (Array.isArray(formData.items) && formData.items.length > 0) {
+        visualListString = formData.items
+            .map(item => `${item.name} x${item.qty}`)
+            .join(', ');
+    }
 
-	  if (!formData.nome?.trim()) newErrors.nome = "Il nome è obbligatorio";
-	  if (!formData.telefono?.trim()) newErrors.telefono = "Il numero è obbligatorio";
-	  else if (!phoneRegex.test(formData.telefono)) newErrors.telefono = "Numero non valido";
-	  if (formData.email && !emailRegex.test(formData.email)) newErrors.email = "Email non valida";
+    // 2. UNIONE INVENTARIO: Mettiamo insieme la lista visuale E il testo scritto nel campo "Inventario"
+    let finalInventory = visualListString;
+	if (formData.inventario) {
+		if (finalInventory) finalInventory += " | "; 
+		finalInventory += formData.inventario;      
+	}
 
-	  if (Object.keys(newErrors).length > 0) {
-		setErrors(newErrors);
-		setLoading(false);
-		return;
-	  }
+    // 3. NOTE PULITE: Qui ci va SOLO il messaggio del cliente
+    const finalNotes = formData.note || ''; 
 
-	  try {
-		await api.post('/leads', formData);
-		setSnackbar({ 
-		  open: true, 
-		  severity: 'success', 
-		  message: 'Richiesta inviata! Ti contatteremo entro 24 ore.' 
-		});
-		
-		// Reset dello stato
+    // 4. Oggetto dati SEPARATO
+    const dataToSend = {
+        cliente_nome: formData.nome,
+        telefono: formData.telefono,
+        email: formData.email,
+        da_indirizzo: formData.da_indirizzo,
+        a_indirizzo: formData.a_indirizzo,
+        piano_partenza: formData.piano_partenza,
+        ascensore_partenza: formData.ascensore_partenza,
+        piano_arrivo: formData.piano_arrivo,
+        ascensore_arrivo: formData.ascensore_arrivo,
+        
+        // --- QUI AVVIENE LA MAGIA ---
+        items: finalInventory, // Va nella colonna 'items'
+        note: finalNotes,      // Va nella colonna 'note'
+        // ----------------------------
+
+        data_trasloco: formData.startDate,
+        ora_trasloco: formData.startTime
+    };
+
+    try {
+        // Invio al server
+        await api.post('/leads', dataToSend);
+        
+        setSnackbar({ 
+            open: true, 
+            severity: 'success', 
+            message: 'Richiesta inviata con successo!' 
+        });
+
+        // Reset Form
 		setFormData({
-		  nome: '', telefono: '', email: '', da_indirizzo: '', a_indirizzo: '',
-		  piano_partenza: '0', ascensore_partenza: false, piano_arrivo: '0',
-		  ascensore_arrivo: false, startDate: '', startTime: '', inventario: '', note: ''
+			nome: '',
+			telefono: '',
+			email: '',
+			da_indirizzo: '',
+			a_indirizzo: '',
+			piano_partenza: '0',
+			ascensore_partenza: false,  // default NO
+			piano_arrivo: '0',
+			ascensore_arrivo: false,    // default NO
+			startDate: '',
+			startTime: '', 
+			items: [],
+			inventario: '',
+			note: '' 
 		});
-		setInventoryList([]);
-		
-		setTimeout(() => navigate('/thank-you'), 3000);
-	  } catch (error) {
-		setSnackbar({ open: true, severity: 'error', message: "Errore durante l'invio." });
-	  } finally {
-		setLoading(false);
-	  }
-	};
 
+        
+        // Se usi setInventoryList per pulire le icone visive
+        if (typeof setInventoryList === 'function') setInventoryList([]); 
+
+        setTimeout(() => navigate('/thank-you'), 1500);
+
+    } catch (error) {
+        console.error("Errore invio:", error);
+        setSnackbar({ 
+            open: true, 
+            severity: 'error', 
+            message: "Errore: " + (error.response?.data?.error || "Impossibile inviare")
+        });
+    }
+};
 
   const scrollToForm = () => {
     document.getElementById('form-section').scrollIntoView({ behavior: 'smooth' });
@@ -487,30 +519,28 @@ function Home() {
 							</Typography>
 						</Box>
 						<Grid container spacing={3}>
-							<Grid size={{ xs: 12, md: 6 }}>
+							<Grid size={{ xs: 12 }}>
 								<TextField 
-									fullWidth required 
-									label="Nome e Cognome o Azienda" 
-									variant="outlined"
-									id="nome" name="nome"
-									value={formData.nome || ''} 
-									onChange={handleChange}
-									error={!!errors.nome} // Diventa rosso se vuoto
-									helperText={errors.nome} // Scrive "Il nome è obbligatorio"
+									fullWidth required label="Nome e Cognome o Azienda" variant="outlined"
+									id="nome" name="nome" autoComplete="name"
+									value={formData.nome || ''} onChange={handleChange} 
 									InputProps={{ startAdornment: <Box sx={{ mr: 1, color: 'action.active' }}><PersonIcon /></Box> }}
 								/>
 							</Grid>
 							<Grid size={{ xs: 12, md: 6 }}>
 								<TextField 
-									fullWidth 
-									required 
-									label="Telefono"
-									name="telefono"
-									value={formData.telefono}
-									onChange={handleChange}
-									error={!!errors.telefono} // Diventa rosso se c'è un errore
-									helperText={errors.telefono} // Mostra il messaggio specifico
+									fullWidth label="Telefono" variant="outlined"
+									id="telefono" name="telefono" autoComplete="tel"
+									value={formData.telefono} onChange={handleChange} 
 									InputProps={{ startAdornment: <Box sx={{ mr: 1, color: 'action.active' }}><PhoneIcon /></Box> }}
+								/>
+							</Grid>
+							<Grid size={{ xs: 12, md: 6 }}>
+								<TextField 
+									fullWidth label="Email" variant="outlined"
+									id="email" name="email" autoComplete="email"
+									value={formData.email} onChange={handleChange} 
+									InputProps={{ startAdornment: <Box sx={{ mr: 1, color: 'action.active' }}><EmailIcon /></Box> }}
 								/>
 							</Grid>
 						</Grid>
@@ -670,81 +700,59 @@ function Home() {
 					</Paper>
 
 					{/* --- 3. INVENTARIO E NOTE --- */}
-					<Paper variant="outlined" sx={{ p: 2, bgcolor: '#f8f9fa', borderRadius: 2, mb: 3 }}>
-						<Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 'bold', color: 'text.secondary' }}>
-							AGGIUNTA RAPIDA (Clicca per aggiungere)
+					<Paper elevation={3} sx={{ p: { xs: 3, md: 4 }, mb: 4, borderRadius: 4, bgcolor: '#fff' }}>
+						<Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+							<HandymanIcon color="primary" sx={{ mr: 1, fontSize: 28 }} />
+							<Typography variant="h5" sx={{ fontWeight: '800', color: '#102a43' }}>
+								Cosa Trasportiamo?
+							</Typography>
+						</Box>
+
+						<Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+							Seleziona gli oggetti principali o descrivi il carico:
 						</Typography>
-						
-						<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+
+						<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 3 }}>
 							{QUICK_ITEMS.map((item) => (
-								<Chip 
-									key={item} 
-									label={item} 
-									onClick={() => handleAddItem(item)} 
-									clickable 
-									sx={{ bgcolor: '#fff', border: '1px solid #e0e0e0', '&:hover': { bgcolor: '#e3f2fd' } }} 
+								<Chip
+									key={item} label={item} onClick={() => handleAddItem(item)}
+									icon={<AddCircleOutlineIcon />} clickable
+									sx={{ bgcolor: 'white', border: '1px solid #ddd', '&:hover': { bgcolor: '#e3f2fd', borderColor: '#2196f3' } }}
 								/>
 							))}
 						</Box>
 
-						<Divider sx={{ my: 2 }} />
-
-						{/* SEZIONE INPUT + TASTO AGGIUNGI */}
-						<Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
-							<Autocomplete
-								freeSolo
-								disablePortal
-								sx={{ flexGrow: 1 }}
-								options={EXTENDED_ITEMS}
-								// Queste due righe sono fondamentali e causavano l'errore:
-								inputValue={inputValue} 
-								onInputChange={(event, newInputValue) => {
-									setInputValue(newInputValue);
-								}}
-								onChange={(event, newValue) => {
-									if (newValue) handleAddItem(newValue);
-								}}
-								filterOptions={(options, params) => filter(options, params)}
-								renderInput={(params) => (
-									<TextField 
-										{...params} 
-										label="Cerca o scrivi oggetto..." 
-										variant="outlined" 
-										size="small"
-										onKeyDown={(e) => {
-											if (e.key === 'Enter') {
-												e.preventDefault();
-												e.stopPropagation();
-												if (inputValue.trim() !== '') handleAddItem(inputValue);
-											}
-										}}
-									/>
-								)}
-							/>
-							<Button 
-								variant="contained" 
-								onClick={() => handleAddItem(inputValue)}
-								sx={{ minWidth: '48px', height: '40px' }}
-							>
-								<AddCircleOutlineIcon />
-							</Button>
-						</Box>
-
 						{/* LISTA OGGETTI AGGIUNTI */}
 						{inventoryList.length > 0 && (
-							<Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', gap: 1 }}>
+							<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 3, maxHeight: 300, overflowY: 'auto' }}>
 								{inventoryList.map((item) => (
-									<Paper key={item.name} elevation={0} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 1, border: '1px solid #bbdefb', bgcolor: '#e3f2fd' }}>
-										<Typography variant="body2" fontWeight="bold" sx={{ pl: 1 }}>{item.name}</Typography>
-										<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+									<Paper key={item.name} elevation={0} sx={{ p: 1.5, border: '1px solid #bbdefb', borderRadius: 2, bgcolor: '#e3f2fd', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+										<Typography fontWeight="bold">{item.name}</Typography>
+										<Box sx={{ display: 'flex', alignItems: 'center' }}>
 											<IconButton size="small" onClick={() => handleRemoveItem(item.name)} color="error"><RemoveCircleOutlineIcon /></IconButton>
-											<Typography fontWeight="bold">{item.qty}</Typography>
+											<Typography sx={{ mx: 1, fontWeight: 'bold' }}>{item.qty}</Typography>
 											<IconButton size="small" onClick={() => handleAddItem(item.name)} color="primary"><AddCircleOutlineIcon /></IconButton>
 										</Box>
 									</Paper>
 								))}
 							</Box>
 						)}
+
+						<TextField
+							id="inventario" name="inventario"
+							label="Descrizione extra / Misure / Lista completa"
+							fullWidth multiline rows={3}
+							value={formData.inventario || ''} onChange={handleChange}
+							helperText="La lista selezionata sopra verrà inclusa automaticamente."
+							sx={{ mb: 3 }}
+						/>
+
+						<TextField
+							id="note" name="note"
+							label="Note aggiuntive (es. ZTL, cortile interno, scale strette...)"
+							fullWidth multiline rows={2}
+							value={formData.note || ''} onChange={handleChange}
+						/>
 					</Paper>
 
 					{/* BOTTONE INVIO */}
@@ -805,18 +813,6 @@ function Home() {
       `}</style>
     </Box>
   );
-}
-
-function LocationMarker() {
-  const map = useMapEvents({
-    click(e) {
-      console.log("Posizione selezionata:", e.latlng);
-    },
-    locationfound(e) {
-      map.flyTo(e.latlng, map.getZoom());
-    },
-  });
-  return null;
 }
 
 export default Home;
