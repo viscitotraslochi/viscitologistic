@@ -100,11 +100,38 @@ const EXTENDED_ITEMS = [
     "Umidificatore"
   ])
 ].sort((a, b) => a.localeCompare('it'));
+const isValidEmail = (email) => {
+  const s = (email ?? '').trim();
+  if (!s) return true;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(s);
+};
+
+const normalizePhone = (phone) => (phone ?? '').toString().replace(/[^\d+]/g, '').trim();
+
+const isValidPhoneIT = (phone) => {
+  const p = normalizePhone(phone);
+  if (!p) return false;
+  if (p.startsWith('+')) return /^\+39\d{9,11}$/.test(p);
+  return /^\d{9,11}$/.test(p);
+};
+
+const validateContact = () => {
+  const phoneOk = isValidPhoneIT(formData.phone);
+  const emailOk = isValidEmail(formData.email);
+
+  setErrors({
+    phone: phoneOk ? '' : 'Telefono non valido (es: 3331234567 o +393331234567)',
+    email: emailOk ? '' : 'Email non valida (es: nome@dominio.it)'
+  });
+
+  return phoneOk && emailOk;
+};
+
 
 function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
   const lastFocusedRef = useRef(null);
   const [inputValue, setInputValue] = useState('');
-  
+  const [errors, setErrors] = useState({ phone: '', email: '' });
   const [suggestions, setSuggestions] = useState({ da: [], a: [] });
 
   const [formData, setFormData] = useState({
@@ -395,6 +422,10 @@ useEffect(() => {
       if (finalItems) finalItems += ' | ';
       finalItems += extra;
     }
+	if (!validateContact()) {
+	  alert('Controlla Telefono/Email: alcuni dati non sono validi.');
+	  return;
+	}
 
     const payload = {
       cliente_nome: clean(formData.cliente_nome),
@@ -469,12 +500,36 @@ useEffect(() => {
             <TextField id="cliente_nome" label="Nome Cliente" name="cliente_nome" fullWidth required value={formData.cliente_nome} onChange={handleChange} />
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField id="phone" label="Telefono" name="phone" fullWidth required value={formData.phone} onChange={handleChange} />
+            <TextField
+			  id="phone"
+			  label="Telefono"
+			  name="phone"
+			  fullWidth
+			  required
+			  value={formData.phone}
+			  onChange={(e) => {
+				handleChange(e);
+				if (errors.phone) setErrors(prev => ({ ...prev, phone: '' }));
+			  }}
+			  error={Boolean(errors.phone)}
+			  helperText={errors.phone || ' '}
+			/>
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField id="email" label="Email" name="email" fullWidth value={formData.email} onChange={handleChange} />
+            <TextField
+			  id="email"
+			  label="Email"
+			  name="email"
+			  fullWidth
+			  value={formData.email}
+			  onChange={(e) => {
+				handleChange(e);
+				if (errors.email) setErrors(prev => ({ ...prev, email: '' }));
+			  }}
+			  error={Boolean(errors.email)}
+			  helperText={errors.email || ' '}
+			/>
           </Grid>
-
           <Grid size={{ xs: 12 }}><Divider sx={{ my: 1 }} /></Grid>
 
           <Grid size={{ xs: 12, sm: 6 }}>

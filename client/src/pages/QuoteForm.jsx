@@ -65,6 +65,7 @@ export default function QuoteForm() {
   const [currentField, setCurrentField] = useState(null);
   const [suggestions, setSuggestions] = useState({ da: [], a: [] });
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const [errors, setErrors] = useState({ phone: '', email: '' });
 
   /* ================== SYNC inventoryList -> formData.items ================== */
   useEffect(() => {
@@ -92,6 +93,38 @@ export default function QuoteForm() {
     const s = clean(v);
     return s.length ? s : null;
   };
+  
+const isValidEmail = (email) => {
+  const s = (email ?? '').trim();
+  if (!s) return true; // email opzionale
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(s);
+};
+
+const normalizePhone = (phone) => (phone ?? '').toString().replace(/[^\d+]/g, '').trim();
+
+const isValidPhoneIT = (phone) => {
+  const p = normalizePhone(phone);
+  if (!p) return false; // telefono lo vogliamo valido se presente/obbligatorio lato UI
+  // accetta: 10 cifre (mobile) o +39 + 10 cifre / anche 9-11 cifre generiche per fissi
+  // (è una validazione pragmatica, non perfetta E.164)
+  if (p.startsWith('+')) {
+    return /^\+39\d{9,11}$/.test(p);
+  }
+  return /^\d{9,11}$/.test(p);
+};
+
+const validateContact = () => {
+  const phoneOk = isValidPhoneIT(formData.phone);
+  const emailOk = isValidEmail(formData.email);
+
+  setErrors({
+    phone: phoneOk ? '' : 'Inserisci un numero valido (es: 3331234567 o +393331234567)',
+    email: emailOk ? '' : 'Inserisci un indirizzo email valido (es: nome@dominio.it)'
+  });
+
+  return phoneOk && emailOk;
+};
+
 
 // --- Debounce semplice ---
 const useDebouncedValue = (value, delay = 400) => {
@@ -178,6 +211,11 @@ useEffect(() => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+	
+	if (!validateContact()) {
+	  setSnackbar({ open: true, severity: 'warning', message: 'Controlla Telefono/Email: alcuni dati non sono validi.' });
+	  return;
+	}
 
     // items finali: items (auto) + items_extra (testo libero)
     let finalItems = clean(formData.items);
@@ -277,23 +315,35 @@ useEffect(() => {
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
-                  fullWidth
-                  label="Telefono"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  InputProps={{ startAdornment: <PhoneIcon sx={{ mr: 1 }} /> }}
-                />
+				  fullWidth
+				  required
+				  label="Telefono"
+				  name="phone"
+				  value={formData.phone}
+				  onChange={(e) => {
+					handleChange(e);
+					if (errors.phone) setErrors(prev => ({ ...prev, phone: '' }));
+				  }}
+				  error={Boolean(errors.phone)}
+				  helperText={errors.phone || ' '}
+				  InputProps={{ startAdornment: <PhoneIcon sx={{ mr: 1 }} /> }}
+				/>
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
-                  fullWidth
-                  label="Email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  InputProps={{ startAdornment: <EmailIcon sx={{ mr: 1 }} /> }}
-                />
+				  fullWidth
+				  label="Email"
+				  name="email"
+				  value={formData.email}
+				  onChange={(e) => {
+					handleChange(e);
+					if (errors.email) setErrors(prev => ({ ...prev, email: '' }));
+				  }}
+				  error={Boolean(errors.email)}
+				  helperText={errors.email || ' '}
+				  InputProps={{ startAdornment: <EmailIcon sx={{ mr: 1 }} /> }}
+				/>
+
               </Grid>
             </Grid>
           </Paper>
