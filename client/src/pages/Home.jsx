@@ -253,56 +253,47 @@ function Home() {
   };
 
 	const handleSubmit = async (e) => {
-		e.preventDefault();
+	  e.preventDefault();
+	  setErrors({});
+	  setLoading(true);
 
-		// Reset errori precedenti
-		setErrors({});
-		const newErrors = {};
+	  const newErrors = {};
+	  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+	  const phoneRegex = /^[0-9+ ]{6,15}$/;
 
-		// REGEX
-		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		const phoneRegex = /^[0-9+ ]{6,15}$/; 
+	  if (!formData.nome?.trim()) newErrors.nome = "Il nome è obbligatorio";
+	  if (!formData.telefono?.trim()) newErrors.telefono = "Il numero è obbligatorio";
+	  else if (!phoneRegex.test(formData.telefono)) newErrors.telefono = "Numero non valido";
+	  if (formData.email && !emailRegex.test(formData.email)) newErrors.email = "Email non valida";
 
-		// CONTROLLI
-		if (!formData.cliente_nome?.trim()) {
-			newErrors.cliente_nome = "Il nome è obbligatorio";
-		}
-		if (formData.email && !emailRegex.test(formData.email)) {
-			newErrors.email = "Email non valida (es. nome@dominio.it)";
-		}
-		if (!formData.telefono?.trim()) {
-			newErrors.telefono = "Il numero di telefono è obbligatorio";
-		} else if (!phoneRegex.test(formData.telefono)) {
-			newErrors.telefono = "Inserisci un numero valido";
-		}
+	  if (Object.keys(newErrors).length > 0) {
+		setErrors(newErrors);
+		setLoading(false);
+		return;
+	  }
 
-		if (Object.keys(newErrors).length > 0) {
-			setErrors(newErrors);
-			return; // Blocca l'invio
-		}
-
-		// MAPPA I DATI PER L'API
-		const dataToSend = {
-			cliente_nome: formData.cliente_nome, // Assicurati che sia uguale a quello che si aspetta il backend
-			telefono: formData.telefono,
-			email: formData.email,
-			// ... gli altri campi
-		};
-
-		try {
-			await api.post('/leads', dataToSend);
-			
-			// MESSAGGIO DI CONFERMA PERSONALIZZATO
-			setSnackbar({ 
-				open: true, 
-				severity: 'success', 
-				message: 'Richiesta inviata! Un nostro operatore ti contatterà telefonicamente entro 24 ore per il preventivo.' 
-			});
-
-			// RESET DEL FORM (Rinomina nome -> cliente_nome anche qui)
-			setFormData({ cliente_nome: '', telefono: '', email: '', ... });
-			setInventoryList([]);
-		} catch (error) { ... }
+	  try {
+		await api.post('/leads', formData);
+		setSnackbar({ 
+		  open: true, 
+		  severity: 'success', 
+		  message: 'Richiesta inviata! Ti contatteremo entro 24 ore.' 
+		});
+		
+		// Reset dello stato
+		setFormData({
+		  nome: '', telefono: '', email: '', da_indirizzo: '', a_indirizzo: '',
+		  piano_partenza: '0', ascensore_partenza: false, piano_arrivo: '0',
+		  ascensore_arrivo: false, startDate: '', startTime: '', inventario: '', note: ''
+		});
+		setInventoryList([]);
+		
+		setTimeout(() => navigate('/thank-you'), 3000);
+	  } catch (error) {
+		setSnackbar({ open: true, severity: 'error', message: "Errore durante l'invio." });
+	  } finally {
+		setLoading(false);
+	  }
 	};
 
 		try {
