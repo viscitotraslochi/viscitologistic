@@ -77,9 +77,7 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 
     // --- GESTIONE INVENTARIO ---
     const handleAddItem = (itemName) => {
-		// Gestisce sia stringhe dirette che oggetti dall'autocomplete
 		const name = (typeof itemName === 'string' ? itemName : itemName?.label)?.trim();
-		
 		if (!name) return;
 
 		setInventoryList(prev => {
@@ -91,8 +89,7 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 			}
 		});
 
-		// Reset immediato
-		setInputValue('');
+		setInputValue(''); // Svuota il campo
 	};
 
     const handleRemoveItem = (itemName) => {
@@ -377,11 +374,12 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 							<Divider sx={{ my: 2 }} />
 
 							{/* INPUT AUTOCOMPLETE + BOTTONE AGGIUNGI */}
-							<Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+							<Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start', width: '100%', mt: 1 }}>
 								<Autocomplete
 									freeSolo
-									disablePortal // <--- FONDAMENTALE: evita che la lista finisca sotto il Dialog
-									openOnFocus   // <--- Fa apparire la lista appena clicchi
+									disablePortal
+									// sx={{ flexGrow: 1 }} fa sì che la casella occupi tutto lo spazio rimasto
+									sx={{ flexGrow: 1 }} 
 									options={EXTENDED_ITEMS}
 									inputValue={inputValue}
 									onInputChange={(event, newInputValue) => {
@@ -397,9 +395,9 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 											{...params}
 											label="Cerca o scrivi oggetto..."
 											size="small"
+											fullWidth // Assicura che il campo di testo interno sia largo
 											onKeyDown={(e) => {
 												if (e.key === 'Enter') {
-													// BLOCCA il salto al campo Note
 													e.preventDefault();
 													e.stopPropagation();
 													if (inputValue.trim() !== '') {
@@ -413,7 +411,8 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 								<Button 
 									variant="contained" 
 									onClick={() => handleAddItem(inputValue)}
-									sx={{ minWidth: '48px', p: 0 }}
+									// Altezza fissa per allinearsi al TextField size="small"
+									sx={{ height: '40px', minWidth: '48px', p: 0 }}
 								>
 									<AddCircleOutlineIcon />
 								</Button>
