@@ -1,7 +1,5 @@
 require('dotenv').config();
 
-import axios from 'axios';
-
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg'); 
