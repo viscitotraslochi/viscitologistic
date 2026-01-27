@@ -294,13 +294,22 @@ app.delete('/leads/:id', async (req, res) => {
   }
 });
 
+Per allineare il backend alle nuove funzionalità del frontend, dobbiamo aggiornare la rotta POST (creazione) per includere i nuovi campi e assicurarci che la rotta GET restituisca tutti i dati necessari.
+
+Ecco come modificare la sezione 4. GESTIONE VEICOLI nel tuo file index.js.
+
+Aggiornamento index.js
+Sostituisci la sezione esistente con questo codice aggiornato:
+
+JavaScript
 // ==========================================
-// 4. GESTIONE VEICOLI
+// 4. GESTIONE VEICOLI (AGGIORNATA)
 // ==========================================
 
-// GET veicoli
+// GET veicoli: recupera tutti i campi inclusi i nuovi dettagli
 app.get('/vehicles', async (req, res) => {
   try {
+    // Ordiniamo per targa per mantenere la lista organizzata
     const result = await pool.query('SELECT * FROM vehicles ORDER BY targa ASC');
     res.json(result.rows);
   } catch (err) {
@@ -311,23 +320,63 @@ app.get('/vehicles', async (req, res) => {
 
 // POST aggiungi veicolo
 app.post('/vehicles', async (req, res) => {
-  const { targa, modello, scadenza_assicurazione, scadenza_revisione, km_attuali, note } = req.body;
+  const { 
+    targa, modello, marca, anno, alimentazione, telaio,
+    scadenza_assicurazione, scadenza_revisione, km_attuali, note 
+  } = req.body;
+
   if(!targa || !modello) return res.status(400).json({ error: "Targa e modello obbligatori" });
 
   try {
     const newVehicle = await pool.query(
-      `INSERT INTO vehicles (targa, modello, scadenza_assicurazione, scadenza_revisione, km_attuali, note)
-       VALUES ($1,$2,$3,$4,$5,$6) RETURNING *`,
-      [targa, modello, scadenza_assicurazione, scadenza_revisione, km_attuali || 0, note]
+      `INSERT INTO vehicles (
+        targa, modello, marca, anno, alimentazione, telaio,
+        scadenza_assicurazione, scadenza_revisione, km_attuali, note
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *`,
+      [
+        targa, modello, marca || null, anno || null, alimentazione || null, telaio || null,
+        scadenza_assicurazione || null, 
+        scadenza_revisione || null, 
+        km_attuali || 0, 
+        note || ''
+      ]
     );
     res.json(newVehicle.rows[0]);
   } catch (err) {
-    console.error(err);
+    console.error("Errore inserimento veicolo:", err);
     res.status(500).json({ error: "Errore aggiunta veicolo" });
   }
 });
 
-// DELETE veicolo
+// PUT aggiornamento veicolo 
+app.put('/vehicles/:id', async (req, res) => {
+  const { id } = req.params;
+  const { 
+    targa, modello, marca, anno, alimentazione, telaio,
+    scadenza_assicurazione, scadenza_revisione, km_attuali, note 
+  } = req.body;
+
+  try {
+    const update = await pool.query(
+      `UPDATE vehicles SET 
+        targa=$1, modello=$2, marca=$3, anno=$4, alimentazione=$5, telaio=$6,
+        scadenza_assicurazione=$7, scadenza_revisione=$8, km_attuali=$9, note=$10
+      WHERE id=$11 RETURNING *`,
+      [
+        targa, modello, marca, anno, alimentazione, telaio,
+        scadenza_assicurazione, scadenza_revisione, km_attuali, note, id
+      ]
+    );
+    
+    if(update.rows.length === 0) return res.status(404).json({ error: "Veicolo non trovato" });
+    res.json(update.rows[0]);
+  } catch (err) {
+    console.error("Errore aggiornamento veicolo:", err);
+    res.status(500).json({ error: "Errore aggiornamento veicolo" });
+  }
+});
+
+// DELETE veicolo 
 app.delete('/vehicles/:id', async (req, res) => {
   const { id } = req.params;
   try {

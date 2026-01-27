@@ -3,188 +3,159 @@ import api from '../api/axiosConfig';
 import { 
   Box, Grid, Card, CardContent, Typography, Button, IconButton, 
   Dialog, DialogTitle, DialogContent, TextField, DialogActions, Chip,
-  useTheme, useMediaQuery, AppBar, Toolbar, Slide
+  useTheme, useMediaQuery, AppBar, Toolbar, Slide, MenuItem
 } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CloseIcon from '@mui/icons-material/Close';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import BuildIcon from '@mui/icons-material/Build';
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 
-// Effetto transizione fluido per il Dialog mobile
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
+// Valori predefiniti per reset
+const initialFormState = {
+  targa: '', modello: '', marca: '', anno: '', 
+  alimentazione: '', telaio: '',
+  scadenza_assicurazione: '', scadenza_revisione: '', 
+  km_attuali: '', note: ''
+};
+
+const formatDate = (dateString) => {
+  if (!dateString) return 'N/D';
+  const date = new Date(dateString);
+  // Opzioni per forzare il formato a 2 cifre per giorno e mese
+  return date.toLocaleDateString('it-IT', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+};
+
 function FleetView() {
   const [vehicles, setVehicles] = useState([]);
   const [open, setOpen] = useState(false);
-  
-  // Stato del form
-  const [formData, setFormData] = useState({
-    targa: '', 
-    modello: '', 
-    scadenza_assicurazione: '', 
-    scadenza_revisione: '', 
-    km_attuali: '', 
-    note: ''
-  });
+  const [editingId, setEditingId] = useState(null); // null = creazione, id = modifica
+  const [formData, setFormData] = useState(initialFormState);
 
-  // Hook per rilevare se siamo su mobile (schermo piccolo)
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  useEffect(() => {
-    fetchVehicles();
-  }, []);
+  useEffect(() => { fetchVehicles(); }, []);
 
   const fetchVehicles = async () => {
     try {
       const res = await api.get('/vehicles');
       setVehicles(res.data);
-    } catch (err) {
-      console.error("Errore fetch veicoli", err);
-    }
+    } catch (err) { console.error("Errore fetch veicoli", err); }
   };
 
-  const handleCreate = async () => {
+  const handleOpenDialog = (vehicle = null) => {
+	  if (vehicle) {
+		setEditingId(vehicle.id);
+		setFormData({
+		  ...vehicle,
+		  scadenza_assicurazione: vehicle.scadenza_assicurazione ? new Date(vehicle.scadenza_assicurazione).toISOString().split('T')[0] : '',
+		  scadenza_revisione: vehicle.scadenza_revisione ? new Date(vehicle.scadenza_revisione).toISOString().split('T')[0] : '',
+		});
+	  } else {
+		setEditingId(null);
+		setFormData(initialFormState);
+	  }
+	  setOpen(true);
+	};
+
+  const handleSubmit = async () => {
     try {
-      await api.post('/vehicles', formData);
+      if (editingId) {
+        await api.put(`/vehicles/${editingId}`, formData);
+      } else {
+        await api.post('/vehicles', formData);
+      }
       setOpen(false);
-      // Reset del form
-      setFormData({ targa: '', modello: '', scadenza_assicurazione: '', scadenza_revisione: '', km_attuali: '', note: '' });
       fetchVehicles();
     } catch (err) {
-      console.error(err);
-      alert("Errore creazione veicolo. Controlla di aver inserito i dati corretti.");
+      alert("Errore durante il salvataggio.");
     }
   };
 
   const handleDelete = async (id) => {
-    if(!window.confirm("Sei sicuro di voler eliminare questo mezzo dalla flotta?")) return;
+    if(!window.confirm("Eliminare definitivamente questo mezzo?")) return;
     try {
       await api.delete(`/vehicles/${id}`);
       fetchVehicles();
-    } catch (err) {
-      alert("Errore cancellazione");
-    }
+    } catch (err) { alert("Errore cancellazione"); }
   };
 
-  // Calcola il colore in base alla scadenza
   const getStatusColor = (dateString) => {
     if (!dateString) return 'default';
-    const date = new Date(dateString);
-    const today = new Date();
-    const diffTime = date - today;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Differenza in giorni
-
-    if (diffDays < 0) return 'error';     // Scaduta (Rosso)
-    if (diffDays < 30) return 'warning';  // Scade entro 30gg (Arancione)
-    return 'success';                     // Ok (Verde)
+    const diffDays = Math.ceil((new Date(dateString) - new Date()) / (1000 * 60 * 60 * 24));
+    if (diffDays < 0) return 'error';
+    if (diffDays < 30) return 'warning';
+    return 'success';
   };
 
   return (
-    <Box sx={{ pb: 8 }}> {/* Padding extra in basso per scroll comodo su mobile */}
-      
-      {/* HEADER DELLA PAGINA */}
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        mb: 3,
-        flexDirection: isMobile ? 'column' : 'row',
-        gap: 2
-      }}>
+    <Box sx={{ pb: 8 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3, flexDirection: isMobile ? 'column' : 'row', gap: 2 }}>
         <Typography variant="h5" sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
-          <LocalShippingIcon color="primary" /> Parco Mezzi
+          <LocalShippingIcon color="primary" /> Parco Mezzi ({vehicles.length})
         </Typography>
         <Button 
           variant="contained" 
-          fullWidth={isMobile} 
-          size="large"
           startIcon={<AddCircleIcon />} 
-          onClick={() => setOpen(true)}
+          onClick={() => handleOpenDialog()}
           sx={{ borderRadius: 2 }}
         >
-          Aggiungi Mezzo
+          Nuovo Mezzo
         </Button>
       </Box>
 
-      {/* GRIGLIA VEICOLI */}
       <Grid container spacing={2}>
         {vehicles.map((v) => (
-          <Grid size={{ xs: 12, sm: 6, md: 4 }} key={v.id}>
-            <Card sx={{ 
-              borderRadius: 3, 
-              boxShadow: 3, 
-              position: 'relative',
-              overflow: 'visible' 
-            }}>
-              {/* Barra colorata laterale estetica */}
-              <Box sx={{ 
-                position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, 
-                bgcolor: '#1976d2',
-                borderTopLeftRadius: 12,
-                borderBottomLeftRadius: 12
-              }} />
-
+          <Grid item xs={12} sm={6} md={4} key={v.id}>
+            <Card sx={{ borderRadius: 3, boxShadow: 3, position: 'relative' }}>
+              <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 6, bgcolor: 'primary.main' }} />
               <CardContent sx={{ pl: 3 }}>
-                {/* Intestazione Card */}
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 1 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
                   <Box>
-                    <Typography variant="h5" fontWeight="900" sx={{ letterSpacing: 1 }}>
-                      {v.targa.toUpperCase()}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                      {v.modello}
-                    </Typography>
+                    <Typography variant="h5" fontWeight="900">{v.targa.toUpperCase()}</Typography>
+                    <Typography variant="body2" color="text.secondary">{v.marca} {v.modello} ({v.anno || 'N/D'})</Typography>
                   </Box>
-                  <IconButton onClick={() => handleDelete(v.id)} color="error" size="small">
-                    <DeleteIcon />
-                  </IconButton>
+                  <Box>
+                    <IconButton onClick={() => handleOpenDialog(v)} color="primary" size="small"><EditIcon /></IconButton>
+                    <IconButton onClick={() => handleDelete(v.id)} color="error" size="small"><DeleteIcon /></IconButton>
+                  </Box>
                 </Box>
                 
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, mt: 2 }}>
-                  
-                  {/* Assicurazione */}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: '#f5f5f5', p: 1, borderRadius: 1 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <VerifiedUserIcon fontSize="small" color="action" />
-                      <Typography variant="body2" fontWeight="bold">Assic.</Typography>
-                    </Box>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 2 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', bgcolor: '#f5f5f5', p: 1, borderRadius: 1 }}>
+                    <Typography variant="caption" fontWeight="bold">Assicurazione</Typography>
                     <Chip 
-                      label={v.scadenza_assicurazione ? new Date(v.scadenza_assicurazione).toLocaleDateString() : 'MANCA'} 
-                      color={getStatusColor(v.scadenza_assicurazione)} 
-                      size="small" 
-                      variant={getStatusColor(v.scadenza_assicurazione) === 'default' ? 'outlined' : 'filled'}
-                      icon={getStatusColor(v.scadenza_assicurazione) === 'error' ? <EventBusyIcon /> : <CheckCircleIcon />}
+                      label={v.scadenza_assicurazione ? formatDate(v.scadenza_assicurazione) : 'MANCA'} 
+					  color={getStatusColor(v.scadenza_assicurazione)} 
+					  size="small" 
                     />
                   </Box>
-
-                  {/* Revisione */}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: '#f5f5f5', p: 1, borderRadius: 1 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <BuildIcon fontSize="small" color="action" />
-                      <Typography variant="body2" fontWeight="bold">Revis.</Typography>
-                    </Box>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', bgcolor: '#f5f5f5', p: 1, borderRadius: 1 }}>
+                    <Typography variant="caption" fontWeight="bold">Revisione</Typography>
                     <Chip 
-                      label={v.scadenza_revisione ? new Date(v.scadenza_revisione).toLocaleDateString() : 'MANCA'} 
-                      color={getStatusColor(v.scadenza_revisione)} 
-                      size="small" 
-                      variant={getStatusColor(v.scadenza_revisione) === 'default' ? 'outlined' : 'filled'}
+                      label={v.scadenza_revisione ? formatDate(v.scadenza_revisione) : 'MANCA'} 
+					  color={getStatusColor(v.scadenza_revisione)} 
+					  size="small"
                     />
                   </Box>
-
-                  {/* Km e Note */}
-                  <Typography variant="body2" sx={{ mt: 1 }}>
-                    <strong>Km:</strong> {v.km_attuali ? Number(v.km_attuali).toLocaleString() : 0}
-                  </Typography>
-
+                  <Typography variant="body2"><strong>KM:</strong> {Number(v.km_attuali).toLocaleString()}</Typography>
+                  {v.alimentazione && <Typography variant="caption"><strong>Carburante:</strong> {v.alimentazione}</Typography>}
                   {v.note && (
-                    <Typography variant="caption" sx={{ display: 'block', bgcolor: '#fffde7', p: 1, borderRadius: 1, fontStyle: 'italic', border: '1px dashed #ccc' }}>
+                    <Typography variant="caption" sx={{ bgcolor: '#fffde7', p: 1, borderRadius: 1, border: '1px dashed #ccc' }}>
                       {v.note}
                     </Typography>
                   )}
@@ -195,76 +166,40 @@ function FleetView() {
         ))}
       </Grid>
 
-      {/* DIALOG DI INSERIMENTO OTTIMIZZATO MOBILE */}
-      <Dialog 
-        fullScreen={isMobile} // SU MOBILE A TUTTO SCHERMO
-        open={open} 
-        onClose={() => setOpen(false)}
-        TransitionComponent={Transition}
-      >
-        {/* Header Dialog Mobile */}
-        {isMobile && (
-          <AppBar sx={{ position: 'relative' }}>
-            <Toolbar>
-              <IconButton edge="start" color="inherit" onClick={() => setOpen(false)} aria-label="close">
-                <CloseIcon />
-              </IconButton>
-              <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
-                Nuovo Veicolo
-              </Typography>
-              <Button autoFocus color="inherit" onClick={handleCreate}>
-                Salva
-              </Button>
-            </Toolbar>
-          </AppBar>
-        )}
-
-        {/* Header Dialog Desktop */}
-        {!isMobile && <DialogTitle>Aggiungi Veicolo</DialogTitle>}
-
-        <DialogContent sx={{ pt: isMobile ? 3 : 1 }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-            
-            <TextField label="Targa" variant="outlined" fullWidth required
-              value={formData.targa} onChange={(e) => setFormData({...formData, targa: e.target.value})} />
-            
-            <TextField label="Modello" variant="outlined" fullWidth required
-              value={formData.modello} onChange={(e) => setFormData({...formData, modello: e.target.value})} />
-            
-            <TextField label="Km Attuali" type="number" variant="outlined" fullWidth 
-              value={formData.km_attuali} onChange={(e) => setFormData({...formData, km_attuali: e.target.value})} />
-            
-            {/* DATE FIX: InputLabelProps={{ shrink: true }} impedisce sovrapposizioni */}
-            <TextField 
-              label="Scadenza Assicurazione" 
-              type="date" 
-              fullWidth 
-              variant="outlined"
-              value={formData.scadenza_assicurazione} 
-              onChange={(e) => setFormData({...formData, scadenza_assicurazione: e.target.value})}
-              InputLabelProps={{ shrink: true }}
-            />
-            
-            <TextField 
-              label="Scadenza Revisione" 
-              type="date" 
-              fullWidth 
-              variant="outlined"
-              value={formData.scadenza_revisione} 
-              onChange={(e) => setFormData({...formData, scadenza_revisione: e.target.value})}
-              InputLabelProps={{ shrink: true }}
-            />
-            
-            <TextField label="Note / Manutenzione" multiline rows={3} variant="outlined" fullWidth 
-              value={formData.note} onChange={(e) => setFormData({...formData, note: e.target.value})} />
-          </Box>
+      <Dialog fullScreen={isMobile} open={open} onClose={() => setOpen(false)} TransitionComponent={Transition}>
+        <AppBar sx={{ position: 'relative', display: isMobile ? 'block' : 'none' }}>
+          <Toolbar>
+            <IconButton edge="start" color="inherit" onClick={() => setOpen(false)}><CloseIcon /></IconButton>
+            <Typography sx={{ ml: 2, flex: 1 }} variant="h6">{editingId ? 'Modifica' : 'Nuovo'} Veicolo</Typography>
+            <Button color="inherit" onClick={handleSubmit}>Salva</Button>
+          </Toolbar>
+        </AppBar>
+        
+        {!isMobile && <DialogTitle>{editingId ? 'Modifica Veicolo' : 'Aggiungi Veicolo'}</DialogTitle>}
+        
+        <DialogContent sx={{ pt: 2 }}>
+          <Grid container spacing={2} sx={{ mt: 0.5 }}>
+            <Grid item xs={6}><TextField label="Targa" fullWidth value={formData.targa} onChange={(e) => setFormData({...formData, targa: e.target.value})} /></Grid>
+            <Grid item xs={6}><TextField label="Marca" fullWidth value={formData.marca} onChange={(e) => setFormData({...formData, marca: e.target.value})} /></Grid>
+            <Grid item xs={12}><TextField label="Modello" fullWidth value={formData.modello} onChange={(e) => setFormData({...formData, modello: e.target.value})} /></Grid>
+            <Grid item xs={6}><TextField label="Anno" type="number" fullWidth value={formData.anno} onChange={(e) => setFormData({...formData, anno: e.target.value})} /></Grid>
+            <Grid item xs={6}>
+              <TextField select label="Alimentazione" fullWidth value={formData.alimentazione} onChange={(e) => setFormData({...formData, alimentazione: e.target.value})}>
+                {['Diesel', 'Benzina', 'Metano', 'GPL', 'Elettrico'].map(opt => <MenuItem key={opt} value={opt}>{opt}</MenuItem>)}
+              </TextField>
+            </Grid>
+            <Grid item xs={12}><TextField label="N° Telaio" fullWidth value={formData.telaio} onChange={(e) => setFormData({...formData, telaio: e.target.value})} /></Grid>
+            <Grid item xs={12}><TextField label="Km Attuali" type="number" fullWidth value={formData.km_attuali} onChange={(e) => setFormData({...formData, km_attuali: e.target.value})} /></Grid>
+            <Grid item xs={6}><TextField label="Scad. Assicurazione" type="date" fullWidth InputLabelProps={{ shrink: true }} value={formData.scadenza_assicurazione} onChange={(e) => setFormData({...formData, scadenza_assicurazione: e.target.value})} /></Grid>
+            <Grid item xs={6}><TextField label="Scad. Revisione" type="date" fullWidth InputLabelProps={{ shrink: true }} value={formData.scadenza_revisione} onChange={(e) => setFormData({...formData, scadenza_revisione: e.target.value})} /></Grid>
+            <Grid item xs={12}><TextField label="Note" multiline rows={3} fullWidth value={formData.note} onChange={(e) => setFormData({...formData, note: e.target.value})} /></Grid>
+          </Grid>
         </DialogContent>
 
-        {/* Footer Dialog Desktop */}
         {!isMobile && (
           <DialogActions>
             <Button onClick={() => setOpen(false)}>Annulla</Button>
-            <Button onClick={handleCreate} variant="contained">Salva</Button>
+            <Button onClick={handleSubmit} variant="contained">Salva Modifiche</Button>
           </DialogActions>
         )}
       </Dialog>
