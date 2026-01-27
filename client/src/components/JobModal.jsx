@@ -45,7 +45,7 @@ const EXTENDED_ITEMS = [
     "Divano Angolare", "Chaise Longue", "Pouf", "Tappeto",
     "Specchio Bagno", "Mobile Bagno", "Scarpiera", "Appendiabiti",
     "Bicicletta", "Tapis Roulant", "Pesi", "Valigia",
-    "Quadro", "Vaso", "Lampadario", "Pianta", "Scatola Libri"
+    "Quadro", "Vaso", "Lampadario", "Pianta", "Scatola Libri, capoc"
 ];
 
 function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
@@ -79,18 +79,23 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 
     // --- GESTIONE INVENTARIO ---
     const handleAddItem = (itemName) => {
-		if (!itemName || itemName.trim() === '') return;
-		const name = itemName.trim();
+		// Se itemName è un oggetto (capita con MUI), prendiamo la label o la stringa
+		const finalName = typeof itemName === 'string' ? itemName : itemName?.label;
+		
+		if (!finalName || finalName.trim() === '') return;
+		
+		const name = finalName.trim();
 
 		setInventoryList(prev => {
 			const existing = prev.find(i => i.name.toLowerCase() === name.toLowerCase());
 			if (existing) {
 				return prev.map(i => i.name.toLowerCase() === name.toLowerCase() ? { ...i, qty: i.qty + 1 } : i);
 			} else {
+				setInventoryList([]);
 				return [...prev, { name: name, qty: 1 }];
 			}
 		});
-		setInputValue(''); // Fondamentale per pulire il campo
+		setInputValue(''); // Reset dell'input dopo l'aggiunta
 	};
 
     const handleRemoveItem = (itemName) => {
@@ -375,13 +380,16 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 							{/* --- NUOVO CAMPO AUTOCOMPLETE --- */}
 							<Autocomplete
 								freeSolo
+								disableClearable={false}
 								options={EXTENDED_ITEMS}
 								inputValue={inputValue}
-								onInputChange={(e, val) => setInputValue(val)}
+								onInputChange={(e, val) => {
+									setInputValue(val);
+								}}
 								onChange={(e, newValue) => {
+									// Gestisce la selezione dalla lista suggerita (Desktop e Mobile)
 									if (newValue) {
 										handleAddItem(newValue);
-										setInputValue('');
 									}
 								}}
 								renderInput={(params) => (
@@ -392,8 +400,13 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 										size="small" 
 										onKeyDown={(e) => {
 											if (e.key === 'Enter') {
-												e.preventDefault(); // Evita di chiudere il modale o inviare il form
-												handleAddItem(inputValue);
+												// BLOCCA il passaggio al campo successivo (le Note)
+												e.preventDefault(); 
+												e.stopPropagation();
+												
+												if (inputValue.trim() !== '') {
+													handleAddItem(inputValue);
+												}
 											}
 										}}
 									/>
