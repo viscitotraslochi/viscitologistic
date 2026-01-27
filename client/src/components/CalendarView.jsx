@@ -149,13 +149,14 @@ function CalendarView() {
         // --- CASO 1: VISTA GRIGLIA (Mese e Settimana - Rimane compatta) ---
         if (view.type === 'dayGridMonth' || view.type === 'timeGridWeek') {
         
-    const visibleEvents = React.useMemo(() => {
-        if (typeFilter === 'all') return events;
-        return events.filter(e => {
+    
+    const visibleEvents = (typeFilter === 'all')
+        ? events
+        : events.filter(e => {
             const t = String(e.extendedProps?.job_type || e.extendedProps?.tipo_lavoro || e.extendedProps?.tipo || '').toLowerCase();
             return t === typeFilter;
         });
-    }, [events, typeFilter]);
+
     return (
                 <div style={{
                     backgroundColor: bgColor,
