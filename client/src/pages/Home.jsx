@@ -154,8 +154,6 @@ function Home() {
 		ascensore_arrivo: 'NO',  
 	});
 
-	const [inventoryList, setInventoryList] = useState([]);
-
 	// Sincronizza inventoryList -> formData.items
 	useEffect(() => {
 		const textString = inventoryList.map(item => `${item.name} x${item.qty}`).join(', ');
