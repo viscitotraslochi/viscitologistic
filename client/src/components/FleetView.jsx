@@ -210,32 +210,45 @@ function FleetView() {
 			].map((field) => (
 			  <Grid item xs={12} sm={field.size} key={field.id}>
 				<TextField
-				  id={`input-${field.id}`} // Risolve errore label
+				  id={field.id}
+				  name={field.id}
 				  label={field.label}
 				  fullWidth
 				  required={field.required}
 				  variant="outlined"
 				  type={field.type || 'text'}
-				  InputLabelProps={field.type === 'date' ? { shrink: true } : undefined}
+				  InputLabelProps={{
+					shrink: field.type === 'date',
+					htmlFor: field.id
+				  }}
 				  value={formData[field.id]}
-				  onChange={(e) => setFormData({ 
-					...formData, 
-					[field.id]: field.id === 'targa' ? e.target.value.toUpperCase() : e.target.value 
-				  })}
+				  onChange={(e) =>
+					setFormData({
+					  ...formData,
+					  [field.id]:
+						field.id === 'targa'
+						  ? e.target.value.toUpperCase()
+						  : e.target.value
+					})
+				  }
 				/>
 			  </Grid>
 			))}
 			
 			<Grid item xs={12}>
 			  <TextField
-				id="input-alimentazione"
-				select
-				label="Alimentazione"
-				fullWidth
-				variant="outlined"
-				value={formData.alimentazione}
-				onChange={(e) => setFormData({ ...formData, alimentazione: e.target.value })}
-			  >
+				  id="alimentazione"
+				  name="alimentazione"
+				  select
+				  label="Alimentazione"
+				  fullWidth
+				  variant="outlined"
+				  value={formData.alimentazione}
+				  InputLabelProps={{ htmlFor: 'alimentazione' }}
+				  onChange={(e) =>
+					setFormData({ ...formData, alimentazione: e.target.value })
+				  }
+				>
 				{['Diesel', 'Benzina', 'Metano', 'GPL', 'Elettrico', 'Ibrida'].map(opt => (
 				  <MenuItem key={opt} value={opt}>{opt}</MenuItem>
 				))}
@@ -244,15 +257,19 @@ function FleetView() {
 
 			<Grid item xs={12}>
 			  <TextField
-				id="input-note"
-				label="Note e Manutenzione"
-				multiline
-				rows={3}
-				fullWidth
-				variant="outlined"
-				value={formData.note}
-				onChange={(e) => setFormData({ ...formData, note: e.target.value })}
-			  />
+				  id="note"
+				  name="note"
+				  label="Note e Manutenzione"
+				  multiline
+				  rows={3}
+				  fullWidth
+				  variant="outlined"
+				  InputLabelProps={{ htmlFor: 'note' }}
+				  value={formData.note}
+				  onChange={(e) =>
+					setFormData({ ...formData, note: e.target.value })
+				  }
+				/>
 			</Grid>
 		  </Grid>
 		</DialogContent>
