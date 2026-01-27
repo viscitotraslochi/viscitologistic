@@ -1,4 +1,7 @@
 require('dotenv').config();
+
+import axios from 'axios';
+
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg'); 
@@ -397,16 +400,29 @@ app.post('/contatto', async (req, res) => {
   }
 });
 
-const axios = require('axios');
+// Host corretto per Render
+const HOST =
+  process.env.RENDER_EXTERNAL_HOSTNAME ||
+  'viscito-backend.onrender.com';
 
-setInterval(() => {
-  const host = process.env.RENDER_EXTERNAL_HOSTNAME 
-               ? `${process.env.RENDER_EXTERNAL_HOSTNAME}.onrender.com` 
-               : 'viscito-backend.onrender.com'; 
+// Ping ogni 14 minuti
+setInterval(async () => {
+  try {
+    await axios.get(`https://${HOST}/jobs`, {
+      timeout: 10_000, // 10 secondi
+      headers: {
+        'User-Agent': 'render-keepalive'
+      }
+    });
 
-  axios.get(`https://${host}/jobs`)
-    .then(() => console.log('Auto-ping: Backend mantenuto sveglio'))
-    .catch((err) => console.error('Auto-ping fallito:', err.message));
-}, 840000); // 14 minuti
+    console.log('Auto-ping: Backend mantenuto sveglio');
+  } catch (err) {
+    console.error(
+      'Auto-ping fallito:',
+      err.code || err.message
+    );
+  }
+}, 14 * 60 * 1000);
+
 
 app.listen(port, () => console.log(`Server avviato sulla porta ${port}`));
