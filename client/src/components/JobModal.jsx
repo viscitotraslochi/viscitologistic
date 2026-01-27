@@ -127,6 +127,7 @@ const validateContact = (fd, setErrors) => {
   return phoneOk && emailOk;
 };
 
+
 function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
   const lastFocusedRef = useRef(null);
   const [inputValue, setInputValue] = useState('');

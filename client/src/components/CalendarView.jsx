@@ -40,6 +40,7 @@ function CalendarView() {
     const calendarRef = useRef(null);
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const [currentView, setCurrentView] = useState(isMobile ? 'listWeek' : 'dayGridMonth');
 
     // --- 1. GESTIONE CAMBIO VISTA AUTOMATICO ---
     useEffect(() => {
@@ -147,7 +148,15 @@ function CalendarView() {
 
         // --- CASO 1: VISTA GRIGLIA (Mese e Settimana - Rimane compatta) ---
         if (view.type === 'dayGridMonth' || view.type === 'timeGridWeek') {
-            return (
+        
+    const visibleEvents = React.useMemo(() => {
+        if (typeFilter === 'all') return events;
+        return events.filter(e => {
+            const t = String(e.extendedProps?.job_type || e.extendedProps?.tipo_lavoro || e.extendedProps?.tipo || '').toLowerCase();
+            return t === typeFilter;
+        });
+    }, [events, typeFilter]);
+    return (
                 <div style={{
                     backgroundColor: bgColor,
                     borderLeft: `4px solid ${mainColor}`,
@@ -452,32 +461,83 @@ function CalendarView() {
         <Paper elevation={0} sx={{ p: 0, height: '85vh', display: 'flex', flexDirection: 'column', bgcolor: 'transparent' }}>
             
             {/* Header Pagina */}
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, px: 1 }}>
-                <Typography variant={isMobile ? "h5" : "h4"} component="h2" sx={{ fontWeight: '800', color: '#102a43' }}>
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: isMobile ? 'column' : 'row',
+                    alignItems: isMobile ? 'stretch' : 'center',
+                    justifyContent: 'space-between',
+                    gap: 1,
+                    mb: 2,
+                    px: 1
+                }}
+            >
+                <Typography
+                    variant={isMobile ? 'h5' : 'h4'}
+                    component="h2"
+                    sx={{ fontWeight: 800, color: '#102a43', lineHeight: 1.1 }}
+                >
                     Calendario
                 </Typography>
-                <Button 
-                    variant="contained" 
-                    startIcon={<AddIcon />} 
-                    onClick={() => { setSelectedJob(null); setIsModalOpen(true); }}
-                    sx={{ borderRadius: 2, fontWeight: 'bold', textTransform: 'none' }}
+
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: isMobile ? 'column' : 'row',
+                        alignItems: isMobile ? 'stretch' : 'center',
+                        justifyContent: 'flex-end',
+                        gap: 1,
+                        flexWrap: 'wrap'
+                    }}
                 >
-                    Nuovo Lavoro
-                </Button>
-            
-                <ToggleButtonGroup
-                    value={typeFilter}
-                    exclusive
-                    onChange={(e, v) => { if (v) setTypeFilter(v); }}
-                    size="small"
-                    sx={{ ml: 2, bgcolor: '#fff', borderRadius: 2, '& .MuiToggleButton-root': { textTransform: 'none', fontWeight: 700 } }}
-                >
-                    <ToggleButton value="all">Tutti</ToggleButton>
-                    <ToggleButton value="sopralluogo">Sopralluoghi</ToggleButton>
-                    <ToggleButton value="trasloco">Traslochi</ToggleButton>
-                </ToggleButtonGroup>
-</Box>
-            
+                    <Button
+                        variant="contained"
+                        startIcon={<AddIcon />}
+                        onClick={() => {
+                            setSelectedJob(null);
+                            setSelectedDate(null);
+                            setIsModalOpen(true);
+                        }}
+                        fullWidth={isMobile}
+                        sx={{
+                            borderRadius: 2,
+                            fontWeight: 800,
+                            textTransform: 'none',
+                            whiteSpace: 'nowrap'
+                        }}
+                    >
+                        Nuovo Lavoro
+                    </Button>
+
+                    {/* Filtro visibile solo in vista Lista */}
+                    {String(currentView || '').startsWith('list') && (
+                        <ToggleButtonGroup
+                            value={typeFilter}
+                            exclusive
+                            onChange={(e, v) => {
+                                if (v) setTypeFilter(v);
+                            }}
+                            size="small"
+                            fullWidth={isMobile}
+                            sx={{
+                                bgcolor: '#fff',
+                                borderRadius: 2,
+                                flexWrap: 'wrap',
+                                '& .MuiToggleButton-root': {
+                                    textTransform: 'none',
+                                    fontWeight: 800,
+                                    px: isMobile ? 1 : 1.5
+                                }
+                            }}
+                        >
+                            <ToggleButton value="all">Tutti</ToggleButton>
+                            <ToggleButton value="sopralluogo">Sopralluoghi</ToggleButton>
+                            <ToggleButton value="trasloco">Traslochi</ToggleButton>
+                        </ToggleButtonGroup>
+                    )}
+                </Box>
+            </Box>
+
             {/* Contenitore Calendario */}
             <Box sx={{ 
                 flexGrow: 1, 
@@ -510,6 +570,7 @@ function CalendarView() {
                     
                     events={filteredEvents}
                     height="100%"
+                    datesSet={(arg) => setCurrentView(arg.view.type)}
                     dateClick={handleDateClick}
                     eventClick={handleEventClick}
                     eventContent={renderEventContent} 
