@@ -237,13 +237,13 @@ export default function InventorySelector({ inventoryList, setInventoryList, for
       <TextField
         id="items_extra"
         name="items_extra"
-        label="Descrizione extra / Misure / Lista completa"
+        label="Descrizione extra / Misure"
         fullWidth
         multiline
         rows={3}
         value={formData.items_extra || ''}
         onChange={(e) => setFormData(prev => ({ ...prev, items_extra: e.target.value }))}
-        helperText="Questa parte verrà aggiunta al riepilogo al momento dell'invio."
+        helperText="Questa parte verrà aggiunta all'inventario."
         sx={{ mt: 2 }}
       />
     </Paper>

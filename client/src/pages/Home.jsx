@@ -31,7 +31,7 @@ export default function Home() {
       }}
     >
       {/* HERO */}
-      <HomeHero onScrollToForm={scrollToForm} />
+      <HomeHero ScrollToForm={scrollToForm} />
 
       {/* SERVIZI */}
       <ServicesSection isMobile={isMobile} />

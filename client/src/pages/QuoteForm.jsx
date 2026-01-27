@@ -13,7 +13,8 @@ import {
   MenuItem,
   Snackbar,
   Alert,
-  IconButton
+  IconButton,
+  Autocomplete 
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
 
@@ -91,6 +92,81 @@ export default function QuoteForm() {
     const s = clean(v);
     return s.length ? s : null;
   };
+
+// --- Debounce semplice ---
+const useDebouncedValue = (value, delay = 400) => {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(t);
+  }, [value, delay]);
+  return debounced;
+};
+
+const debouncedDa = useDebouncedValue(formData.da_indirizzo, 350);
+const debouncedA = useDebouncedValue(formData.a_indirizzo, 350);
+
+const fetchAddressSuggestions = async (query) => {
+  const q = (query ?? '').trim();
+  if (q.length < 3) return [];
+
+  const url = `https://nominatim.openstreetmap.org/search
+    ?format=json
+    &addressdetails=1
+    &limit=6
+    &countrycodes=it
+    &accept-language=it
+    &q=${encodeURIComponent(q)}`.replace(/\s+/g, '');
+
+  const res = await fetch(url, {
+    headers: {
+      // richiesto da Nominatim (policy)
+      'Accept': 'application/json'
+    }
+  });
+
+  const data = await res.json();
+
+  return (data || []).map(item => ({
+    label: item.display_name,   // testo mostrato
+    value: item.display_name,   // valore finale
+    lat: item.lat,
+    lon: item.lon
+  }));
+};
+
+
+// --- aggiorna suggestions quando l’utente digita ---
+useEffect(() => {
+  let alive = true;
+  (async () => {
+    try {
+      const list = await fetchAddressSuggestions(debouncedDa);
+      if (!alive) return;
+      setSuggestions(prev => ({ ...prev, da: list }));
+    } catch {
+      if (!alive) return;
+      setSuggestions(prev => ({ ...prev, da: [] }));
+    }
+  })();
+  return () => { alive = false; };
+}, [debouncedDa]);
+
+useEffect(() => {
+  let alive = true;
+  (async () => {
+    try {
+      const list = await fetchAddressSuggestions(debouncedA);
+      if (!alive) return;
+      setSuggestions(prev => ({ ...prev, a: list }));
+    } catch {
+      if (!alive) return;
+      setSuggestions(prev => ({ ...prev, a: [] }));
+    }
+  })();
+  return () => { alive = false; };
+}, [debouncedA]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -223,32 +299,70 @@ export default function QuoteForm() {
 
             <Grid container spacing={4}>
               <Grid size={{ xs: 12, md: 6 }}>
-                <TextField
-                  fullWidth
-                  required
-                  label="Indirizzo Partenza"
-                  name="da_indirizzo"
-                  value={formData.da_indirizzo}
-                  onChange={handleChange}
-                  InputProps={{
-                    startAdornment: <HomeIcon sx={{ mr: 1 }} />,
-                    endAdornment: <IconButton onClick={() => openMap('da_indirizzo')}><MapIcon /></IconButton>
-                  }}
-                />
-              </Grid>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <TextField
-                  fullWidth
-                  label="Indirizzo Arrivo"
-                  name="a_indirizzo"
-                  value={formData.a_indirizzo}
-                  onChange={handleChange}
-                  InputProps={{
-                    startAdornment: <LocationOnIcon sx={{ mr: 1 }} />,
-                    endAdornment: <IconButton onClick={() => openMap('a_indirizzo')}><MapIcon /></IconButton>
-                  }}
-                />
-              </Grid>
+				  <Autocomplete
+					freeSolo
+					options={suggestions.da || []}
+					inputValue={formData.da_indirizzo}
+					onInputChange={(e, newVal) => setFormData(prev => ({ ...prev, da_indirizzo: newVal }))}
+					onChange={(e, newVal) => {
+					  if (typeof newVal === 'string') {
+						setFormData(prev => ({ ...prev, da_indirizzo: newVal }));
+					  }
+					}}
+					renderInput={(params) => (
+					  <TextField
+						{...params}
+						fullWidth
+						required
+						label="Indirizzo Partenza"
+						name="da_indirizzo"
+						InputProps={{
+						  ...params.InputProps,
+						  startAdornment: <HomeIcon sx={{ mr: 1 }} />,
+						  endAdornment: (
+							<>
+							  {params.InputProps.endAdornment}
+							  <IconButton onClick={() => openMap('da_indirizzo')}><MapIcon /></IconButton>
+							</>
+						  )
+						}}
+					  />
+					)}
+				  />
+				</Grid>
+
+				<Grid size={{ xs: 12, md: 6 }}>
+				  <Autocomplete
+					freeSolo
+					options={suggestions.a || []}
+					inputValue={formData.a_indirizzo}
+					onInputChange={(e, newVal) => setFormData(prev => ({ ...prev, a_indirizzo: newVal }))}
+					onChange={(e, newVal) => {
+					  if (typeof newVal === 'string') {
+						setFormData(prev => ({ ...prev, a_indirizzo: newVal }));
+					  }
+					}}
+					renderInput={(params) => (
+					  <TextField
+						{...params}
+						fullWidth
+						label="Indirizzo Arrivo"
+						name="a_indirizzo"
+						InputProps={{
+						  ...params.InputProps,
+						  startAdornment: <LocationOnIcon sx={{ mr: 1 }} />,
+						  endAdornment: (
+							<>
+							  {params.InputProps.endAdornment}
+							  <IconButton onClick={() => openMap('a_indirizzo')}><MapIcon /></IconButton>
+							</>
+						  )
+						}}
+					  />
+					)}
+				  />
+				</Grid>
+
 
               <Grid size={{ xs: 6 }}>
                 <FormControl fullWidth size="small">

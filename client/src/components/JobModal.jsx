@@ -104,6 +104,8 @@ const EXTENDED_ITEMS = [
 function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
   const lastFocusedRef = useRef(null);
   const [inputValue, setInputValue] = useState('');
+  
+  const [suggestions, setSuggestions] = useState({ da: [], a: [] });
 
   const [formData, setFormData] = useState({
     cliente_nome: '',
@@ -169,6 +171,78 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
+  
+  // --- Debounce semplice ---
+const useDebouncedValue = (value, delay = 350) => {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(t);
+  }, [value, delay]);
+  return debounced;
+};
+
+const debouncedDa = useDebouncedValue(formData.da_indirizzo, 350);
+const debouncedA = useDebouncedValue(formData.a_indirizzo, 350);
+
+// --- Nominatim (OSM) - SOLO ITALIA ---
+const fetchAddressSuggestions = async (query) => {
+  const q = (query ?? '').trim();
+  if (q.length < 3) return [];
+
+  const url = `
+    https://nominatim.openstreetmap.org/search
+      ?format=json
+      &addressdetails=1
+      &limit=6
+      &countrycodes=it
+      &accept-language=it
+      &q=${encodeURIComponent(q)}
+  `.replace(/\s+/g, '');
+
+  const res = await fetch(url, { headers: { Accept: 'application/json' } });
+  const data = await res.json();
+
+  return (data || []).map(item => ({
+    label: item.display_name,
+    value: item.display_name,
+    lat: item.lat,
+    lon: item.lon
+  }));
+};
+
+// Aggiorna suggestions per "da_indirizzo"
+useEffect(() => {
+  let alive = true;
+  (async () => {
+    try {
+      const list = await fetchAddressSuggestions(debouncedDa);
+      if (!alive) return;
+      setSuggestions(prev => ({ ...prev, da: list }));
+    } catch {
+      if (!alive) return;
+      setSuggestions(prev => ({ ...prev, da: [] }));
+    }
+  })();
+  return () => { alive = false; };
+}, [debouncedDa]);
+
+// Aggiorna suggestions per "a_indirizzo"
+useEffect(() => {
+  let alive = true;
+  (async () => {
+    try {
+      const list = await fetchAddressSuggestions(debouncedA);
+      if (!alive) return;
+      setSuggestions(prev => ({ ...prev, a: list }));
+    } catch {
+      if (!alive) return;
+      setSuggestions(prev => ({ ...prev, a: [] }));
+    }
+  })();
+  return () => { alive = false; };
+}, [debouncedA]);
+
 
   function LocationMarker() {
     useMapEvents({
@@ -182,6 +256,7 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
           const address = data.address?.Match_addr || "Indirizzo non trovato";
           if (currentMapField) {
             setFormData(prev => ({ ...prev, [currentMapField]: address }));
+			setSuggestions({ da: [], a: [] });
             setMapOpen(false);
           }
         } catch (error) {
@@ -391,26 +466,47 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
           <Grid size={{ xs: 12 }}><Divider sx={{ my: 1 }} /></Grid>
 
           <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField
-              id="da_indirizzo"
-              label="Partenza"
-              name="da_indirizzo"
-              fullWidth
-              value={formData.da_indirizzo}
-              onChange={handleChange}
-              InputProps={{
-                endAdornment: (
-                  <IconButton onClick={(e) => {
-                    lastFocusedRef.current = e.currentTarget;
-                    e.currentTarget.blur();
-                    setCurrentMapField('da_indirizzo');
-                    setMapOpen(true);
-                  }}>
-                    <MapIcon color="primary" />
-                  </IconButton>
-                )
-              }}
-            />
+            <Autocomplete
+			  freeSolo
+			  disablePortal
+			  options={suggestions.da || []}
+			  getOptionLabel={(opt) => (typeof opt === 'string' ? opt : opt?.label || '')}
+			  inputValue={formData.da_indirizzo || ''}
+			  onInputChange={(event, newInputValue) => {
+				setFormData(prev => ({ ...prev, da_indirizzo: newInputValue }));
+			  }}
+			  onChange={(event, newValue) => {
+				const v = typeof newValue === 'string' ? newValue : newValue?.value;
+				if (v) setFormData(prev => ({ ...prev, da_indirizzo: v }));
+			  }}
+			  renderInput={(params) => (
+				<TextField
+				  {...params}
+				  id="da_indirizzo"
+				  label="Partenza"
+				  name="da_indirizzo"
+				  fullWidth
+				  value={formData.da_indirizzo}
+				  onChange={handleChange}
+				  InputProps={{
+					...params.InputProps,
+					endAdornment: (
+					  <>
+						{params.InputProps.endAdornment}
+						<IconButton onClick={(e) => {
+						  lastFocusedRef.current = e.currentTarget;
+						  e.currentTarget.blur();
+						  setCurrentMapField('da_indirizzo');
+						  setMapOpen(true);
+						}}>
+						  <MapIcon color="primary" />
+						</IconButton>
+					  </>
+					)
+				  }}
+				/>
+			  )}
+			/>
             <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
               <TextField
                 select
@@ -443,26 +539,48 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
           </Grid>
 
           <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField
-              id="a_indirizzo"
-              label="Destinazione"
-              name="a_indirizzo"
-              fullWidth
-              value={formData.a_indirizzo}
-              onChange={handleChange}
-              InputProps={{
-                endAdornment: (
-                  <IconButton onClick={(e) => {
-                    lastFocusedRef.current = e.currentTarget;
-                    e.currentTarget.blur();
-                    setCurrentMapField('a_indirizzo');
-                    setMapOpen(true);
-                  }}>
-                    <MapIcon color="primary" />
-                  </IconButton>
-                )
-              }}
-            />
+            <Autocomplete
+			  freeSolo
+			  disablePortal
+			  options={suggestions.a || []}
+			  getOptionLabel={(opt) => (typeof opt === 'string' ? opt : opt?.label || '')}
+			  inputValue={formData.a_indirizzo || ''}
+			  onInputChange={(event, newInputValue) => {
+				setFormData(prev => ({ ...prev, a_indirizzo: newInputValue }));
+			  }}
+			  onChange={(event, newValue) => {
+				const v = typeof newValue === 'string' ? newValue : newValue?.value;
+				if (v) setFormData(prev => ({ ...prev, a_indirizzo: v }));
+			  }}
+			  renderInput={(params) => (
+				<TextField
+				  {...params}
+				  id="a_indirizzo"
+				  label="Destinazione"
+				  name="a_indirizzo"
+				  fullWidth
+				  value={formData.a_indirizzo}
+				  onChange={handleChange}
+				  InputProps={{
+					...params.InputProps,
+					endAdornment: (
+					  <>
+						{params.InputProps.endAdornment}
+						<IconButton onClick={(e) => {
+						  lastFocusedRef.current = e.currentTarget;
+						  e.currentTarget.blur();
+						  setCurrentMapField('a_indirizzo');
+						  setMapOpen(true);
+						}}>
+						  <MapIcon color="primary" />
+						</IconButton>
+					  </>
+					)
+				  }}
+				/>
+			  )}
+			/>
+
             <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
               <TextField
                 select
