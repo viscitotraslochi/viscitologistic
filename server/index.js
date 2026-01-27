@@ -398,35 +398,4 @@ app.post('/contatto', async (req, res) => {
   }
 });
 
-import axios from 'axios';
-import https from 'https';
-
-// --- Agente HTTPS forzato TLS 1.2+ ---
-const httpsAgent = new https.Agent({
-  minVersion: 'TLSv1.2', // obbliga TLS moderno
-  keepAlive: true
-});
-
-// --- Funzione di ping ---
-const autoPingBackend = async () => {
-  const host = process.env.RENDER_EXTERNAL_HOSTNAME
-               ? `${process.env.RENDER_EXTERNAL_HOSTNAME}.onrender.com`
-               : 'viscito-backend.onrender.com';
-
-  try {
-    await axios.get(`https://${host}/jobs`, { httpsAgent });
-    console.log('Auto-ping: Backend sveglio');
-  } catch (err) {
-    console.error('Auto-ping fallito:', err.message);
-  }
-};
-
-// --- Ping ogni 14 minuti (840000 ms) ---
-setInterval(autoPingBackend, 14 * 60 * 1000);
-
-// --- Ping subito all'avvio ---
-autoPingBackend();
-
-
-
 app.listen(port, () => console.log(`Server avviato sulla porta ${port}`));
