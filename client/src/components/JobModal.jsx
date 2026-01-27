@@ -77,9 +77,10 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 
     // --- GESTIONE INVENTARIO ---
     const handleAddItem = (itemName) => {
-		if (!itemName || itemName.trim() === '') return;
+		// Gestisce sia stringhe dirette che oggetti dall'autocomplete
+		const name = (typeof itemName === 'string' ? itemName : itemName?.label)?.trim();
 		
-		const name = itemName.trim();
+		if (!name) return;
 
 		setInventoryList(prev => {
 			const existing = prev.find(i => i.name.toLowerCase() === name.toLowerCase());
@@ -90,8 +91,8 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 			}
 		});
 
-		// Pulisce l'input e resetta il focus dell'autocomplete
-		setInputValue(''); 
+		// Reset immediato
+		setInputValue('');
 	};
 
     const handleRemoveItem = (itemName) => {
@@ -362,7 +363,7 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 
                     {/* INVENTARIO */}
                     <Grid size={{ xs: 12 }}>
-                        <Paper variant="outlined" sx={{ p: 2, bgcolor: '#f8f9fa', borderRadius: 2 }}>
+						<Paper variant="outlined" sx={{ p: 2, bgcolor: '#f8f9fa', borderRadius: 2 }}>
 							<Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 'bold', color: 'text.secondary' }}>
 								AGGIUNTA RAPIDA
 							</Typography>
@@ -373,43 +374,51 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 								))}
 							</Box>
 
-							{/* --- NUOVO CAMPO AUTOCOMPLETE --- */}
-							<Autocomplete
-								freeSolo
-								// Questo permette di vedere i suggerimenti anche mentre scrivi
-								options={EXTENDED_ITEMS}
-								inputValue={inputValue}
-								onInputChange={(e, val) => setInputValue(val)}
-								// Gestisce il click sul suggerimento
-								onChange={(e, newValue) => {
-									if (newValue) {
-										handleAddItem(newValue);
-									}
-								}}
-								// IMPORTANTE PER MOBILE: Impedisce che "Invio" passi al campo successivo
-								renderInput={(params) => (
-									<TextField 
-										{...params} 
-										label="Cerca o scrivi nuovo oggetto..." 
-										variant="outlined" 
-										size="small" 
-										onKeyDown={(e) => {
-											if (e.key === 'Enter') {
-												// Blocca il comportamento di default (passare al campo Note)
-												e.preventDefault();
-												e.stopPropagation();
-												
-												if (inputValue && inputValue.trim() !== '') {
-													handleAddItem(inputValue);
-												}
-											}
-										}}
-									/>
-								)}
-							/>
 							<Divider sx={{ my: 2 }} />
 
-							<Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold', color: '#1976d2' }}>
+							{/* INPUT AUTOCOMPLETE + BOTTONE AGGIUNGI */}
+							<Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+								<Autocomplete
+									freeSolo
+									fullWidth
+									options={EXTENDED_ITEMS}
+									inputValue={inputValue}
+									onInputChange={(event, newInputValue) => {
+										setInputValue(newInputValue);
+									}}
+									onChange={(event, newValue) => {
+										if (newValue) {
+											handleAddItem(newValue);
+										}
+									}}
+									renderInput={(params) => (
+										<TextField
+											{...params}
+											label="Cerca o scrivi oggetto..."
+											size="small"
+											onKeyDown={(e) => {
+												if (e.key === 'Enter') {
+													// BLOCCA il salto al campo Note
+													e.preventDefault();
+													e.stopPropagation();
+													if (inputValue.trim() !== '') {
+														handleAddItem(inputValue);
+													}
+												}
+											}}
+										/>
+									)}
+								/>
+								<Button 
+									variant="contained" 
+									onClick={() => handleAddItem(inputValue)}
+									sx={{ minWidth: '48px', p: 0 }}
+								>
+									<AddCircleOutlineIcon />
+								</Button>
+							</Box>
+
+							<Typography variant="subtitle2" sx={{ mt: 2, mb: 1, fontWeight: 'bold', color: '#1976d2' }}>
 								INVENTARIO CORRENTE:
 							</Typography>
 
@@ -426,9 +435,7 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 								))}
 							</Box>
 
-							{/* RIEPILOGO FINALE: lo mettiamo in sola lettura (readOnly) perché si aggiorna da solo */}
 							<TextField 
-								id="items" 
 								label="Riepilogo (Auto-generato)" 
 								fullWidth 
 								multiline 
@@ -438,7 +445,7 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 								slotProps={{ input: { readOnly: true } }} 
 							/>
 						</Paper>
-                    </Grid>
+					</Grid>
 
                     <Grid size={{ xs: 12 }}>
                         <TextField id="notes" label="Note" name="notes" multiline rows={2} fullWidth value={formData.notes} onChange={handleChange} />
