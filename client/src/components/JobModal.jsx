@@ -30,13 +30,13 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-const QUICK_ITEMS = [
-    "Scatole P", "Scatole M", "Scatole G", "Baule",
-    "Divano 2p", "Divano 3p", "Poltrona", 
-    "Letto Sing.", "Letto Matr.", "Materasso S", "Materasso M",
-    "Armadio 2a", "Armadio 6a", "Comò", "Comodino",
-    "Tavolo", "Sedia", "Scrivania", "Libreria",
-    "Lavatrice", "Frigo", "TV", "Specchio"
+const EXTENDED_ITEMS = [
+    ...QUICK_ITEMS,
+    "Lavastoviglie", "Asciugatrice", "Forno", "Microonde", "Piano Cottura",
+    "Divano Angolare", "Chaise Longue", "Pouf", "Tappeto",
+    "Specchio Bagno", "Mobile Bagno", "Scarpiera", "Appendiabiti",
+    "Bicicletta", "Tapis Roulant", "Pesi", "Valigia",
+    "Quadro", "Vaso", "Lampadario", "Pianta", "Scatola Libri"
 ];
 
 const EXTENDED_ITEMS = [
@@ -79,17 +79,19 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 
     // --- GESTIONE INVENTARIO ---
     const handleAddItem = (itemName) => {
-        if (!itemName) return;
-        setInventoryList(prev => {
-            const existing = prev.find(i => i.name.toLowerCase() === itemName.toLowerCase());
-            if (existing) {
-                return prev.map(i => i.name.toLowerCase() === itemName.toLowerCase() ? { ...i, qty: i.qty + 1 } : i);
-            } else {
-                return [...prev, { name: itemName, qty: 1 }];
-            }
-        });
-        setInputValue('');
-    };
+		if (!itemName || itemName.trim() === '') return;
+		const name = itemName.trim();
+
+		setInventoryList(prev => {
+			const existing = prev.find(i => i.name.toLowerCase() === name.toLowerCase());
+			if (existing) {
+				return prev.map(i => i.name.toLowerCase() === name.toLowerCase() ? { ...i, qty: i.qty + 1 } : i);
+			} else {
+				return [...prev, { name: name, qty: 1 }];
+			}
+		});
+		setInputValue(''); // Fondamentale per pulire il campo
+	};
 
     const handleRemoveItem = (itemName) => {
         setInventoryList(prev => {
@@ -105,9 +107,9 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 
     // Sincronizza inventoryList -> formData.items
     useEffect(() => {
-        const textString = inventoryList.map(item => `${item.name} x${item.qty}`).join(', ');
-        setFormData(prev => ({ ...prev, items: textString }));
-    }, [inventoryList]);
+		const textString = inventoryList.map(item => `${item.name} x${item.qty}`).join(', ');
+		setFormData(prev => ({ ...prev, items: textString }));
+	}, [inventoryList]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -360,47 +362,75 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
                     {/* INVENTARIO */}
                     <Grid size={{ xs: 12 }}>
                         <Paper variant="outlined" sx={{ p: 2, bgcolor: '#f8f9fa', borderRadius: 2 }}>
-                            <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 'bold', color: 'text.secondary' }}>AGGIUNTA RAPIDA</Typography>
-                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-                                {QUICK_ITEMS.map((item) => (
-                                    <Chip key={item} label={item} onClick={() => handleAddItem(item)} clickable sx={{ bgcolor: '#fff', border: '1px solid #e0e0e0' }} />
-                                ))}
-                            </Box>
+							<Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 'bold', color: 'text.secondary' }}>
+								AGGIUNTA RAPIDA
+							</Typography>
+							
+							<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+								{QUICK_ITEMS.map((item) => (
+									<Chip key={item} label={item} onClick={() => handleAddItem(item)} clickable sx={{ bgcolor: '#fff', border: '1px solid #e0e0e0' }} />
+								))}
+							</Box>
 
-                            <Autocomplete
-                                freeSolo
-                                options={EXTENDED_ITEMS}
-                                inputValue={inputValue}
-                                onInputChange={(e, val) => setInputValue(val)}
-                                onChange={(e, val) => { if(val) handleAddItem(val); }}
-                                renderInput={(params) => (
-                                    <TextField {...params} label="Cerca o scrivi nuovo oggetto..." variant="outlined" size="small" 
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter' && inputValue) {
-                                                e.preventDefault();
-                                                handleAddItem(inputValue);
-                                            }
-                                        }}
-                                    />
-                                )}
-                            />
+							{/* --- NUOVO CAMPO AUTOCOMPLETE --- */}
+							<Autocomplete
+								freeSolo
+								options={EXTENDED_ITEMS}
+								inputValue={inputValue}
+								onInputChange={(e, val) => setInputValue(val)}
+								onChange={(e, newValue) => {
+									if (newValue) {
+										handleAddItem(newValue);
+										setInputValue('');
+									}
+								}}
+								renderInput={(params) => (
+									<TextField 
+										{...params} 
+										label="Cerca o scrivi nuovo oggetto..." 
+										variant="outlined" 
+										size="small" 
+										onKeyDown={(e) => {
+											if (e.key === 'Enter') {
+												e.preventDefault(); // Evita di chiudere il modale o inviare il form
+												handleAddItem(inputValue);
+											}
+										}}
+									/>
+								)}
+							/>
 
-                            <Divider sx={{ my: 2 }} />
-                            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold', color: '#1976d2' }}>INVENTARIO CORRENTE:</Typography>
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                                {inventoryList.map((item) => (
-                                    <Paper key={item.name} elevation={0} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 1, border: '1px solid #bbdefb', bgcolor: '#e3f2fd' }}>
-                                        <Typography variant="body2" fontWeight="bold" sx={{ pl: 1 }}>{item.name}</Typography>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                            <IconButton size="small" onClick={() => handleRemoveItem(item.name)} color="error"><RemoveCircleOutlineIcon /></IconButton>
-                                            <Typography fontWeight="bold">{item.qty}</Typography>
-                                            <IconButton size="small" onClick={() => handleAddItem(item.name)} color="primary"><AddCircleOutlineIcon /></IconButton>
-                                        </Box>
-                                    </Paper>
-                                ))}
-                            </Box>
-                            <TextField id="items" label="Riepilogo (Auto-generato)" name="items" fullWidth multiline minRows={2} value={formData.items} sx={{ mt: 2, bgcolor: '#f5f5f5' }} InputProps={{ readOnly: true }} />
-                        </Paper>
+							<Divider sx={{ my: 2 }} />
+
+							<Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 'bold', color: '#1976d2' }}>
+								INVENTARIO CORRENTE:
+							</Typography>
+
+							<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+								{inventoryList.map((item) => (
+									<Paper key={item.name} elevation={0} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 1, border: '1px solid #bbdefb', bgcolor: '#e3f2fd' }}>
+										<Typography variant="body2" fontWeight="bold" sx={{ pl: 1 }}>{item.name}</Typography>
+										<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+											<IconButton size="small" onClick={() => handleRemoveItem(item.name)} color="error"><RemoveCircleOutlineIcon /></IconButton>
+											<Typography fontWeight="bold">{item.qty}</Typography>
+											<IconButton size="small" onClick={() => handleAddItem(item.name)} color="primary"><AddCircleOutlineIcon /></IconButton>
+										</Box>
+									</Paper>
+								))}
+							</Box>
+
+							{/* RIEPILOGO FINALE: lo mettiamo in sola lettura (readOnly) perché si aggiorna da solo */}
+							<TextField 
+								id="items" 
+								label="Riepilogo (Auto-generato)" 
+								fullWidth 
+								multiline 
+								minRows={2} 
+								value={formData.items} 
+								sx={{ mt: 2, bgcolor: '#f5f5f5' }} 
+								slotProps={{ input: { readOnly: true } }} 
+							/>
+						</Paper>
                     </Grid>
 
                     <Grid size={{ xs: 12 }}>
