@@ -6,7 +6,7 @@ import {
   AppBar, Toolbar, Typography, Button, Container, Box, Card, CardContent, 
   TextField, Paper, Snackbar, Alert, Checkbox, FormControlLabel, Select, MenuItem,
   IconButton, Chip, useTheme, useMediaQuery, List, ListItem, ListItemIcon, ListItemText,
-  Dialog, DialogContent, DialogTitle, Autocomplete, Divider, FormControl, InputLabel
+  Dialog, DialogContent, DialogTitle, Autocomplete, Divider, FormControl, InputLabel, createFilterOptions
 } from '@mui/material';
 
 import Grid from '@mui/material/Grid';
@@ -51,16 +51,63 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-// Lista oggetti standard
+const filter = createFilterOptions();
 
+// --- Pulsanti rapidi a vista ---
 const QUICK_ITEMS = [
-    "Scatole P", "Scatole M", "Scatole G", "Baule",
-    "Divano 2p", "Divano 3p", "Poltrona", 
-    "Letto Sing.", "Letto Matr.", "Materasso",
-    "Armadio 2a", "Armadio 6a", "Comò", "Comodino",
-    "Tavolo", "Sedie", "Scrivania", "Libreria",
-    "Lavatrice", "Frigo", "TV", "Specchio"
+    "Scatola", "Frigorifero", "Lavatrice", "Divano", "Tavolo", 
+    "Sedia", "Letto Matr.", "Letto Sing.", "Armadio", "Comodino", 
+    "Comò", "Televisore", "Lavastoviglie", "Poltrona", "Scarpiera"
 ];
+
+// --- Lista completa per Autocomplete ---
+const EXTENDED_ITEMS = [
+    ...new Set([
+        ...QUICK_ITEMS,
+        // --- CUCINA & ELETTRODOMESTICI ---
+        "Affettatrice", "Bollitore", "Bilancia da Cucina", "Cantinetta Vini", 
+        "Congelatore", "Contenitori Plastica", "Forno", "Frigorifero", 
+        "Lavastoviglie", "Macchina del Caffè", "Microonde", "Mixer", 
+        "Piano Cottura", "Posate", "Robot da Cucina", "Set Pentole", 
+        "Servizio Piatti", "Tostapane",
+
+        // --- SOGGIORNO & ZONA GIORNO ---
+        "Camino Elettrico", "Chaise Longue", "Credenza", "Divano 2 Posti", 
+        "Divano 3 Posti", "Divano Angolare", "Libreria", "Madia", 
+        "Mobile TV", "Orologio da Parete", "Piantana", "Poltrona", 
+        "Pouf", "Quadro", "Tappeto", "Tavolino Caffè", "Tavolo", 
+        "Televisore", "Tende", "Vaso", "Vetrina",
+
+        // --- CAMERA DA LETTO & NOTTE ---
+        "Armadio 2 Ante", "Armadio 4 Ante", "Armadio 6 Ante", "Cassettiera", 
+        "Comodino", "Comò", "Cuscini", "Lenzuola", "Letto a Castello", 
+        "Letto Matrimoniale", "Letto Singolo", "Materasso Matrimoniale", 
+        "Materasso Singolo", "Piumone", "Panca Scendiletto", "Settimino",
+
+        // --- BAGNO, LAVANDERIA & PULIZIA ---
+        "Asciugatrice", "Asciugacapelli", "Asse da Stiro", "Aspirapolvere", 
+        "Bilancia Pesapersone", "Cesto Biancheria", "Ferro da Stiro", 
+        "Lavatrice", "Mobile Bagno", "Robot Aspirapolvere", "Scopa e Mocio", 
+        "Specchio Bagno", "Stendibiancheria",
+
+        // --- STUDIO, UFFICIO & INGRESSO ---
+        "Appendiabiti", "Consolle Ingresso", "Libreria Pensile", "Monitor PC", 
+        "Scarpiera", "Scrivania", "Sedia Ufficio", "Specchio Lungo", "Stampante",
+
+        // --- SPORT, TEMPO LIBERO & VALIGIE ---
+        "Attrezzatura Sci", "Bicicletta", "Borsa Sportiva", "Panca Fitness", 
+        "Pesi e Manubri", "Tapis Roulant", "Valigia", "Zaino",
+
+        // --- GARAGE, ESTERNO & ATTREZZI ---
+        "Barbecue", "Cassetta degli Attrezzi", "Ombrellone", "Pianta da Esterno", 
+        "Scala", "Sedia da Giardino", "Tavolo da Esterno", "Tosaerba", "Trapano",
+
+        // --- IMBALLAGGIO & VARIE ---
+        "Condizionatore Portatile", "Pianta da Interno", "Scatola Libri", 
+        "Scatola Documenti", "Scatola", "Stufa Elettrica", "Ventilatore", 
+        "Umidificatore"
+    ])
+].sort((a, b) => a.localeCompare('it'));
 
 const PIANI = Array.from({ length: 16 }, (_, i) => i); // [0, 1, ... 15]
 const ASCENSORE_OPTS = ["SI", "NO"];
@@ -112,20 +159,33 @@ function Home() {
   
   
   
-  // --- NUOVA LOGICA INVENTARIO ---
+	// --- NUOVA LOGICA INVENTARIO ---
     const [inventoryList, setInventoryList] = useState([]);
 
     // 1. Funzione per aggiungere
-    const handleAddItem = (itemName) => {
-        setInventoryList(prev => {
-            const existing = prev.find(i => i.name === itemName);
-            if (existing) {
-                return prev.map(i => i.name === itemName ? { ...i, qty: i.qty + 1 } : i);
-            } else {
-                return [...prev, { name: itemName, qty: 1 }];
-            }
-        });
-    };
+	const handleAddItem = (itemName) => {
+		// Gestisce sia stringhe dirette che oggetti, e pulisce gli spazi
+		const name = (typeof itemName === 'string' ? itemName : itemName?.label)?.trim();
+		
+		if (!name) return;
+
+		setInventoryList(prev => {
+			// Usiamo toLowerCase() per evitare duplicati come "Sedia" e "sedia"
+			const existing = prev.find(i => i.name.toLowerCase() === name.toLowerCase());
+			if (existing) {
+				return prev.map(i => 
+					i.name.toLowerCase() === name.toLowerCase() 
+					? { ...i, qty: i.qty + 1 } 
+					: i
+				);
+			} else {
+				return [...prev, { name: name, qty: 1 }];
+			}
+		});
+
+		// IMPORTANTE: Resetta il campo di input dell'autocomplete
+		setInputValue(''); 
+	};
 
     // 2. Funzione per rimuovere
     const handleRemoveItem = (itemName) => {
@@ -700,59 +760,78 @@ function Home() {
 					</Paper>
 
 					{/* --- 3. INVENTARIO E NOTE --- */}
-					<Paper elevation={3} sx={{ p: { xs: 3, md: 4 }, mb: 4, borderRadius: 4, bgcolor: '#fff' }}>
-						<Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-							<HandymanIcon color="primary" sx={{ mr: 1, fontSize: 28 }} />
-							<Typography variant="h5" sx={{ fontWeight: '800', color: '#102a43' }}>
-								Cosa Trasportiamo?
-							</Typography>
-						</Box>
-
-						<Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-							Seleziona gli oggetti principali o descrivi il carico:
+					<Paper variant="outlined" sx={{ p: 2, bgcolor: '#f8f9fa', borderRadius: 2, mb: 3 }}>
+						<Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 'bold', color: 'text.secondary' }}>
+							AGGIUNTA RAPIDA (Clicca per aggiungere)
 						</Typography>
-
-						<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 3 }}>
+						
+						<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
 							{QUICK_ITEMS.map((item) => (
-								<Chip
-									key={item} label={item} onClick={() => handleAddItem(item)}
-									icon={<AddCircleOutlineIcon />} clickable
-									sx={{ bgcolor: 'white', border: '1px solid #ddd', '&:hover': { bgcolor: '#e3f2fd', borderColor: '#2196f3' } }}
+								<Chip 
+									key={item} 
+									label={item} 
+									onClick={() => handleAddItem(item)} 
+									clickable 
+									sx={{ bgcolor: '#fff', border: '1px solid #e0e0e0', '&:hover': { bgcolor: '#e3f2fd' } }} 
 								/>
 							))}
 						</Box>
 
+						<Divider sx={{ my: 2 }} />
+
+						{/* SEZIONE INPUT + TASTO AGGIUNGI */}
+						<Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start' }}>
+							<Autocomplete
+								freeSolo
+								disablePortal
+								sx={{ flexGrow: 1 }}
+								options={EXTENDED_ITEMS}
+								inputValue={inputValue}
+								onInputChange={(e, val) => setInputValue(val)}
+								onChange={(e, newValue) => {
+									if (newValue) handleAddItem(newValue);
+								}}
+								filterOptions={(options, params) => filter(options, params)}
+								renderInput={(params) => (
+									<TextField 
+										{...params} 
+										label="Cerca o scrivi oggetto..." 
+										variant="outlined" 
+										size="small"
+										onKeyDown={(e) => {
+											if (e.key === 'Enter') {
+												e.preventDefault();
+												e.stopPropagation();
+												if (inputValue.trim() !== '') handleAddItem(inputValue);
+											}
+										}}
+									/>
+								)}
+							/>
+							<Button 
+								variant="contained" 
+								onClick={() => handleAddItem(inputValue)}
+								sx={{ minWidth: '48px', height: '40px' }}
+							>
+								<AddCircleOutlineIcon />
+							</Button>
+						</Box>
+
 						{/* LISTA OGGETTI AGGIUNTI */}
 						{inventoryList.length > 0 && (
-							<Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 3, maxHeight: 300, overflowY: 'auto' }}>
+							<Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', gap: 1 }}>
 								{inventoryList.map((item) => (
-									<Paper key={item.name} elevation={0} sx={{ p: 1.5, border: '1px solid #bbdefb', borderRadius: 2, bgcolor: '#e3f2fd', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-										<Typography fontWeight="bold">{item.name}</Typography>
-										<Box sx={{ display: 'flex', alignItems: 'center' }}>
+									<Paper key={item.name} elevation={0} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 1, border: '1px solid #bbdefb', bgcolor: '#e3f2fd' }}>
+										<Typography variant="body2" fontWeight="bold" sx={{ pl: 1 }}>{item.name}</Typography>
+										<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
 											<IconButton size="small" onClick={() => handleRemoveItem(item.name)} color="error"><RemoveCircleOutlineIcon /></IconButton>
-											<Typography sx={{ mx: 1, fontWeight: 'bold' }}>{item.qty}</Typography>
+											<Typography fontWeight="bold">{item.qty}</Typography>
 											<IconButton size="small" onClick={() => handleAddItem(item.name)} color="primary"><AddCircleOutlineIcon /></IconButton>
 										</Box>
 									</Paper>
 								))}
 							</Box>
 						)}
-
-						<TextField
-							id="inventario" name="inventario"
-							label="Descrizione extra / Misure / Lista completa"
-							fullWidth multiline rows={3}
-							value={formData.inventario || ''} onChange={handleChange}
-							helperText="La lista selezionata sopra verrà inclusa automaticamente."
-							sx={{ mb: 3 }}
-						/>
-
-						<TextField
-							id="note" name="note"
-							label="Note aggiuntive (es. ZTL, cortile interno, scale strette...)"
-							fullWidth multiline rows={2}
-							value={formData.note || ''} onChange={handleChange}
-						/>
 					</Paper>
 
 					{/* BOTTONE INVIO */}

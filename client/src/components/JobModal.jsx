@@ -30,58 +30,65 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
+const filter = createFilterOptions();
+
 // --- Pulsanti rapidi a vista ---
 const QUICK_ITEMS = [
-    "Lavastoviglie", "Asciugatrice", "Forno", "Microonde", "Piano Cottura", 
-	"Divano", "Specchio Bagno", "Mobile Bagno", "Scarpiera", "Appendiabiti", "Bicicletta",
-	"Pesi", "Valigia", "Quadro", "Vaso", "Lampadario", "Pianta", "Scatola Libri"
+    "Scatola", "Frigorifero", "Lavatrice", "Divano", "Tavolo", 
+    "Sedia", "Letto Matr.", "Letto Sing.", "Armadio", "Comodino", 
+    "Comò", "Televisore", "Lavastoviglie", "Poltrona", "Scarpiera"
 ];
 
 // --- Lista completa per Autocomplete ---
 const EXTENDED_ITEMS = [
     ...new Set([
         ...QUICK_ITEMS,
-        // --- SOGGIORNO ---
-        "Divano Angolare", "Chaise Longue", "Pouf", "Tavolino Caffè", "Mobile TV", 
-        "Madia", "Vetrina", "Credenza", "Tappeto", "Quadro", "Vaso", "Lampadario", 
-        "Piantana", "Orologio da Parete", "Tende", "Camino Elettrico",
+        // --- CUCINA & ELETTRODOMESTICI ---
+        "Affettatrice", "Bollitore", "Bilancia da Cucina", "Cantinetta Vini", 
+        "Congelatore", "Contenitori Plastica", "Forno", "Frigorifero", 
+        "Lavastoviglie", "Macchina del Caffè", "Microonde", "Mixer", 
+        "Piano Cottura", "Posate", "Robot da Cucina", "Set Pentole", 
+        "Servizio Piatti", "Tostapane",
 
-        // --- CUCINA ---
-        "Lavastoviglie", "Forno", "Microonde", "Piano Cottura", "Macchina del Caffè", 
-        "Tostapane", "Bollitore", "Mixer", "Robot da Cucina", "Affettatrice", 
-        "Set Pentole", "Servizio Piatti", "Bicchieri", "Posate", "Contenitori Plastica", 
-        "Bilancia da Cucina", "Cantinetta Vini",
+        // --- SOGGIORNO & ZONA GIORNO ---
+        "Camino Elettrico", "Chaise Longue", "Credenza", "Divano 2 Posti", 
+        "Divano 3 Posti", "Divano Angolare", "Libreria", "Madia", 
+        "Mobile TV", "Orologio da Parete", "Piantana", "Poltrona", 
+        "Pouf", "Quadro", "Tappeto", "Tavolino Caffè", "Tavolo", 
+        "Televisore", "Tende", "Vaso", "Vetrina",
 
-        // --- CAMERA DA LETTO ---
-        "Letto a Castello", "Materasso Matrimoniale", "Materasso Singolo", "Armadio 4 Ante", 
-        "Cassettiera", "Settimino", "Piumone", "Cuscini", "Lenzuola", "Panca Scendiletto",
+        // --- CAMERA DA LETTO & NOTTE ---
+        "Armadio 2 Ante", "Armadio 4 Ante", "Armadio 6 Ante", "Cassettiera", 
+        "Comodino", "Comò", "Cuscini", "Lenzuola", "Letto a Castello", 
+        "Letto Matrimoniale", "Letto Singolo", "Materasso Matrimoniale", 
+        "Materasso Singolo", "Piumone", "Panca Scendiletto", "Settimino",
 
-        // --- BAGNO E LAVANDERIA ---
-        "Asciugatrice", "Mobile Bagno", "Specchio Bagno", "Cesto Biancheria", 
-        "Asse da Stiro", "Stendibiancheria", "Ferro da Stiro", "Aspirapolvere", 
-        "Robot Aspirapolvere", "Scopa e Mocio", "Asciugacapelli", "Bilancia Pesapersone",
+        // --- BAGNO, LAVANDERIA & PULIZIA ---
+        "Asciugatrice", "Asciugacapelli", "Asse da Stiro", "Aspirapolvere", 
+        "Bilancia Pesapersone", "Cesto Biancheria", "Ferro da Stiro", 
+        "Lavatrice", "Mobile Bagno", "Robot Aspirapolvere", "Scopa e Mocio", 
+        "Specchio Bagno", "Stendibiancheria",
 
-        // --- STUDIO E UFFICIO ---
-        "Sedia Ufficio", "Monitor PC", "Stampante", "Scrivania Grande", "Libreria Pensile",
+        // --- STUDIO, UFFICIO & INGRESSO ---
+        "Appendiabiti", "Consolle Ingresso", "Libreria Pensile", "Monitor PC", 
+        "Scarpiera", "Scrivania", "Sedia Ufficio", "Specchio Lungo", "Stampante",
 
-        // --- INGRESSO E DISIMPEGNO ---
-        "Scarpiera", "Appendiabiti", "Consolle Ingresso", "Specchio Lungo",
+        // --- SPORT, TEMPO LIBERO & VALIGIE ---
+        "Attrezzatura Sci", "Bicicletta", "Borsa Sportiva", "Panca Fitness", 
+        "Pesi e Manubri", "Tapis Roulant", "Valigia", "Zaino",
 
-        // --- SPORT E TEMPO LIBERO ---
-        "Bicicletta", "Tapis Roulant", "Pesi e Manubri", "Panca Fitness", "Valigia", 
-        "Zaino", "Borsa Sportiva", "Attrezzatura Sci",
+        // --- GARAGE, ESTERNO & ATTREZZI ---
+        "Barbecue", "Cassetta degli Attrezzi", "Ombrellone", "Pianta da Esterno", 
+        "Scala", "Sedia da Giardino", "Tavolo da Esterno", "Tosaerba", "Trapano",
 
-        // --- GARAGE E ESTERNO ---
-        "Scala", "Cassetta degli Attrezzi", "Trapano", "Tosaerba", "Tavolo da Esterno", 
-        "Sedia da Giardino", "Ombrellone", "Barbecue",
-
-        // --- VARIE ---
-        "Pianta da Interno", "Pianta da Esterno", "Scatola Libri", "Scatola Documenti", 
-        "Ventilatore", "Condizionatore Portatile", "Umidificatore", "Stufa Elettrica"
+        // --- IMBALLAGGIO & VARIE ---
+        "Condizionatore Portatile", "Pianta da Interno", "Scatola Libri", 
+        "Scatola Documenti", "Scatola", "Stufa Elettrica", "Ventilatore", 
+        "Umidificatore"
     ])
 ].sort((a, b) => a.localeCompare('it'));
 
-const filter = createFilterOptions();
+
 
 function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
     const lastFocusedRef = useRef(null);
