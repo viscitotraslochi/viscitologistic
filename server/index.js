@@ -400,29 +400,22 @@ app.post('/contatto', async (req, res) => {
   }
 });
 
-// Host corretto per Render
-const HOST =
-  process.env.RENDER_EXTERNAL_HOSTNAME ||
-  'viscito-backend.onrender.com';
+const https = require('https');
+const axios = require('axios');
 
-// Ping ogni 14 minuti
-setInterval(async () => {
-  try {
-    await axios.get(`https://${HOST}/jobs`, {
-      timeout: 10_000, // 10 secondi
-      headers: {
-        'User-Agent': 'render-keepalive'
-      }
-    });
+const agent = new https.Agent({  
+  rejectUnauthorized: false  // ignora certificato
+});
 
-    console.log('Auto-ping: Backend mantenuto sveglio');
-  } catch (err) {
-    console.error(
-      'Auto-ping fallito:',
-      err.code || err.message
-    );
-  }
-}, 14 * 60 * 1000);
+setInterval(() => {
+  const host = process.env.RENDER_EXTERNAL_HOSTNAME 
+               ? `${process.env.RENDER_EXTERNAL_HOSTNAME}.onrender.com` 
+               : 'viscito-backend.onrender.com';
+
+  axios.get(`https://${host}/jobs`, { httpsAgent: agent })
+    .then(() => console.log('Auto-ping: Backend mantenuto sveglio'))
+    .catch(err => console.error('Auto-ping fallito:', err.message));
+}, 840000);
 
 
 app.listen(port, () => console.log(`Server avviato sulla porta ${port}`));
