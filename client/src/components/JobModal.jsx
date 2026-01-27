@@ -383,25 +383,15 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 									disablePortal // <--- FONDAMENTALE: evita che la lista finisca sotto il Dialog
 									openOnFocus   // <--- Fa apparire la lista appena clicchi
 									options={EXTENDED_ITEMS}
-									
-									// Gestione del testo scritto
 									inputValue={inputValue}
 									onInputChange={(event, newInputValue) => {
 										setInputValue(newInputValue);
 									}}
-
-									// Gestione della selezione dalla lista
 									onChange={(event, newValue) => {
 										if (newValue) {
 											handleAddItem(newValue);
-											// Forza il reset del testo dopo la selezione
-											setTimeout(() => setInputValue(''), 0);
 										}
 									}}
-									
-									// Migliora l'usabilità mobile
-									blurOnSelect={true} 
-
 									renderInput={(params) => (
 										<TextField
 											{...params}
@@ -409,6 +399,7 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 											size="small"
 											onKeyDown={(e) => {
 												if (e.key === 'Enter') {
+													// BLOCCA il salto al campo Note
 													e.preventDefault();
 													e.stopPropagation();
 													if (inputValue.trim() !== '') {
