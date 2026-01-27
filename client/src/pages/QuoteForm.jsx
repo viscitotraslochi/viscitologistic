@@ -1,8 +1,4 @@
-// ⚠️ QuoteForm.jsx — VERSIONE DEFINITIVA 1:1
-// Copiato integralmente dallo STEP 4 di Home.jsx_OLD
-// Nessuna modifica a stili, layout, logica o responsive
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -41,10 +37,10 @@ import api from '../api/axiosConfig';
 const PIANI = Array.from({ length: 16 }, (_, i) => i);
 
 export default function QuoteForm() {
-  /* ================== STATO IDENTICO ================== */
+  /* ================== STATO STANDARDIZZATO ================== */
   const [formData, setFormData] = useState({
-    nome: '',
-    telefono: '',
+    cliente_nome: '',
+    phone: '',
     email: '',
     da_indirizzo: '',
     a_indirizzo: '',
@@ -52,10 +48,15 @@ export default function QuoteForm() {
     ascensore_partenza: 'NO',
     piano_arrivo: '0',
     ascensore_arrivo: 'NO',
-    inventario: '',
-    note: '',
-    startDate: '',
-    startTime: ''
+
+    // Inventario standard:
+    items: '',        // auto-generato da inventoryList (read-only)
+    items_extra: '',  // testo libero (era "inventario")
+
+    notes: '',        // era "note"
+
+    date: '',
+    time: ''
   });
 
   const [inventoryList, setInventoryList] = useState([]);
@@ -63,6 +64,16 @@ export default function QuoteForm() {
   const [currentField, setCurrentField] = useState(null);
   const [suggestions, setSuggestions] = useState({ da: [], a: [] });
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+
+  /* ================== SYNC inventoryList -> formData.items ================== */
+  useEffect(() => {
+    const visual = (inventoryList || [])
+      .filter(i => i?.name)
+      .map(i => `${(i.name ?? '').toString().trim()} x${parseInt(i.qty, 10) || 1}`)
+      .join(', ');
+
+    setFormData(prev => ({ ...prev, items: visual }));
+  }, [inventoryList]);
 
   /* ================== HANDLERS ================== */
   const handleChange = (e) => {
@@ -75,36 +86,70 @@ export default function QuoteForm() {
     setMapOpen(true);
   };
 
+  const clean = (v) => (v ?? '').toString().trim();
+  const cleanOrNull = (v) => {
+    const s = clean(v);
+    return s.length ? s : null;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const visualInventory = inventoryList.map(i => `${i.name} x${i.qty}`).join(', ');
-    let finalInventory = visualInventory;
-    if (formData.inventario.trim()) {
-      if (finalInventory) finalInventory += ' | ';
-      finalInventory += formData.inventario.trim();
+    // items finali: items (auto) + items_extra (testo libero)
+    let finalItems = clean(formData.items);
+    const extra = clean(formData.items_extra);
+    if (extra) {
+      if (finalItems) finalItems += ' | ';
+      finalItems += extra;
     }
 
+    // Payload standard unico (uguale al JobModal)
     const dataToSend = {
-      cliente_nome: formData.nome,
-      telefono: formData.telefono,
-      email: formData.email,
-      da_indirizzo: formData.da_indirizzo,
-      a_indirizzo: formData.a_indirizzo,
-      piano_partenza: formData.piano_partenza,
-      ascensore_partenza: formData.ascensore_partenza,
-      piano_arrivo: formData.piano_arrivo,
-      ascensore_arrivo: formData.ascensore_arrivo,
-      items: finalInventory,
-      note: formData.note || '',
-      data_trasloco: formData.startDate,
-      ora_trasloco: formData.startTime
+      cliente_nome: clean(formData.cliente_nome),
+      phone: clean(formData.phone),
+      email: cleanOrNull(formData.email),
+
+      da_indirizzo: clean(formData.da_indirizzo),
+      a_indirizzo: cleanOrNull(formData.a_indirizzo),
+
+      piano_partenza: clean(formData.piano_partenza) || '0',
+      ascensore_partenza: (clean(formData.ascensore_partenza).toUpperCase() === 'SI') ? 'SI' : 'NO',
+
+      piano_arrivo: clean(formData.piano_arrivo) || '0',
+      ascensore_arrivo: (clean(formData.ascensore_arrivo).toUpperCase() === 'SI') ? 'SI' : 'NO',
+
+      items: finalItems,
+      notes: cleanOrNull(formData.notes),
+
+      date: cleanOrNull(formData.date),
+      time: cleanOrNull(formData.time)
     };
 
     try {
       await api.post('/leads', dataToSend);
-      setSnackbar({ open: true, severity: 'success', message: 'Richiesta inviata con successo! Verrai ricontattato a breve.' });
-      setFormData({ nome: '', telefono: '', email: '', da_indirizzo: '', a_indirizzo: '', piano_partenza: '0', ascensore_partenza: 'NO', piano_arrivo: '0', ascensore_arrivo: 'NO', inventario: '', note: '', startDate: '', startTime: '' });
+
+      setSnackbar({
+        open: true,
+        severity: 'success',
+        message: 'Richiesta inviata con successo! Verrai ricontattato a breve.'
+      });
+
+      setFormData({
+        cliente_nome: '',
+        phone: '',
+        email: '',
+        da_indirizzo: '',
+        a_indirizzo: '',
+        piano_partenza: '0',
+        ascensore_partenza: 'NO',
+        piano_arrivo: '0',
+        ascensore_arrivo: 'NO',
+        items: '',
+        items_extra: '',
+        notes: '',
+        date: '',
+        time: ''
+      });
       setInventoryList([]);
     } catch (error) {
       setSnackbar({ open: true, severity: 'error', message: "Errore durante l'invio" });
@@ -136,13 +181,35 @@ export default function QuoteForm() {
             </Box>
             <Grid container spacing={3}>
               <Grid size={{ xs: 12 }}>
-                <TextField fullWidth required label="Nome e Cognome o Azienda" name="nome" value={formData.nome} onChange={handleChange} InputProps={{ startAdornment: <PersonIcon sx={{ mr: 1 }} /> }} />
+                <TextField
+                  fullWidth
+                  required
+                  label="Nome e Cognome o Azienda"
+                  name="cliente_nome"
+                  value={formData.cliente_nome}
+                  onChange={handleChange}
+                  InputProps={{ startAdornment: <PersonIcon sx={{ mr: 1 }} /> }}
+                />
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
-                <TextField fullWidth label="Telefono" name="telefono" value={formData.telefono} onChange={handleChange} InputProps={{ startAdornment: <PhoneIcon sx={{ mr: 1 }} /> }} />
+                <TextField
+                  fullWidth
+                  label="Telefono"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  InputProps={{ startAdornment: <PhoneIcon sx={{ mr: 1 }} /> }}
+                />
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
-                <TextField fullWidth label="Email" name="email" value={formData.email} onChange={handleChange} InputProps={{ startAdornment: <EmailIcon sx={{ mr: 1 }} /> }} />
+                <TextField
+                  fullWidth
+                  label="Email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  InputProps={{ startAdornment: <EmailIcon sx={{ mr: 1 }} /> }}
+                />
               </Grid>
             </Grid>
           </Paper>
@@ -156,12 +223,31 @@ export default function QuoteForm() {
 
             <Grid container spacing={4}>
               <Grid size={{ xs: 12, md: 6 }}>
-                <TextField fullWidth required label="Indirizzo Partenza" name="da_indirizzo" value={formData.da_indirizzo} onChange={handleChange}
-                  InputProps={{ startAdornment: <HomeIcon sx={{ mr: 1 }} />, endAdornment: <IconButton onClick={() => openMap('da_indirizzo')}><MapIcon /></IconButton> }} />
+                <TextField
+                  fullWidth
+                  required
+                  label="Indirizzo Partenza"
+                  name="da_indirizzo"
+                  value={formData.da_indirizzo}
+                  onChange={handleChange}
+                  InputProps={{
+                    startAdornment: <HomeIcon sx={{ mr: 1 }} />,
+                    endAdornment: <IconButton onClick={() => openMap('da_indirizzo')}><MapIcon /></IconButton>
+                  }}
+                />
               </Grid>
               <Grid size={{ xs: 12, md: 6 }}>
-                <TextField fullWidth label="Indirizzo Arrivo" name="a_indirizzo" value={formData.a_indirizzo} onChange={handleChange}
-                  InputProps={{ startAdornment: <LocationOnIcon sx={{ mr: 1 }} />, endAdornment: <IconButton onClick={() => openMap('a_indirizzo')}><MapIcon /></IconButton> }} />
+                <TextField
+                  fullWidth
+                  label="Indirizzo Arrivo"
+                  name="a_indirizzo"
+                  value={formData.a_indirizzo}
+                  onChange={handleChange}
+                  InputProps={{
+                    startAdornment: <LocationOnIcon sx={{ mr: 1 }} />,
+                    endAdornment: <IconButton onClick={() => openMap('a_indirizzo')}><MapIcon /></IconButton>
+                  }}
+                />
               </Grid>
 
               <Grid size={{ xs: 6 }}>
@@ -182,26 +268,44 @@ export default function QuoteForm() {
               </Grid>
 
               <Grid size={{ xs: 6 }}>
-                <TextField type="date" fullWidth label="Data" name="startDate" InputLabelProps={{ shrink: true }} value={formData.startDate} onChange={handleChange} />
+                <TextField type="date" fullWidth label="Data" name="date" InputLabelProps={{ shrink: true }} value={formData.date} onChange={handleChange} />
               </Grid>
               <Grid size={{ xs: 6 }}>
-                <TextField type="time" fullWidth label="Orario" name="startTime" InputLabelProps={{ shrink: true }} value={formData.startTime} onChange={handleChange} />
+                <TextField type="time" fullWidth label="Orario" name="time" InputLabelProps={{ shrink: true }} value={formData.time} onChange={handleChange} />
               </Grid>
             </Grid>
           </Paper>
 
           {/* ================= INVENTARIO ================= */}
-          <InventorySelector inventoryList={inventoryList} setInventoryList={setInventoryList} formData={formData} setFormData={setFormData} />
+			<InventorySelector
+			  inventoryList={inventoryList}
+			  setInventoryList={setInventoryList}
+			  formData={formData}
+			  setFormData={setFormData}
+			/>
 
           {/* ================= NOTE ================= */}
           <Paper elevation={3} sx={{ p: { xs: 3, md: 4 }, mb: 4, borderRadius: 4 }}>
-            <TextField fullWidth multiline rows={3} label="Note aggiuntive" name="note" value={formData.note} onChange={handleChange} />
+            <TextField
+              fullWidth
+              multiline
+              rows={3}
+              label="Note aggiuntive"
+              name="notes"
+              value={formData.notes}
+              onChange={handleChange}
+            />
           </Paper>
 
           {/* ================= INVIO ================= */}
           <Box sx={{ textAlign: 'center', mt: 4 }}>
-            <Button type="submit" variant="contained" size="large" endIcon={<SendIcon />}
-              sx={{ px: 6, py: 2, fontSize: '1.2rem', borderRadius: 50, fontWeight: 'bold', background: 'linear-gradient(45deg, #102a43 30%, #1976d2 90%)', boxShadow: '0 8px 20px rgba(16, 42, 67, 0.4)' }}>
+            <Button
+              type="submit"
+              variant="contained"
+              size="large"
+              endIcon={<SendIcon />}
+              sx={{ px: 6, py: 2, fontSize: '1.2rem', borderRadius: 50, fontWeight: 'bold', background: 'linear-gradient(45deg, #102a43 30%, #1976d2 90%)', boxShadow: '0 8px 20px rgba(16, 42, 67, 0.4)' }}
+            >
               RICHIEDI PREVENTIVO GRATUITO
             </Button>
           </Box>
@@ -220,8 +324,13 @@ export default function QuoteForm() {
         </Container>
       </Box>
 
-      <MapDialog mapOpen={mapOpen} setMapOpen={setMapOpen} currentField={currentField} setFormData={setFormData} setSuggestions={setSuggestions} />
-
+      <MapDialog
+        mapOpen={mapOpen}
+        setMapOpen={setMapOpen}
+        currentField={currentField}
+        setFormData={setFormData}
+        setSuggestions={setSuggestions}
+      />
     </Box>
   );
 }

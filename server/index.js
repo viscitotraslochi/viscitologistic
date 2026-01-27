@@ -204,31 +204,34 @@ app.get('/leads', async (req, res) => {
     const result = await pool.query(`
       SELECT
         *,
-        TO_CHAR(data_trasloco, 'DD-MM-YYYY') AS data_trasloco,
-        TO_CHAR(ora_trasloco, 'HH24:MI') AS ora_trasloco
+        telefono AS phone,
+        note AS notes,
+        TO_CHAR(data_trasloco, 'YYYY-MM-DD') AS date,
+        TO_CHAR(ora_trasloco, 'HH24:MI') AS time
       FROM leads
       ORDER BY data_creazione DESC
     `);
 
     res.json(result.rows);
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Errore recupero leads" });
   }
 });
 
+
 // POST: Crea nuovo lead + invia email
 app.post('/leads', async (req, res) => {
   const {
-    cliente_nome, telefono, email,
+    cliente_nome, phone, email,
     da_indirizzo, a_indirizzo,
     piano_partenza, ascensore_partenza,
     piano_arrivo, ascensore_arrivo,
-    items, note, data_trasloco, ora_trasloco
+    items, notes,
+    date, time
   } = req.body;
 
-  if(!cliente_nome || !telefono || !da_indirizzo || !a_indirizzo) 
+  if (!cliente_nome || !phone || !da_indirizzo || !a_indirizzo)
     return res.status(400).json({ error: "Campi obbligatori mancanti" });
 
   try {
@@ -239,34 +242,49 @@ app.post('/leads', async (req, res) => {
         piano_arrivo, ascensore_arrivo, items, note, data_trasloco, ora_trasloco
       ) VALUES (NOW(), $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *`,
       [
-        cliente_nome, telefono, email,
-        da_indirizzo, a_indirizzo,
-        piano_partenza, normalizeBool(ascensore_partenza),
-        piano_arrivo, normalizeBool(ascensore_arrivo),
-        items, note, data_trasloco, ora_trasloco
+        cliente_nome,
+        phone,                 // <-- mapping phone -> telefono
+        email || null,
+        da_indirizzo,
+        a_indirizzo,
+        piano_partenza || null,
+        normalizeBool(ascensore_partenza),
+        piano_arrivo || null,
+        normalizeBool(ascensore_arrivo),
+        items || '',
+        notes || '',           // <-- mapping notes -> note
+        date || null,          // <-- mapping date -> data_trasloco
+        time || null           // <-- mapping time -> ora_trasloco
       ]
     );
 
     const savedLead = newLead.rows[0];
 
     const html = preventivoEmailTemplate({
-      cliente_nome, telefono, email,
-      da_indirizzo, a_indirizzo,
-      piano_partenza, piano_arrivo,
+      cliente_nome,
+      telefono: phone, // template attuale usa telefono
+      email,
+      da_indirizzo,
+      a_indirizzo,
+      piano_partenza,
+      piano_arrivo,
       ascensore_partenza: normalizeBool(ascensore_partenza),
       ascensore_arrivo: normalizeBool(ascensore_arrivo),
-      items, note, data_trasloco, ora_trasloco
+      items,
+      note: notes,     // template attuale usa note
+      data_trasloco: date,
+      ora_trasloco: time
     });
 
     await inviaEmail(process.env.EMAIL_DESTINATARIO, `🚚 Nuovo Preventivo: ${cliente_nome}`, html);
 
     res.json(savedLead);
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Errore nel salvataggio o invio email" });
   }
 });
+
 
 // PUT lead: aggiornamento stato
 app.put('/leads/:id', async (req, res) => {
