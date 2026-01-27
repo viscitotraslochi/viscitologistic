@@ -294,14 +294,6 @@ app.delete('/leads/:id', async (req, res) => {
   }
 });
 
-Per allineare il backend alle nuove funzionalità del frontend, dobbiamo aggiornare la rotta POST (creazione) per includere i nuovi campi e assicurarci che la rotta GET restituisca tutti i dati necessari.
-
-Ecco come modificare la sezione 4. GESTIONE VEICOLI nel tuo file index.js.
-
-Aggiornamento index.js
-Sostituisci la sezione esistente con questo codice aggiornato:
-
-JavaScript
 // ==========================================
 // 4. GESTIONE VEICOLI (AGGIORNATA)
 // ==========================================
