@@ -51,6 +51,12 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
+const [errors, setErrors] = useState({
+  email: false,
+  telefono: false,
+  nome: false
+});
+
 const filter = createFilterOptions();
 
 // --- Pulsanti rapidi a vista ---
@@ -244,83 +250,45 @@ function Home() {
     }));
   };
 
-  const handleQuantityChange = (item, value) => {
-    setQuantities(prev => ({ ...prev, [item]: value }));
-  };
-
-  const handleAddCustomItem = () => {
-    if (customInput.trim()) {
-      setCustomItems([...customItems, customInput.trim()]);
-      setCustomInput('');
-    }
-  };
-
-  const handleDeleteCustomItem = (itemToDelete) => {
-    setCustomItems(customItems.filter(item => item !== itemToDelete));
-  };
-
-	// --- STATO PER LA MAPPA ---
-    const [mapOpen, setMapOpen] = useState(false);
-    const [currentField, setCurrentField] = useState(null); // 'da_indirizzo' o 'a_indirizzo'
-
-    function LocationMarker() {
-		useMapEvents({
-			click: async (e) => {
-				const { lat, lng } = e.latlng;
-				try {
-					// ArcGIS richiede longitudine,latitudine
-					const response = await fetch(
-						`https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode?f=json&location=${lng},${lat}`
-					);
-					const data = await response.json();
-					
-					// L'indirizzo completo si trova in data.address.Match_addr
-					const address = data.address?.Match_addr || "Indirizzo non trovato";
-
-					if (currentField) {
-						setFormData(prev => ({ ...prev, [currentField]: address }));
-						setMapOpen(false);
-						setSuggestions({ da: [], a: [] }); // Pulisce i suggerimenti
-					}
-				} catch (error) {
-					console.error("Errore mappa:", error);
-				}
-			},
-		});
-		return null;
-	  }
-
-    const openMap = (field) => {
-        setCurrentField(field);
-        setMapOpen(true);
-    };
+  const [errors, setErrors] = useState({}); // Assicurati di avere questo in alto nel componente
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
-		// --- VALIDAZIONE MANUALE ---
+		// --- VALIDAZIONE DEI CAMPI ---
+		const newErrors = {};
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		const phoneRegex = /^[0-9+ ]{6,15}$/; // Accetta numeri, spazio e +
+		const phoneRegex = /^[0-9+ ]{6,15}$/; 
+
+		if (!formData.nome?.trim()) {
+			newErrors.nome = "Il nome è obbligatorio";
+		}
 
 		if (formData.email && !emailRegex.test(formData.email)) {
+			newErrors.email = "L'email non è valida (es: nome@esempio.it)";
+		}
+
+		if (!formData.telefono?.trim()) {
+			newErrors.telefono = "Il numero di telefono è obbligatorio";
+		} else if (!phoneRegex.test(formData.telefono)) {
+			newErrors.telefono = "Inserisci un numero valido (solo cifre, spazi o +)";
+		}
+
+		// Se ci sono errori, blocca l'invio e avvisa l'utente
+		if (Object.keys(newErrors).length > 0) {
+			setErrors(newErrors);
 			setSnackbar({ 
 				open: true, 
 				severity: 'error', 
-				message: 'Inserisci un indirizzo email valido (es: nome@esempio.it)' 
+				message: 'Per favore, controlla i campi evidenziati in rosso.' 
 			});
 			return;
 		}
 
-		if (formData.telefono && !phoneRegex.test(formData.telefono)) {
-			setSnackbar({ 
-				open: true, 
-				severity: 'error', 
-				message: 'Il numero di telefono non sembra corretto. Usa solo numeri.' 
-			});
-			return;
-		}
+		// Reset errori se tutto è ok
+		setErrors({});
 
-		// --- PREPARAZIONE DATI (Tua logica esistente) ---
+		// --- PREPARAZIONE DATI ---
 		let visualListString = inventoryList
 			.map(item => `${item.name} x${item.qty}`)
 			.join(', ');
@@ -346,6 +314,80 @@ function Home() {
 			data_trasloco: formData.startDate,
 			ora_trasloco: formData.startTime
 		};
+
+		try {
+			setLoading(true);
+			await api.post('/leads', dataToSend);
+			
+			// --- MESSAGGIO DI CONFERMA PERSONALIZZATO ---
+			setSnackbar({ 
+				open: true, 
+				severity: 'success', 
+				message: 'Grazie! Richiesta ricevuta. Un nostro consulente ti ricontatterà telefonicamente o tramite email entro 24 ore.' 
+			});
+
+			// Reset completo dello stato
+			setFormData({
+				nome: '', telefono: '', email: '',
+				da_indirizzo: '', a_indirizzo: '',
+				piano_partenza: '0', ascensore_partenza: false,
+				piano_arrivo: '0', ascensore_arrivo: false,
+				startDate: '', startTime: '', 
+				items: [], inventario: '', note: '' 
+			});
+			setInventoryList([]);
+
+			// Reindirizzamento dopo 3.5 secondi per dare tempo di leggere lo snackbar
+			setTimeout(() => navigate('/thank-you'), 3500);
+
+		} catch (error) {
+			console.error("Errore invio:", error);
+			setSnackbar({ 
+				open: true, 
+				severity: 'error', 
+				message: "Si è verificato un problema durante l'invio. Riprova o chiamaci direttamente."
+			});
+		} finally {
+			setLoading(false);
+		}
+	};
+
+		try {
+			setLoading(true);
+			await api.post('/leads', dataToSend);
+			
+			// --- MESSAGGIO DI CONFERMA PERSONALIZZATO ---
+			setSnackbar({ 
+				open: true, 
+				severity: 'success', 
+				message: 'Grazie! Richiesta ricevuta. Un nostro consulente ti ricontatterà telefonicamente o tramite email entro 24 ore.' 
+			});
+
+			// Reset completo dello stato
+			setFormData({
+				nome: '', telefono: '', email: '',
+				da_indirizzo: '', a_indirizzo: '',
+				piano_partenza: '0', ascensore_partenza: false,
+				piano_arrivo: '0', ascensore_arrivo: false,
+				startDate: '', startTime: '', 
+				items: [], inventario: '', note: '' 
+			});
+			setInventoryList([]);
+
+			// Reindirizzamento dopo 3.5 secondi per dare tempo di leggere lo snackbar
+			setTimeout(() => navigate('/thank-you'), 3500);
+
+		} catch (error) {
+			console.error("Errore invio:", error);
+			setSnackbar({ 
+				open: true, 
+				severity: 'error', 
+				message: "Si è verificato un problema durante l'invio. Riprova o chiamaci direttamente."
+			});
+		} finally {
+			setLoading(false);
+		}
+	};
 
 		try {
 			setLoading(true); // Opzionale: aggiungi uno stato di caricamento
@@ -584,24 +626,28 @@ function Home() {
 							</Grid>
 							<Grid size={{ xs: 12, md: 6 }}>
 								<TextField 
-									fullWidth label="Telefono" variant="outlined"
-									id="telefono" name="telefono" autoComplete="tel"
-									value={formData.telefono} onChange={handleChange} 
+									fullWidth 
+									required 
+									label="Telefono"
+									name="telefono"
+									value={formData.telefono}
+									onChange={handleChange}
+									error={!!errors.telefono} // Diventa rosso se c'è un errore
+									helperText={errors.telefono} // Mostra il messaggio specifico
 									InputProps={{ startAdornment: <Box sx={{ mr: 1, color: 'action.active' }}><PhoneIcon /></Box> }}
 								/>
 							</Grid>
 							<Grid size={{ xs: 12, md: 6 }}>
 								<TextField 
-									fullWidth 
-									label="Email" 
+									fullWidth required 
+									label="Nome e Cognome o Azienda" 
 									variant="outlined"
-									type="email" // <--- Importante per validazione browser e mobile
-									id="email" 
-									name="email" 
-									autoComplete="email"
-									value={formData.email} 
-									onChange={handleChange} 
-									InputProps={{ startAdornment: <Box sx={{ mr: 1, color: 'action.active' }}><EmailIcon /></Box> }}
+									id="nome" name="nome"
+									value={formData.nome || ''} 
+									onChange={handleChange}
+									error={!!errors.nome} // Diventa rosso se vuoto
+									helperText={errors.nome} // Scrive "Il nome è obbligatorio"
+									InputProps={{ startAdornment: <Box sx={{ mr: 1, color: 'action.active' }}><PersonIcon /></Box> }}
 								/>
 							</Grid>
 						</Grid>
