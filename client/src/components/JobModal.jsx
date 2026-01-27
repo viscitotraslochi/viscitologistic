@@ -383,29 +383,30 @@ function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
 								disableClearable={false}
 								options={EXTENDED_ITEMS}
 								inputValue={inputValue}
-								onInputChange={(e, val) => {
-									setInputValue(val);
+								onInputChange={(e, val, reason) => {
+									// reason = 'input' quando l'utente digita, 'reset' quando seleziona
+									if (reason === 'input') setInputValue(val);
 								}}
-								onChange={(e, newValue) => {
-									// Gestisce la selezione dalla lista suggerita (Desktop e Mobile)
-									if (newValue) {
+								onChange={(e, newValue, reason) => {
+									// Aggiungi solo se selezionato dalla lista, non da Enter manuale
+									if (reason === 'selectOption' && newValue) {
 										handleAddItem(newValue);
+										setInputValue(''); // reset input
 									}
 								}}
 								renderInput={(params) => (
-									<TextField 
-										{...params} 
-										label="Cerca o scrivi nuovo oggetto..." 
-										variant="outlined" 
-										size="small" 
+									<TextField
+										{...params}
+										label="Cerca o scrivi nuovo oggetto..."
+										variant="outlined"
+										size="small"
 										onKeyDown={(e) => {
 											if (e.key === 'Enter') {
-												// BLOCCA il passaggio al campo successivo (le Note)
-												e.preventDefault(); 
+												e.preventDefault(); // blocca il submit del form
 												e.stopPropagation();
-												
 												if (inputValue.trim() !== '') {
 													handleAddItem(inputValue);
+													setInputValue(''); // reset input
 												}
 											}
 										}}
