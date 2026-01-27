@@ -6,7 +6,7 @@ import {
   AppBar, Toolbar, Typography, Button, Container, Box, Card, CardContent, 
   TextField, Paper, Snackbar, Alert, Checkbox, FormControlLabel, Select, MenuItem,
   IconButton, Chip, useTheme, useMediaQuery, List, ListItem, ListItemIcon, ListItemText,
-  Dialog, DialogContent, DialogTitle, Autocomplete, Divider, FormControl, InputLabel
+  Dialog, DialogContent, DialogTitle, Autocomplete, Divider, FormControl, InputLabel, createFilterOptions
 } from '@mui/material';
 
 import Grid from '@mui/material/Grid';
@@ -50,8 +50,6 @@ let DefaultIcon = L.icon({
     iconAnchor: [12, 41]
 });
 L.Marker.prototype.options.icon = DefaultIcon;
-
-const filter = createFilterOptions();
 
 // --- Pulsanti rapidi a vista ---
 const QUICK_ITEMS = [
@@ -112,6 +110,7 @@ const EXTENDED_ITEMS = [
 const PIANI = Array.from({ length: 16 }, (_, i) => i); // [0, 1, ... 15]
 const ASCENSORE_OPTS = ["SI", "NO"];
 
+const filter = createFilterOptions();
 
 function Home() {
 	const [suggestions, setSuggestions] = useState({ da: [], a: [] });
