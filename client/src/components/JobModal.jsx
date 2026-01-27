@@ -30,22 +30,20 @@ let DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
+// --- Pulsanti rapidi a vista ---
+const QUICK_ITEMS = [
+    "Lavastoviglie", "Asciugatrice", "Forno", "Microonde", "Piano Cottura", 
+	"Divano Angolare", "Chaise Longue", "Pouf", "Tappeto", "Specchio Bagno", 
+	"Mobile Bagno", "Scarpiera", "Appendiabiti", "Bicicletta", "Tapis Roulant", 
+	"Pesi", "Valigia", "Quadro", "Vaso", "Lampadario", "Pianta", "Scatola Libri"
+];
+
+// --- Lista completa per Autocomplete ---
 const EXTENDED_ITEMS = [
     ...QUICK_ITEMS,
-    "Lavastoviglie", "Asciugatrice", "Forno", "Microonde", "Piano Cottura",
-    "Divano Angolare", "Chaise Longue", "Pouf", "Tappeto",
     "Specchio Bagno", "Mobile Bagno", "Scarpiera", "Appendiabiti",
     "Bicicletta", "Tapis Roulant", "Pesi", "Valigia",
     "Quadro", "Vaso", "Lampadario", "Pianta", "Scatola Libri"
-];
-
-const EXTENDED_ITEMS = [
-    ...QUICK_ITEMS,
-    "Lavastoviglie", "Asciugatrice", "Forno", "Microonde", "Piano Cottura",
-    "Divano Angolare", "Chaise Longue", "Pouf", "Tappeto",
-    "Specchio Bagno", "Mobile Bagno", "Scarpiera", "Appendiabiti",
-    "Bicicletta", "Tapis Roulant", "Pesi", "Valigia",
-    "Quadro", "Vaso", "Lampadario", "Pianta", "Scatola Libri, capoc"
 ];
 
 function JobModal({ open, onClose, onJobAdded, jobToEdit, selectedDate }) {
