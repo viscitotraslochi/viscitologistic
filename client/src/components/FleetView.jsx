@@ -178,23 +178,136 @@ function FleetView() {
         {!isMobile && <DialogTitle>{editingId ? 'Modifica Veicolo' : 'Aggiungi Veicolo'}</DialogTitle>}
         
         <DialogContent sx={{ pt: 2 }}>
-          <Grid container spacing={2} sx={{ mt: 0.5 }}>
-            <Grid item xs={6}><TextField label="Targa" fullWidth value={formData.targa} onChange={(e) => setFormData({...formData, targa: e.target.value})} /></Grid>
-            <Grid item xs={6}><TextField label="Marca" fullWidth value={formData.marca} onChange={(e) => setFormData({...formData, marca: e.target.value})} /></Grid>
-            <Grid item xs={12}><TextField label="Modello" fullWidth value={formData.modello} onChange={(e) => setFormData({...formData, modello: e.target.value})} /></Grid>
-            <Grid item xs={6}><TextField label="Anno" type="number" fullWidth value={formData.anno} onChange={(e) => setFormData({...formData, anno: e.target.value})} /></Grid>
-            <Grid item xs={6}>
-              <TextField select label="Alimentazione" fullWidth value={formData.alimentazione} onChange={(e) => setFormData({...formData, alimentazione: e.target.value})}>
-                {['Diesel', 'Benzina', 'Metano', 'GPL', 'Elettrico'].map(opt => <MenuItem key={opt} value={opt}>{opt}</MenuItem>)}
-              </TextField>
-            </Grid>
-            <Grid item xs={12}><TextField label="N° Telaio" fullWidth value={formData.telaio} onChange={(e) => setFormData({...formData, telaio: e.target.value})} /></Grid>
-            <Grid item xs={12}><TextField label="Km Attuali" type="number" fullWidth value={formData.km_attuali} onChange={(e) => setFormData({...formData, km_attuali: e.target.value})} /></Grid>
-            <Grid item xs={6}><TextField label="Scad. Assicurazione" type="date" fullWidth InputLabelProps={{ shrink: true }} value={formData.scadenza_assicurazione} onChange={(e) => setFormData({...formData, scadenza_assicurazione: e.target.value})} /></Grid>
-            <Grid item xs={6}><TextField label="Scad. Revisione" type="date" fullWidth InputLabelProps={{ shrink: true }} value={formData.scadenza_revisione} onChange={(e) => setFormData({...formData, scadenza_revisione: e.target.value})} /></Grid>
-            <Grid item xs={12}><TextField label="Note" multiline rows={3} fullWidth value={formData.note} onChange={(e) => setFormData({...formData, note: e.target.value})} /></Grid>
-          </Grid>
-        </DialogContent>
+		  <Grid container spacing={2} sx={{ mt: 0.5 }}>
+			{/* Riga 1: Targa e Marca */}
+			<Grid item xs={12} sm={6}>
+			  <TextField
+				id="v-targa"
+				label="Targa"
+				fullWidth
+				required
+				variant="outlined"
+				value={formData.targa}
+				onChange={(e) => setFormData({ ...formData, targa: e.target.value.toUpperCase() })}
+			  />
+			</Grid>
+			<Grid item xs={12} sm={6}>
+			  <TextField
+				id="v-marca"
+				label="Marca"
+				fullWidth
+				variant="outlined"
+				value={formData.marca}
+				onChange={(e) => setFormData({ ...formData, marca: e.target.value })}
+			  />
+			</Grid>
+
+			{/* Riga 2: Modello e Anno */}
+			<Grid item xs={12} sm={8}>
+			  <TextField
+				id="v-modello"
+				label="Modello"
+				fullWidth
+				required
+				variant="outlined"
+				value={formData.modello}
+				onChange={(e) => setFormData({ ...formData, modello: e.target.value })}
+			  />
+			</Grid>
+			<Grid item xs={12} sm={4}>
+			  <TextField
+				id="v-anno"
+				label="Anno"
+				type="number"
+				fullWidth
+				variant="outlined"
+				value={formData.anno}
+				onChange={(e) => setFormData({ ...formData, anno: e.target.value })}
+			  />
+			</Grid>
+
+			{/* Riga 3: Telaio e Carburante */}
+			<Grid item xs={12} sm={7}>
+			  <TextField
+				id="v-telaio"
+				label="N° Telaio"
+				fullWidth
+				variant="outlined"
+				value={formData.telaio}
+				onChange={(e) => setFormData({ ...formData, telaio: e.target.value })}
+			  />
+			</Grid>
+			<Grid item xs={12} sm={5}>
+			  <TextField
+				id="v-alimentazione"
+				select
+				label="Alimentazione"
+				fullWidth
+				variant="outlined"
+				value={formData.alimentazione}
+				onChange={(e) => setFormData({ ...formData, alimentazione: e.target.value })}
+			  >
+				{['Diesel', 'Benzina', 'Metano', 'GPL', 'Elettrico', 'Ibrida'].map((opt) => (
+				  <MenuItem key={opt} value={opt}>{opt}</MenuItem>
+				))}
+			  </TextField>
+			</Grid>
+
+			{/* Riga 4: KM attuali */}
+			<Grid item xs={12}>
+			  <TextField
+				id="v-km"
+				label="Kilometri Attuali"
+				type="number"
+				fullWidth
+				variant="outlined"
+				value={formData.km_attuali}
+				onChange={(e) => setFormData({ ...formData, km_attuali: e.target.value })}
+			  />
+			</Grid>
+
+			{/* Riga 5: Date Scadenze */}
+			<Grid item xs={12} sm={6}>
+			  <TextField
+				id="v-assicurazione"
+				label="Scadenza Assicurazione"
+				type="date"
+				fullWidth
+				variant="outlined"
+				InputLabelProps={{ shrink: true }}
+				value={formData.scadenza_assicurazione}
+				onChange={(e) => setFormData({ ...formData, scadenza_assicurazione: e.target.value })}
+			  />
+			</Grid>
+			<Grid item xs={12} sm={6}>
+			  <TextField
+				id="v-revisione"
+				label="Scadenza Revisione"
+				type="date"
+				fullWidth
+				variant="outlined"
+				InputLabelProps={{ shrink: true }}
+				value={formData.scadenza_revisione}
+				onChange={(e) => setFormData({ ...formData, scadenza_revisione: e.target.value })}
+			  />
+			</Grid>
+
+			{/* Riga 6: Note */}
+			<Grid item xs={12}>
+			  <TextField
+				id="v-note"
+				label="Note e Manutenzione"
+				multiline
+				rows={3}
+				fullWidth
+				variant="outlined"
+				placeholder="Inserisci dettagli su riparazioni o scadenze particolari..."
+				value={formData.note}
+				onChange={(e) => setFormData({ ...formData, note: e.target.value })}
+			  />
+			</Grid>
+		  </Grid>
+		</DialogContent>
 
         {!isMobile && (
           <DialogActions>
