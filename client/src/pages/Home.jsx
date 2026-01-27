@@ -296,90 +296,93 @@ function Home() {
     };
 
 	const handleSubmit = async (e) => {
-    e.preventDefault();
+		e.preventDefault();
 
-    // 1. Prepara la lista visuale (Icone selezionate)
-    let visualListString = '';
-    if (Array.isArray(formData.items) && formData.items.length > 0) {
-        visualListString = formData.items
-            .map(item => `${item.name} x${item.qty}`)
-            .join(', ');
-    }
+		// --- VALIDAZIONE MANUALE ---
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		const phoneRegex = /^[0-9+ ]{6,15}$/; // Accetta numeri, spazio e +
 
-    // 2. UNIONE INVENTARIO: Mettiamo insieme la lista visuale E il testo scritto nel campo "Inventario"
-    let finalInventory = visualListString;
-	if (formData.inventario) {
-		if (finalInventory) finalInventory += " | "; 
-		finalInventory += formData.inventario;      
-	}
+		if (formData.email && !emailRegex.test(formData.email)) {
+			setSnackbar({ 
+				open: true, 
+				severity: 'error', 
+				message: 'Inserisci un indirizzo email valido (es: nome@esempio.it)' 
+			});
+			return;
+		}
 
-    // 3. NOTE PULITE: Qui ci va SOLO il messaggio del cliente
-    const finalNotes = formData.note || ''; 
+		if (formData.telefono && !phoneRegex.test(formData.telefono)) {
+			setSnackbar({ 
+				open: true, 
+				severity: 'error', 
+				message: 'Il numero di telefono non sembra corretto. Usa solo numeri.' 
+			});
+			return;
+		}
 
-    // 4. Oggetto dati SEPARATO
-    const dataToSend = {
-        cliente_nome: formData.nome,
-        telefono: formData.telefono,
-        email: formData.email,
-        da_indirizzo: formData.da_indirizzo,
-        a_indirizzo: formData.a_indirizzo,
-        piano_partenza: formData.piano_partenza,
-        ascensore_partenza: formData.ascensore_partenza,
-        piano_arrivo: formData.piano_arrivo,
-        ascensore_arrivo: formData.ascensore_arrivo,
-        
-        // --- QUI AVVIENE LA MAGIA ---
-        items: finalInventory, // Va nella colonna 'items'
-        note: finalNotes,      // Va nella colonna 'note'
-        // ----------------------------
+		// --- PREPARAZIONE DATI (Tua logica esistente) ---
+		let visualListString = inventoryList
+			.map(item => `${item.name} x${item.qty}`)
+			.join(', ');
 
-        data_trasloco: formData.startDate,
-        ora_trasloco: formData.startTime
-    };
+		let finalInventory = visualListString;
+		if (formData.inventario && formData.inventario !== visualListString) {
+			if (finalInventory) finalInventory += " | "; 
+			finalInventory += formData.inventario;      
+		}
 
-    try {
-        // Invio al server
-        await api.post('/leads', dataToSend);
-        
-        setSnackbar({ 
-            open: true, 
-            severity: 'success', 
-            message: 'Richiesta inviata con successo!' 
-        });
+		const dataToSend = {
+			cliente_nome: formData.nome,
+			telefono: formData.telefono,
+			email: formData.email,
+			da_indirizzo: formData.da_indirizzo,
+			a_indirizzo: formData.a_indirizzo,
+			piano_partenza: formData.piano_partenza,
+			ascensore_partenza: formData.ascensore_partenza,
+			piano_arrivo: formData.piano_arrivo,
+			ascensore_arrivo: formData.ascensore_arrivo,
+			items: finalInventory,
+			note: formData.note || '',
+			data_trasloco: formData.startDate,
+			ora_trasloco: formData.startTime
+		};
 
-        // Reset Form
-		setFormData({
-			nome: '',
-			telefono: '',
-			email: '',
-			da_indirizzo: '',
-			a_indirizzo: '',
-			piano_partenza: '0',
-			ascensore_partenza: false,  // default NO
-			piano_arrivo: '0',
-			ascensore_arrivo: false,    // default NO
-			startDate: '',
-			startTime: '', 
-			items: [],
-			inventario: '',
-			note: '' 
-		});
+		try {
+			setLoading(true); // Opzionale: aggiungi uno stato di caricamento
+			await api.post('/leads', dataToSend);
+			
+			// --- MESSAGGIO DI CONFERMA MIGLIORATO ---
+			setSnackbar({ 
+				open: true, 
+				severity: 'success', 
+				message: 'Grazie! La tua richiesta è stata inviata. Un nostro consulente ti ricontatterà telefonicamente o via email entro 24 ore.' 
+			});
 
-        
-        // Se usi setInventoryList per pulire le icone visive
-        if (typeof setInventoryList === 'function') setInventoryList([]); 
+			// Reset Form completo
+			setFormData({
+				nome: '', telefono: '', email: '',
+				da_indirizzo: '', a_indirizzo: '',
+				piano_partenza: '0', ascensore_partenza: false,
+				piano_arrivo: '0', ascensore_arrivo: false,
+				startDate: '', startTime: '', 
+				items: [], inventario: '', note: '' 
+			});
+			setInventoryList([]); // Svuota la lista visuale
 
-        setTimeout(() => navigate('/thank-you'), 1500);
+			// Reindirizzamento dopo un tempo leggermente più lungo per far leggere il messaggio
+			setTimeout(() => navigate('/thank-you'), 3000);
 
-    } catch (error) {
-        console.error("Errore invio:", error);
-        setSnackbar({ 
-            open: true, 
-            severity: 'error', 
-            message: "Errore: " + (error.response?.data?.error || "Impossibile inviare")
-        });
-    }
-};
+		} catch (error) {
+			console.error("Errore invio:", error);
+			setSnackbar({ 
+				open: true, 
+				severity: 'error', 
+				message: "Ops! Errore durante l'invio. Riprova o chiamaci direttamente."
+			});
+		} finally {
+			setLoading(false);
+		}
+	};
 
   const scrollToForm = () => {
     document.getElementById('form-section').scrollIntoView({ behavior: 'smooth' });
@@ -589,9 +592,15 @@ function Home() {
 							</Grid>
 							<Grid size={{ xs: 12, md: 6 }}>
 								<TextField 
-									fullWidth label="Email" variant="outlined"
-									id="email" name="email" autoComplete="email"
-									value={formData.email} onChange={handleChange} 
+									fullWidth 
+									label="Email" 
+									variant="outlined"
+									type="email" // <--- Importante per validazione browser e mobile
+									id="email" 
+									name="email" 
+									autoComplete="email"
+									value={formData.email} 
+									onChange={handleChange} 
 									InputProps={{ startAdornment: <Box sx={{ mr: 1, color: 'action.active' }}><EmailIcon /></Box> }}
 								/>
 							</Grid>
