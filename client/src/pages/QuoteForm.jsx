@@ -249,6 +249,23 @@ useEffect(() => {
 
     try {
       await api.post('/leads', dataToSend);
+	  
+	  // GA4 / GTM event (se usi dataLayer)
+		window.dataLayer = window.dataLayer || [];
+		window.dataLayer.push({
+		  event: "lead_submit",
+		  lead_source: "website",
+		  page: window.location.pathname
+		});
+
+		// (opzionale) gtag diretto se lo usi senza GTM
+		if (typeof window.gtag === "function") {
+		  window.gtag("event", "generate_lead", {
+			method: "quote_form",
+			page_location: window.location.href
+		  });
+		}
+
 
       setSnackbar({
         open: true,
