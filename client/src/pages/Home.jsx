@@ -2,6 +2,7 @@ import { Box, useTheme, useMediaQuery } from '@mui/material';
 import HomeHero from './HomeHero';
 import ServicesSection from './ServicesSection';
 import QuoteForm from './QuoteForm';
+import { Helmet } from 'react-helmet-async';
 
 export default function Home() {
   const theme = useTheme();
@@ -14,6 +15,16 @@ const scrollToForm = () => {
 
 
   return (
+  <>
+  <Helmet>
+    <title>Traslochi a Salerno e in tutta Italia | Viscito Logistic</title>
+    <meta
+      name="description"
+      content="Viscito Logistic offre traslochi professionali a Salerno e in tutta Italia. Preventivo gratuito, montaggio mobili e logistica."
+    />
+    <link rel="canonical" href="https://www.viscitologistic.it/" />
+  </Helmet>
+
     <Box
       sx={{
         height: '100vh',

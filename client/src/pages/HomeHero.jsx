@@ -32,7 +32,7 @@ export default function HomeHero({ scrollToForm }) {
             <Box
               component="img"
               src="/viscitologistic.png"
-              alt="Viscito Logistic"
+              alt="Viscito Logistic - Traslochi e Logistica a Salerno"
               sx={{
                 height: { xs: 35, md: 55 },
                 maxWidth: { xs: '180px', md: '250px' },
@@ -96,19 +96,18 @@ export default function HomeHero({ scrollToForm }) {
 
         <Container maxWidth="md" sx={{ position: 'relative', zIndex: 2 }}>
           <Typography
-            component="h1"
-            sx={{
-              fontWeight: 800,
-              typography: { xs: 'h3', md: 'h1' },
-              mb: 2
-            }}
-          >
-            Traslochi e Logistica <br />{' '}
-            <Box component="span" sx={{ color: '#90caf9' }}>
-              Senza Confini
-            </Box>
-          </Typography>
-
+			  component="h1"
+			  sx={{
+				fontWeight: 800,
+				typography: { xs: 'h3', md: 'h1' },
+				mb: 2
+			  }}
+			>
+			  Traslochi professionali a Salerno <br />
+			  <Box component="span" sx={{ color: '#90caf9' }}>
+				in tutta Italia
+			  </Box>
+			</Typography>
           <Typography
             variant="h5"
             sx={{
