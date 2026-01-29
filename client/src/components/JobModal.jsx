@@ -850,15 +850,41 @@ useEffect(() => {
             </Paper>
           </Grid>
 
-          <Grid size={{ xs: 12 }}>
-            <TextField id="notes" label="Note" name="notes" multiline rows={2} fullWidth value={formData.notes} onChange={handleChange} />
+          <Grid size={{ xs: 12, md: 4 }}>
+            <TextField
+              id="notes"
+              label="Note"
+              name="notes"
+              multiline
+              minRows={3}
+              fullWidth
+              value={formData.notes}
+              onChange={handleChange}
+            />
           </Grid>
 
-          <Grid size={{ xs: 6 }}>
-            <TextField id="price" label="Prezzo Pattuito (€)" name="price" type="number" fullWidth value={formData.price} onChange={handleChange} />
+          <Grid size={{ xs: 12, md: 4 }}>
+            <TextField
+              id="price"
+              label="Prezzo Pattuito (€)"
+              name="price"
+              type="number"
+              fullWidth
+              value={formData.price}
+              onChange={handleChange}
+            />
           </Grid>
-          <Grid size={{ xs: 6 }}>
-            <TextField id="deposit" label="Acconto (€)" name="deposit" type="number" fullWidth value={formData.deposit} onChange={handleChange} />
+
+          <Grid size={{ xs: 12, md: 4 }}>
+            <TextField
+              id="deposit"
+              label="Acconto (€)"
+              name="deposit"
+              type="number"
+              fullWidth
+              value={formData.deposit}
+              onChange={handleChange}
+            />
           </Grid>
         </Grid>
       </DialogContent>
