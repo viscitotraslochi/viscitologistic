@@ -147,14 +147,26 @@ function CalendarView() {
 
     // --- CASO 1: VISTA GRIGLIA (Mese e Settimana) ---
     if (view.type === 'dayGridMonth' || view.type === 'timeGridWeek') {
-      return (
-        <div
+	  const isSopralluogo = jobType === 'sopralluogo';
+	  const badgeText = isSopralluogo ? 'SOPR' : 'TRAS';
+
+	  const tooltipText = [
+		badgeText,
+		startTime ? `• ${startTime}` : null,
+		extendedProps?.da_indirizzo ? `• Da: ${extendedProps.da_indirizzo}` : null,
+		extendedProps?.a_indirizzo ? `• A: ${extendedProps.a_indirizzo}` : null,
+		extendedProps?.telefono ? `• Tel: ${extendedProps.telefono}` : null
+	  ].filter(Boolean).join(' ');
+
+	  return (
+		<div
+		  title={tooltipText}
 		  style={{
 			display: 'flex',
 			alignItems: 'center',
 			gap: '6px',
 			padding: '3px 6px',
-			borderRadius: '6px',
+			borderRadius: '8px',
 			background: bgColor,
 			borderLeft: `4px solid ${mainColor}`,
 			fontSize: '0.78rem',
@@ -167,9 +179,9 @@ function CalendarView() {
 		  {/* ORA */}
 		  <span
 			style={{
-			  fontWeight: 800,
+			  fontWeight: 900,
 			  color: mainColor,
-			  minWidth: 38
+			  minWidth: 42
 			}}
 		  >
 			{startTime || '—'}
@@ -178,18 +190,35 @@ function CalendarView() {
 		  {/* NOME */}
 		  <span
 			style={{
-			  fontWeight: 600,
+			  fontWeight: 650,
 			  color: '#263238',
 			  overflow: 'hidden',
-			  textOverflow: 'ellipsis'
+			  textOverflow: 'ellipsis',
+			  flex: 1
 			}}
 		  >
 			{eventInfo.event.title}
 		  </span>
-		</div>
 
-      );
-    }
+		  {/* BADGE TIPO */}
+		  <span
+			style={{
+			  padding: '1px 6px',
+			  borderRadius: 999,
+			  fontSize: '0.65rem',
+			  fontWeight: 900,
+			  letterSpacing: '0.4px',
+			  background: mainColor,
+			  color: '#fff',
+			  flexShrink: 0
+			}}
+		  >
+			{badgeText}
+		  </span>
+		</div>
+	  );
+	}
+
 
     // --- CASO 2: VISTA LISTA (Cards) ---
     const openFromCard = () => {
