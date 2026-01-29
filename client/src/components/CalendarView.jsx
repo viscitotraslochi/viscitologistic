@@ -483,30 +483,36 @@ function CalendarView() {
             Nuovo Lavoro
           </Button>
 
-          {/* Filtro visibile solo in vista Lista */}
-          {String(currentView || '').startsWith('list') && (
-            <ToggleButtonGroup
-              value={typeFilter}
-              exclusive
-              onChange={(e, v) => { if (v) setTypeFilter(v); }}
-              size="small"
-              fullWidth={isMobile}
-              sx={{
-                bgcolor: '#fff',
-                borderRadius: 2,
-                flexWrap: 'wrap',
-                '& .MuiToggleButton-root': {
-                  textTransform: 'none',
-                  fontWeight: 800,
-                  px: isMobile ? 1 : 1.5
-                }
-              }}
-            >
-              <ToggleButton value="all">Tutti</ToggleButton>
-              <ToggleButton value="sopralluogo">Sopralluoghi</ToggleButton>
-              <ToggleButton value="trasloco">Traslochi</ToggleButton>
-            </ToggleButtonGroup>
-          )}
+          {/* Filtro: desktop sempre, mobile solo in lista (come prima) */}
+			{(!isMobile || String(currentView || '').startsWith('list')) && (
+			  <ToggleButtonGroup
+				  value={typeFilter}
+				  exclusive
+				  onChange={(e, v) => {
+					if (!v) return;
+					setTypeFilter(v);
+
+					// forza il refresh del calendario (utile in mese/settimana)
+					calendarRef.current?.getApi()?.rerenderEvents();
+				  }}
+				  size="small"
+				  fullWidth={isMobile}
+				  sx={{
+					bgcolor: '#fff',
+					borderRadius: 2,
+					flexWrap: 'wrap',
+					'& .MuiToggleButton-root': {
+					  textTransform: 'none',
+					  fontWeight: 800,
+					  px: isMobile ? 1 : 1.5
+					}
+				  }}
+				>
+				<ToggleButton value="all">Tutti</ToggleButton>
+				<ToggleButton value="sopralluogo">Sopralluoghi</ToggleButton>
+				<ToggleButton value="trasloco">Traslochi</ToggleButton>
+			  </ToggleButtonGroup>
+			)}
         </Box>
       </Box>
 
