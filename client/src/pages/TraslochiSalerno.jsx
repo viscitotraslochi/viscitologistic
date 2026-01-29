@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import { Link } from "react-router-dom";
 
 export default function TraslochiSalerno() {
   return (
@@ -102,6 +103,11 @@ export default function TraslochiSalerno() {
           Il nostro team è pronto ad aiutarti a organizzare il tuo trasloco in
           modo semplice, veloce e sicuro.
         </p>
+		<p>
+		  <Link to="/#preventivo" style={{ fontWeight: 700 }}>
+			Vai al modulo preventivo
+		  </Link>
+		</p>
       </main>
     </>
   );

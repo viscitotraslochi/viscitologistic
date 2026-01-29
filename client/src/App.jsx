@@ -20,6 +20,11 @@ import LeadsView from './components/LeadsView';
 import FleetView from './components/FleetView';
 import ChangePasswordModal from './components/ChangePasswordModal'; 
 import TraslochiSalerno from './pages/TraslochiSalerno';
+import TraslochiNapoli from "./pages/TraslochiNapoli";
+import TraslochiCampania from "./pages/TraslochiCampania";
+import TraslochiAvellino from "./pages/TraslochiAvellino";
+import TraslochiCaserta from "./pages/TraslochiCaserta";
+import TraslochiBenevento from "./pages/TraslochiBenevento";
 
 // --- COMPONENTE ADMIN PANEL ---
 function AdminPanel() {
@@ -174,6 +179,11 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
 		<Route path="/traslochi-salerno" element={<TraslochiSalerno />} />
+		<Route path="/traslochi-napoli" element={<TraslochiNapoli />} />
+		<Route path="/traslochi-campania" element={<TraslochiCampania />} />
+		<Route path="/traslochi-avellino" element={<TraslochiAvellino />} />
+		<Route path="/traslochi-caserta" element={<TraslochiCaserta />} />
+		<Route path="/traslochi-benevento" element={<TraslochiBenevento />} />
         <Route path="/login" element={<Login onLoginSuccess={() => {}} />} /> 
         <Route path="/admin" element={<AdminPanel />} />
         <Route path="*" element={<Navigate to="/" replace />} />

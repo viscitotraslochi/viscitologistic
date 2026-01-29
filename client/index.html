@@ -38,36 +38,50 @@
 	{
 	  "@context": "https://schema.org",
 	  "@type": "MovingCompany",
-	  "name": "Viscito Logistic",
+	  "name": "Viscito Traslochi e Logistica",
 	  "url": "https://www.viscitotraslochi.com/",
 	  "logo": "https://www.viscitotraslochi.com/viscitologistic.png",
 	  "image": "https://www.viscitotraslochi.com/viscitologistic.png",
-	  "telephone": "+393663370679",
-	  "telephone": "+393397882956",
+	  "priceRange": "€€",
 	  "address": {
 		"@type": "PostalAddress",
 		"addressLocality": "Salerno",
-		"addressRegion": "SA",
+		"addressRegion": "Campania",
 		"addressCountry": "IT"
 	  },
 	  "areaServed": [
-		"Salerno",
-		"Campania",
-		"Italia"
+		{ "@type": "City", "name": "Salerno" },
+		{ "@type": "AdministrativeArea", "name": "Campania" },
+		{ "@type": "Country", "name": "Italia" }
 	  ],
 	  "openingHoursSpecification": [
 		{
 		  "@type": "OpeningHoursSpecification",
-		  "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+		  "dayOfWeek": [
+			"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"
+		  ],
 		  "opens": "08:00",
 		  "closes": "20:00"
 		}
 	  ],
-	  "priceRange": "€€",
+	  "contactPoint": [
+		{
+		  "@type": "ContactPoint",
+		  "telephone": "+393663370679",
+		  "contactType": "customer service",
+		  "areaServed": "IT",
+		  "availableLanguage": ["it"]
+		},
+		{
+		  "@type": "ContactPoint",
+		  "telephone": "+393397882956",
+		  "contactType": "customer service",
+		  "areaServed": "IT",
+		  "availableLanguage": ["it"]
+		}
+	  ],
 	  "sameAs": [
-		"https://www.facebook.com/p/Viscito-Traslochi-Servizi-100050365226297/",
-		"https://www.instagram.com/TUO-PROFILO",
-		"https://www.linkedin.com/company/TUA-PAGINA"
+		"https://www.facebook.com/p/Viscito-Traslochi-Servizi-100050365226297/"
 	  ]
 	}
 	</script>
