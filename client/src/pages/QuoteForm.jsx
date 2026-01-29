@@ -601,16 +601,92 @@ useEffect(() => {
       </Container>
 
       {/* ================= FOOTER ================= */}
-      <Box sx={{ bgcolor: '#102a43', color: 'white', py: 4, mt: 'auto' }}>
-        <Container maxWidth="lg" sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="body2" sx={{ opacity: 0.7, mb: { xs: 2, md: 0 } }}>© 2026 Viscito Logistic - Salerno</Typography>
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <IconButton size="small" sx={{ color: 'white', bgcolor: 'rgba(255,255,255,0.1)' }}><FacebookIcon /></IconButton>
-            <IconButton size="small" sx={{ color: 'white', bgcolor: 'rgba(255,255,255,0.1)' }}><InstagramIcon /></IconButton>
-            <IconButton size="small" sx={{ color: 'white', bgcolor: 'rgba(255,255,255,0.1)' }}><LinkedInIcon /></IconButton>
-          </Box>
-        </Container>
-      </Box>
+		<Box sx={{ bgcolor: '#102a43', color: 'white', py: 5, mt: 'auto' }}>
+		  <Container
+			maxWidth="lg"
+			sx={{
+			  display: 'grid',
+			  gridTemplateColumns: { xs: '1fr', md: '2fr 1fr' },
+			  gap: 4,
+			  alignItems: 'center'
+			}}
+		  >
+			{/* COLONNA 1 – BRAND / AZIENDA */}
+			<Box>
+			  <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+				Viscito Traslochi e Logistica
+			  </Typography>
+
+			  <Typography variant="body2" sx={{ opacity: 0.75, lineHeight: 1.7 }}>
+				Azienda specializzata in traslochi per privati e aziende.
+				Operiamo a Salerno, in Campania e in tutta Italia con servizi
+				professionali, rapidi e senza stress.
+			  </Typography>
+
+			  <Typography variant="body2" sx={{ opacity: 0.6, mt: 2 }}>
+				© 2026 Viscito Logistic – Salerno
+			  </Typography>
+			</Box>
+
+			{/* COLONNA 2 – SOCIAL / AFFIDABILITÀ */}
+			<Box>
+			  <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
+				Seguici
+			  </Typography>
+
+			  <Box sx={{ display: 'flex', gap: 1 }}>
+				<IconButton
+				  size="small"
+				  sx={{ color: 'white', bgcolor: 'rgba(255,255,255,0.12)' }}
+				  component="a"
+				  href="https://www.facebook.com/p/Viscito-Traslochi-Servizi-100050365226297/"
+				  target="_blank"
+				  rel="noopener"
+				>
+				  <FacebookIcon fontSize="small" />
+				</IconButton>
+
+				<IconButton
+				  size="small"
+				  sx={{ color: 'white', bgcolor: 'rgba(255,255,255,0.12)' }}
+				>
+				  <InstagramIcon fontSize="small" />
+				</IconButton>
+
+				<IconButton
+				  size="small"
+				  sx={{ color: 'white', bgcolor: 'rgba(255,255,255,0.12)' }}
+				>
+				  <LinkedInIcon fontSize="small" />
+				</IconButton>
+			  </Box>
+
+			  <Typography variant="body2" sx={{ opacity: 0.7, mt: 2 }}>
+				Preventivi gratuiti<br />
+				Assistenza rapida
+			  </Typography>
+			  <Typography
+				  variant="body2"
+				  sx={{
+					mt: 1,
+					fontWeight: { xs: 600, md: 500 } // 👈 più marcato su mobile
+				  }}
+				>
+				  <a
+					href="/#preventivo"
+					style={{
+					  color: '#90caf9',
+					  textDecoration: 'none'
+					}}
+				  >
+					Richiedi un preventivo gratuito →
+				  </a>
+				</Typography>
+			</Box>
+		  </Container>
+		</Box>
+
+
 
       <MapDialog
         mapOpen={mapOpen}

@@ -64,38 +64,41 @@ export default function HomeHero({ scrollToForm }) {
       </AppBar>
 
       {/* HERO */}
-      <Box
-        sx={{
-          flexGrow: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          textAlign: 'center',
-          bgcolor: '#102a43',
-          color: 'white',
-          backgroundImage:
-            'url("https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1920&q=80")',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          position: 'relative',
-          mt: '64px'
-        }}
-      >
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background:
-              'linear-gradient(135deg, rgba(25, 118, 210, 0.9) 0%, rgba(13, 71, 161, 0.75) 100%)',
-            zIndex: 1
-          }}
-        />
+		<Box
+		  sx={{
+			flexGrow: 1,
+			display: 'flex',
+			alignItems: 'center',
+			justifyContent: 'center',
+			textAlign: 'center',
+			color: 'white',
+			backgroundImage: 'url("/HomeHero.webp")',
+			backgroundSize: 'cover',
+			backgroundPosition: 'center',
+			position: 'relative',
+			mt: '64px'
+		  }}
+		>
+		  {/* overlay */}
+		  <Box
+			sx={{
+			  position: 'absolute',
+			  top: 0,
+			  left: 0,
+			  right: 0,
+			  bottom: 0,
+			  background: {
+  xs: 'linear-gradient(135deg, rgba(12,35,55,0.94) 0%, rgba(13,71,161,0.78) 100%)',
+  md: 'linear-gradient(135deg, rgba(12,35,55,0.90) 0%, rgba(13,71,161,0.70) 100%)'
+}
+,
+			  zIndex: 1
+			}}
+		  />
 
-        <Container maxWidth="md" sx={{ position: 'relative', zIndex: 2 }}>
-          <Typography
+		  {/* contenuto */}
+		  <Container maxWidth="md" sx={{ position: 'relative', zIndex: 2 }}>
+			<Typography
 			  component="h1"
 			  sx={{
 				fontWeight: 800,
@@ -108,56 +111,59 @@ export default function HomeHero({ scrollToForm }) {
 				in tutta Italia
 			  </Box>
 			</Typography>
-          <Typography
-            variant="h5"
-            sx={{
-              mb: 5,
-              opacity: 0.9,
-              fontSize: { xs: '1.1rem', md: '1.35rem' },
-              fontWeight: 400
-            }}
-          >
-            Soluzioni di trasporto nazionali, montaggio arredi e depositi.
-            Affidati all'esperienza Viscito.
-          </Typography>
 
-          <Button
-            variant="contained"
-            size="large"
-            onClick={scrollToForm}
-            sx={{
-              bgcolor: 'white',
-              color: '#0d47a1',
-              fontSize: '1.1rem',
-              px: 5,
-              py: 1.5,
-              fontWeight: 'bold',
-              borderRadius: 2,
-              '&:hover': {
-                bgcolor: '#f5f5f5',
-                transform: 'translateY(-2px)'
-              }
-            }}
-          >
-            RICHIEDI PREVENTIVO
-          </Button>
-        </Container>
+			<Typography
+			  variant="h5"
+			  sx={{
+				mb: 5,
+				opacity: 0.9,
+				fontSize: { xs: '1.1rem', md: '1.35rem' },
+				fontWeight: 400
+			  }}
+			>
+			  Soluzioni di trasporto nazionali, montaggio arredi e depositi.
+			  Affidati all'esperienza Viscito.
+			</Typography>
 
-        <Box
-          sx={{
-            position: 'absolute',
-            bottom: 20,
-            left: 0,
-            right: 0,
-            display: 'flex',
-            justifyContent: 'center',
-            zIndex: 2,
-            animation: 'bounce 2s infinite'
-          }}
-        >
-          <KeyboardArrowDownIcon sx={{ color: 'white', fontSize: 40, opacity: 0.8 }} />
-        </Box>
-      </Box>
-    </Box>
+			<Button
+			  variant="contained"
+			  size="large"
+			  onClick={scrollToForm}
+			  sx={{
+				bgcolor: 'white',
+				color: '#0d47a1',
+				fontSize: '1.1rem',
+				px: 5,
+				py: 1.5,
+				fontWeight: 'bold',
+				borderRadius: 2,
+				'&:hover': {
+				  bgcolor: '#f5f5f5',
+				  transform: 'translateY(-2px)'
+				}
+			  }}
+			>
+			  RICHIEDI PREVENTIVO
+			</Button>
+		  </Container>
+
+		  {/* freccia */}
+		  <Box
+			sx={{
+			  position: 'absolute',
+			  bottom: 20,
+			  left: 0,
+			  right: 0,
+			  display: 'flex',
+			  justifyContent: 'center',
+			  zIndex: 2,
+			  animation: 'bounce 2s infinite'
+			}}
+		  >
+			<KeyboardArrowDownIcon sx={{ color: 'white', fontSize: 40, opacity: 0.8 }} />
+		  </Box>
+		</Box>
+	</Box>
+
   );
 }

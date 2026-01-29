@@ -45,18 +45,11 @@ export default function Home() {
       </Helmet>
 
       <Box
-        sx={{
-          height: '100vh',
-          overflowY: 'scroll',
-          scrollSnapType: 'y mandatory',
-          scrollBehavior: 'smooth',
-          '&::-webkit-scrollbar': { width: 8 },
-          '&::-webkit-scrollbar-thumb': {
-            background: '#888',
-            borderRadius: 4
-          }
-        }}
-      >
+		  sx={{
+			minHeight: '100vh',
+			scrollBehavior: 'smooth'
+		  }}
+		>
         {/* HERO */}
         <HomeHero scrollToForm={scrollToForm} />
 
