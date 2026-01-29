@@ -15,9 +15,7 @@ export default function HomeHero({ scrollToForm }) {
   // scroll alla sezione servizi
   const scrollToServices = () => {
     const el = document.getElementById('servizi');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   return (
@@ -168,7 +166,11 @@ export default function HomeHero({ scrollToForm }) {
         <Box
           role="button"
           aria-label="Scorri ai servizi"
+          tabIndex={0}
           onClick={scrollToServices}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') scrollToServices();
+          }}
           sx={{
             position: 'absolute',
             bottom: 20,
@@ -178,7 +180,8 @@ export default function HomeHero({ scrollToForm }) {
             justifyContent: 'center',
             zIndex: 2,
             animation: 'bounce 2s infinite',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            outline: 'none'
           }}
         >
           <KeyboardArrowDownIcon

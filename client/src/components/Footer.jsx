@@ -5,7 +5,7 @@ export default function Footer() {
   return (
     <Box
       component="footer"
-      className="seo-footer"   // 👈 AGGIUNTO
+      className="seo-footer"
       sx={{
         mt: 6,
         py: 4,
@@ -15,13 +15,11 @@ export default function Footer() {
       }}
     >
       <Box sx={{ maxWidth: 1100, mx: "auto" }}>
-        {/* TESTO AZIENDA */}
         <Typography variant="body2" sx={{ mb: 2, color: "#555" }}>
           <strong>Viscito Traslochi e Logistica</strong> – Servizi professionali
           di trasloco per privati e aziende in Campania e in tutta Italia.
         </Typography>
 
-        {/* LINK SEO */}
         <Typography variant="body2" sx={{ mb: 1, fontWeight: 600 }}>
           Traslochi per zona
         </Typography>
@@ -35,7 +33,6 @@ export default function Footer() {
           <MuiLink component={Link} to="/traslochi-benevento">Traslochi a Benevento</MuiLink>
         </Typography>
 
-        {/* CREDITI */}
         <Typography variant="caption" sx={{ display: "block", mt: 3, color: "#888" }}>
           © {new Date().getFullYear()} Viscito Traslochi e Logistica
         </Typography>

@@ -1,19 +1,20 @@
 import { Box, useTheme, useMediaQuery } from '@mui/material';
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 
 import HomeHero from './HomeHero';
-import ServicesSection from './ServicesSection';
-import QuoteForm from './QuoteForm';
-import Footer from '../components/Footer'; // footer SEO "non a vista"
+const ServicesSection = lazy(() => import('./ServicesSection'));
+const QuoteForm = lazy(() => import('./QuoteForm'));
+
+import Footer from '../components/Footer'; // footer SEO (nascosto in Home via CSS)
 
 export default function Home() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const location = useLocation();
 
-  // ✅ Nasconde il footer SEO solo in Home via CSS: body.is-home .seo-footer { display:none }
+  // ✅ Nasconde il footer SEO solo in Home (CSS: body.is-home .seo-footer { display:none })
   useEffect(() => {
     document.body.classList.add('is-home');
     return () => document.body.classList.remove('is-home');
@@ -39,9 +40,6 @@ export default function Home() {
     <>
       <Helmet>
         <title>Traslochi a Salerno e in tutta Italia | Viscito Traslochi e Logistica</title>
-
-        {/* ❌ rimosso preload qui perché in HomeHero.jsx usiamo già <img fetchpriority="high"> */}
-
         <meta
           name="description"
           content="Viscito Traslochi e Logistica offre traslochi professionali a Salerno e in tutta Italia. Preventivo gratuito, smontaggio mobili e logistica."
@@ -53,12 +51,16 @@ export default function Home() {
         {/* HERO */}
         <HomeHero scrollToForm={scrollToForm} />
 
-        {/* SERVIZI */}
-        <ServicesSection isMobile={isMobile} scrollToForm={scrollToForm} />
+        {/* SERVIZI (lazy) */}
+        <Suspense fallback={null}>
+          <ServicesSection isMobile={isMobile} scrollToForm={scrollToForm} />
+        </Suspense>
 
-        {/* FORM PREVENTIVO */}
+        {/* FORM PREVENTIVO (lazy) */}
         <Box id="preventivo">
-          <QuoteForm />
+          <Suspense fallback={null}>
+            <QuoteForm />
+          </Suspense>
         </Box>
 
         {/* FOOTER SEO (presente ma nascosto in Home via CSS) */}

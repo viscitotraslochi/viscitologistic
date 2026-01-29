@@ -32,7 +32,7 @@ import InstagramIcon from '@mui/icons-material/Instagram';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 
 import InventorySelector from './InventorySelector';
-import MapDialog from './MapDialog';
+const MapDialog = lazy(() => import('./MapDialog'));
 import api from '../api/axiosConfig';
 
 const PIANI = Array.from({ length: 16 }, (_, i) => i);
