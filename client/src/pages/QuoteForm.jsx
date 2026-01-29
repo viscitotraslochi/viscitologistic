@@ -264,14 +264,6 @@ useEffect(() => {
 		  page: window.location.pathname
 		});
 
-		// (opzionale) gtag diretto se lo usi senza GTM
-		if (typeof window.gtag === "function") {
-		  window.gtag("event", "generate_lead", {
-			method: "quote_form",
-			page_location: window.location.href
-		  });
-		}
-
 
       setSnackbar({
         open: true,
@@ -495,8 +487,8 @@ useEffect(() => {
 						onChange={(e, newVal) => {
 						  if (typeof newVal === 'string') {
 							setFormData(prev => ({ ...prev, a_indirizzo: newVal }));
-						  }}
-						}
+						    }
+						}}
 						renderInput={(params) => (
 						  <TextField
 							{...params}
