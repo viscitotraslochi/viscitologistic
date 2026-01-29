@@ -309,6 +309,13 @@ useEffect(() => {
 
       <Container maxWidth="md" sx={{ mb: 8 }}>
         <form onSubmit={handleSubmit}>
+		if (typeof window.gtag === 'function') {
+		  window.gtag('event', 'generate_lead', {
+			event_category: 'lead',
+			event_label: 'preventivo',
+			value: 1
+		  });
+		}
 		<Typography
 		  component="h2"
 		  variant="h4"

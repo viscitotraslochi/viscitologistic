@@ -123,27 +123,36 @@ export default function ServicesSection({ isMobile, scrollToForm }) {
             }}
           >
             <Button
-              variant="contained"
-              size="large"
-              component="a"
-              href="tel:+393663370679"
-              startIcon={<PhoneInTalkIcon />}
-              sx={{
-                flex: 1,
-                borderRadius: 999,
-                px: 3.5,
-                py: 1.6,
-                fontWeight: 800,
-                textTransform: 'none',
-                boxShadow: '0 10px 25px rgba(16,42,67,0.18)',
-                '&:hover': {
-                  boxShadow: '0 14px 30px rgba(16,42,67,0.22)',
-                  transform: 'translateY(-2px)'
-                }
-              }}
-            >
-              Chiama ora
-            </Button>
+			  variant="contained"
+			  size="large"
+			  component="a"
+			  href="tel:+393663370679"
+			  startIcon={<PhoneInTalkIcon />}
+			  onClick={() => {
+				if (typeof window.gtag === 'function') {
+				  window.gtag('event', 'click_phone', {
+					event_category: 'contact',
+					event_label: 'telefono_cta'
+				  });
+				}
+			  }}
+			  sx={{
+				flex: 1,
+				borderRadius: 999,
+				px: 3.5,
+				py: 1.6,
+				fontWeight: 800,
+				textTransform: 'none',
+				boxShadow: '0 10px 25px rgba(16,42,67,0.18)',
+				'&:hover': {
+				  boxShadow: '0 14px 30px rgba(16,42,67,0.22)',
+				  transform: 'translateY(-2px)'
+				}
+			  }}
+			>
+			  Chiama ora
+			</Button>
+
 
             <Button
               variant="outlined"

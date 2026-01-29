@@ -139,5 +139,174 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+	<!-- ========================= -->
+<!-- COOKIE BANNER (MINIMALE) -->
+<!-- ========================= -->
+<style>
+  #cookie-banner {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    z-index: 99999;
+    background: rgba(18, 18, 18, 0.95);
+    color: #fff;
+    border-radius: 14px;
+    padding: 14px 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.35);
+    display: none;
+    max-width: 980px;
+    margin: 0 auto;
+  }
+  #cookie-banner .row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  #cookie-banner p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.35;
+    opacity: 0.95;
+  }
+  #cookie-banner a {
+    color: #90caf9;
+    text-decoration: underline;
+  }
+  #cookie-banner .actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .cookie-btn {
+    border: 0;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .cookie-accept { background: #ffffff; color: #0d47a1; }
+  .cookie-reject { background: rgba(255,255,255,0.14); color: #fff; }
+  #cookie-manage {
+    position: fixed;
+    left: 16px;
+    bottom: 16px;
+    z-index: 99998;
+    background: rgba(18, 18, 18, 0.75);
+    color: #fff;
+    border: 0;
+    border-radius: 999px;
+    padding: 9px 12px;
+    cursor: pointer;
+    display: none;
+    font-weight: 700;
+    font-size: 13px;
+  }
+</style>
+
+<div id="cookie-banner" role="dialog" aria-live="polite" aria-label="Preferenze cookie">
+  <div class="row">
+    <p>
+      Usiamo cookie tecnici necessari e, solo con il tuo consenso, cookie di analisi (Google Analytics) per migliorare il sito.
+      <a href="/privacy" rel="nofollow">Leggi la Privacy/Cookie Policy</a>.
+    </p>
+
+    <div class="actions">
+      <button class="cookie-btn cookie-reject" id="cookie-reject">Rifiuta</button>
+      <button class="cookie-btn cookie-accept" id="cookie-accept">Accetta</button>
+    </div>
+  </div>
+</div>
+
+<button id="cookie-manage" type="button" aria-label="Gestisci cookie">🍪 Cookie</button>
+
+<script>
+  (function () {
+    const KEY = 'cookie_consent_v1'; // puoi cambiare versione se aggiorni banner
+    const banner = document.getElementById('cookie-banner');
+    const manageBtn = document.getElementById('cookie-manage');
+    const acceptBtn = document.getElementById('cookie-accept');
+    const rejectBtn = document.getElementById('cookie-reject');
+
+    function showBanner() {
+      banner.style.display = 'block';
+      manageBtn.style.display = 'none';
+    }
+
+    function hideBanner() {
+      banner.style.display = 'none';
+      manageBtn.style.display = 'block';
+    }
+
+    function applyConsent(choice) {
+      // Consent Mode v2:
+      // - ads restano denied (non fai ads/remarketing)
+      // - analytics granted solo se accetta
+      if (typeof gtag === 'function') {
+        if (choice === 'accepted') {
+          gtag('consent', 'update', {
+            analytics_storage: 'granted',
+            ad_storage: 'denied',
+            ad_user_data: 'denied',
+            ad_personalization: 'denied'
+          });
+        } else {
+          gtag('consent', 'update', {
+            analytics_storage: 'denied',
+            ad_storage: 'denied',
+            ad_user_data: 'denied',
+            ad_personalization: 'denied'
+          });
+        }
+      }
+    }
+
+    function save(choice) {
+      try { localStorage.setItem(KEY, choice); } catch (e) {}
+    }
+
+    function get() {
+      try { return localStorage.getItem(KEY); } catch (e) { return null; }
+    }
+
+    // Init
+    const current = get();
+    if (current === 'accepted' || current === 'rejected') {
+      applyConsent(current);
+      // Mostra solo il pulsante gestione
+      manageBtn.style.display = 'block';
+    } else {
+      // Nessuna scelta: mostra banner
+      showBanner();
+    }
+
+    acceptBtn.addEventListener('click', function () {
+      save('accepted');
+      applyConsent('accepted');
+      hideBanner();
+    });
+
+    rejectBtn.addEventListener('click', function () {
+      save('rejected');
+      applyConsent('rejected');
+      hideBanner();
+    });
+
+    manageBtn.addEventListener('click', function () {
+      showBanner();
+    });
+
+    // Espone un metodo per eventuale link "Revoca consenso" in futuro
+    window.__cookieConsentReset = function () {
+      try { localStorage.removeItem(KEY); } catch (e) {}
+      showBanner();
+    };
+  })();
+</script>
+
   </body>
 </html>
