@@ -1,10 +1,12 @@
 import { Box, useTheme, useMediaQuery } from '@mui/material';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
+
 import HomeHero from './HomeHero';
 import ServicesSection from './ServicesSection';
 import QuoteForm from './QuoteForm';
-import { Helmet } from 'react-helmet-async';
+import Footer from '../components/Footer'; // 👈 FOOTER
 
 export default function Home() {
   const theme = useTheme();
@@ -65,6 +67,9 @@ export default function Home() {
         <Box id="preventivo">
           <QuoteForm />
         </Box>
+
+        {/* FOOTER SEO */}
+        <Footer />
       </Box>
     </>
   );
