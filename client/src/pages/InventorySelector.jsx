@@ -19,11 +19,13 @@ import HandymanIcon from '@mui/icons-material/Handyman';
 const filter = createFilterOptions();
 
 // --- Pulsanti rapidi a vista (identici al JobModal) ---
-const QUICK_ITEMS = [
-  "Scatola", "Frigorifero", "Lavatrice", "Divano", "Tavolo",
-  "Sedia", "Letto Matr.", "Letto Sing.", "Armadio", "Comodino",
-  "Comò", "Televisore", "Lavastoviglie", "Poltrona", "Scarpiera"
+const QUICK_ITEMS=["Entrata","Parete att.","Camera","Cucina","Cameretta","Ripostiglio",
+"Garage","Sottotetto","Bagno","Lavatrice","Asciugatrice","Scarpiera","Specchio",
+"Pianoforte","Frigorifero","Tapis roulant","Piante","Scaffale","Divano 2p","Divano 3p",
+"Divano chslg","Poltrona","Armadio","Madia","Lettino","Letto","Scrivania","Libreria",
+"Piantana","Tavolo","Sedie","TV"
 ];
+
 
 // --- Lista completa per Autocomplete (identica al JobModal) ---
 const EXTENDED_ITEMS = [

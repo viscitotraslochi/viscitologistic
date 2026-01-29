@@ -46,13 +46,15 @@ L.Marker.prototype.options.icon = DefaultIcon;
 const filter = createFilterOptions();
 
 // --- Pulsanti rapidi a vista ---
-const QUICK_ITEMS = [
-  "Scatola", "Frigorifero", "Lavatrice", "Divano", "Tavolo",
-  "Sedia", "Letto Matr.", "Letto Sing.", "Armadio", "Comodino",
-  "Comò", "Televisore", "Lavastoviglie", "Poltrona", "Scarpiera"
+const QUICK_ITEMS=["Entrata","Parete att.","Camera","Cucina","Cameretta","Ripostiglio",
+"Garage","Sottotetto","Bagno","Lavatrice","Asciugatrice","Scarpiera","Specchio",
+"Pianoforte","Frigorifero","Tapis roulant","Piante","Scaffale","Divano 2p","Divano 3p",
+"Divano chslg","Poltrona","Armadio","Madia","Lettino","Letto","Scrivania","Libreria",
+"Piantana","Tavolo","Sedie","TV"
 ];
 
-// --- Lista completa per Autocomplete ---
+
+// --- Lista completa per Autocomplete (identica al JobModal) ---
 const EXTENDED_ITEMS = [
   ...new Set([
     ...QUICK_ITEMS,

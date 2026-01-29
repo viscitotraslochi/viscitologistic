@@ -1,17 +1,12 @@
-// ⚠️ ServicesSection.jsx — VERSIONE DEFINITIVA 1:1 (100%)
-// Estratto riga per riga da Home.jsx_OLD
-// Nessuna modifica a stili, layout, responsive o logica
-
 import React from 'react';
 import { Box, Container, Typography, Card, CardContent } from '@mui/material';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import HandymanIcon from '@mui/icons-material/Handyman';
 import PublicIcon from '@mui/icons-material/Public';
 
 export default function ServicesSection({ isMobile }) {
-  // STILE IDENTICO AL FILE ORIGINALE
   const sectionStyle = {
     height: '100vh',
     width: '100%',
@@ -26,15 +21,10 @@ export default function ServicesSection({ isMobile }) {
   return (
     <Box sx={sectionStyle}>
       <Container maxWidth="lg">
-        {/* TITOLO */}
         <Box sx={{ textAlign: 'center', mb: { xs: 4, md: 8 } }}>
           <Typography
             variant="overline"
-            sx={{
-              color: '#1976d2',
-              fontWeight: 'bold',
-              letterSpacing: 2
-            }}
+            sx={{ color: '#1976d2', fontWeight: 'bold', letterSpacing: 2 }}
           >
             COSA FACCIAMO
           </Typography>
@@ -46,7 +36,6 @@ export default function ServicesSection({ isMobile }) {
           </Typography>
         </Box>
 
-        {/* CARD SERVIZI */}
         <Grid container spacing={4} justifyContent="center">
           {[{
             icon: <LocalShippingIcon sx={{ fontSize: 30, color: '#1565c0' }} />,

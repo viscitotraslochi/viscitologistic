@@ -16,7 +16,7 @@ import {
   IconButton,
   Autocomplete 
 } from '@mui/material';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Grid2';
 
 import PublicIcon from '@mui/icons-material/Public';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
@@ -373,104 +373,196 @@ useEffect(() => {
           </Paper>
 
           {/* ================= DOVE E QUANDO ================= */}
-          <Paper elevation={3} sx={{ p: { xs: 3, md: 4 }, mb: 4, borderRadius: 4 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-              <LocalShippingIcon color="primary" sx={{ mr: 1, fontSize: 28 }} />
-              <Typography variant="h5" sx={{ fontWeight: 800, color: '#102a43' }}>Dove e Quando</Typography>
-            </Box>
+			<Paper elevation={3} sx={{ p: { xs: 3, md: 4 }, mb: 4, borderRadius: 4 }}>
+			  <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+				<LocalShippingIcon color="primary" sx={{ mr: 1, fontSize: 28 }} />
+				<Typography variant="h5" sx={{ fontWeight: 800, color: '#102a43' }}>
+				  Dove e Quando
+				</Typography>
+			  </Box>
 
-            <Grid container spacing={4}>
-              <Grid size={{ xs: 12, md: 6 }}>
-				  <Autocomplete
-					freeSolo
-					options={suggestions.da || []}
-					inputValue={formData.da_indirizzo}
-					onInputChange={(e, newVal) => setFormData(prev => ({ ...prev, da_indirizzo: newVal }))}
-					onChange={(e, newVal) => {
-					  if (typeof newVal === 'string') {
-						setFormData(prev => ({ ...prev, da_indirizzo: newVal }));
-					  }
-					}}
-					renderInput={(params) => (
-					  <TextField
-						{...params}
-						fullWidth
-						required
-						label="Indirizzo Partenza"
-						name="da_indirizzo"
-						InputProps={{
-						  ...params.InputProps,
-						  startAdornment: <HomeIcon sx={{ mr: 1 }} />,
-						  endAdornment: (
-							<>
-							  {params.InputProps.endAdornment}
-							  <IconButton onClick={() => openMap('da_indirizzo')}><MapIcon /></IconButton>
-							</>
-						  )
-						}}
-					  />
-					)}
-				  />
-				</Grid>
-
+			  <Grid container spacing={4}>
+				{/* ===== COLONNA PARTENZA ===== */}
 				<Grid size={{ xs: 12, md: 6 }}>
-				  <Autocomplete
-					freeSolo
-					options={suggestions.a || []}
-					inputValue={formData.a_indirizzo}
-					onInputChange={(e, newVal) => setFormData(prev => ({ ...prev, a_indirizzo: newVal }))}
-					onChange={(e, newVal) => {
-					  if (typeof newVal === 'string') {
-						setFormData(prev => ({ ...prev, a_indirizzo: newVal }));
-					  }
-					}}
-					renderInput={(params) => (
-					  <TextField
-						{...params}
-						fullWidth
-						label="Indirizzo Arrivo"
-						name="a_indirizzo"
-						InputProps={{
-						  ...params.InputProps,
-						  startAdornment: <LocationOnIcon sx={{ mr: 1 }} />,
-						  endAdornment: (
-							<>
-							  {params.InputProps.endAdornment}
-							  <IconButton onClick={() => openMap('a_indirizzo')}><MapIcon /></IconButton>
-							</>
-						  )
+				  <Grid container spacing={2}>
+					{/* Indirizzo Partenza */}
+					<Grid size={12}>
+					  <Autocomplete
+						freeSolo
+						options={suggestions.da || []}
+						inputValue={formData.da_indirizzo}
+						onInputChange={(e, newVal) =>
+						  setFormData(prev => ({ ...prev, da_indirizzo: newVal }))
+						}
+						onChange={(e, newVal) => {
+						  if (typeof newVal === 'string') {
+							setFormData(prev => ({ ...prev, da_indirizzo: newVal }));
+						  }
 						}}
+						renderInput={(params) => (
+						  <TextField
+							{...params}
+							fullWidth
+							required
+							label="Indirizzo Partenza"
+							name="da_indirizzo"
+							InputProps={{
+							  ...params.InputProps,
+							  startAdornment: <HomeIcon sx={{ mr: 1 }} />,
+							  endAdornment: (
+								<>
+								  {params.InputProps.endAdornment}
+								  <IconButton onClick={() => openMap('da_indirizzo')}>
+									<MapIcon />
+								  </IconButton>
+								</>
+							  )
+							}}
+						  />
+						)}
 					  />
-					)}
+					</Grid>
+
+					{/* Piano Partenza */}
+					<Grid size={12}>
+					  <FormControl fullWidth size="small">
+						<InputLabel>Piano Partenza</InputLabel>
+						<Select
+						  name="piano_partenza"
+						  value={formData.piano_partenza}
+						  label="Piano Partenza"
+						  onChange={handleChange}
+						>
+						  {PIANI.map(p => (
+							<MenuItem key={p} value={p}>
+							  {p === 0 ? 'Terra' : p}
+							</MenuItem>
+						  ))}
+						</Select>
+					  </FormControl>
+					</Grid>
+
+					{/* Ascensore Partenza */}
+					<Grid size={12}>
+					  <FormControl fullWidth size="small">
+						<InputLabel>Ascensore Partenza</InputLabel>
+						<Select
+						  name="ascensore_partenza"
+						  value={formData.ascensore_partenza}
+						  label="Ascensore Partenza"
+						  onChange={handleChange}
+						>
+						  <MenuItem value="SI">Sì</MenuItem>
+						  <MenuItem value="NO">No</MenuItem>
+						</Select>
+					  </FormControl>
+					</Grid>
+				  </Grid>
+				</Grid>
+
+				{/* ===== COLONNA ARRIVO ===== */}
+				<Grid size={{ xs: 12, md: 6 }}>
+				  <Grid container spacing={2}>
+					{/* Indirizzo Arrivo */}
+					<Grid size={12}>
+					  <Autocomplete
+						freeSolo
+						options={suggestions.a || []}
+						inputValue={formData.a_indirizzo}
+						onInputChange={(e, newVal) =>
+						  setFormData(prev => ({ ...prev, a_indirizzo: newVal }))
+						}
+						onChange={(e, newVal) => {
+						  if (typeof newVal === 'string') {
+							setFormData(prev => ({ ...prev, a_indirizzo: newVal }));
+						  }
+						}}
+						renderInput={(params) => (
+						  <TextField
+							{...params}
+							fullWidth
+							label="Indirizzo Arrivo"
+							name="a_indirizzo"
+							InputProps={{
+							  ...params.InputProps,
+							  startAdornment: <LocationOnIcon sx={{ mr: 1 }} />,
+							  endAdornment: (
+								<>
+								  {params.InputProps.endAdornment}
+								  <IconButton onClick={() => openMap('a_indirizzo')}>
+									<MapIcon />
+								  </IconButton>
+								</>
+							  )
+							}}
+						  />
+						)}
+					  />
+					</Grid>
+
+					{/* Piano Arrivo */}
+					<Grid size={12}>
+					  <FormControl fullWidth size="small">
+						<InputLabel>Piano Arrivo</InputLabel>
+						<Select
+						  name="piano_arrivo"
+						  value={formData.piano_arrivo}
+						  label="Piano Arrivo"
+						  onChange={handleChange}
+						>
+						  {PIANI.map(p => (
+							<MenuItem key={p} value={p}>
+							  {p === 0 ? 'Terra' : p}
+							</MenuItem>
+						  ))}
+						</Select>
+					  </FormControl>
+					</Grid>
+
+					{/* Ascensore Arrivo */}
+					<Grid size={12}>
+					  <FormControl fullWidth size="small">
+						<InputLabel>Ascensore Arrivo</InputLabel>
+						<Select
+						  name="ascensore_arrivo"
+						  value={formData.ascensore_arrivo}
+						  label="Ascensore Arrivo"
+						  onChange={handleChange}
+						>
+						  <MenuItem value="SI">Sì</MenuItem>
+						  <MenuItem value="NO">No</MenuItem>
+						</Select>
+					  </FormControl>
+					</Grid>
+				  </Grid>
+				</Grid>
+
+				{/* ===== DATA & ORA (sotto entrambe le colonne) ===== */}
+				<Grid size={{ xs: 6 }}>
+				  <TextField
+					type="date"
+					fullWidth
+					label="Data Approssimativa"
+					name="date"
+					InputLabelProps={{ shrink: true }}
+					value={formData.date}
+					onChange={handleChange}
 				  />
 				</Grid>
 
-
-              <Grid size={{ xs: 6 }}>
-                <FormControl fullWidth size="small">
-                  <InputLabel>Piano Partenza</InputLabel>
-                  <Select name="piano_partenza" value={formData.piano_partenza} label="Piano Partenza" onChange={handleChange}>
-                    {PIANI.map(p => <MenuItem key={p} value={p}>{p === 0 ? 'Terra' : p}</MenuItem>)}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid size={{ xs: 6 }}>
-                <FormControl fullWidth size="small">
-                  <InputLabel>Piano Arrivo</InputLabel>
-                  <Select name="piano_arrivo" value={formData.piano_arrivo} label="Piano Arrivo" onChange={handleChange}>
-                    {PIANI.map(p => <MenuItem key={p} value={p}>{p === 0 ? 'Terra' : p}</MenuItem>)}
-                  </Select>
-                </FormControl>
-              </Grid>
-
-              <Grid size={{ xs: 6 }}>
-                <TextField type="date" fullWidth label="Data Approssimativa" name="date" InputLabelProps={{ shrink: true }} value={formData.date} onChange={handleChange} />
-              </Grid>
-              <Grid size={{ xs: 6 }}>
-                <TextField type="time" fullWidth label="Orario" name="time" InputLabelProps={{ shrink: true }} value={formData.time} onChange={handleChange} />
-              </Grid>
-            </Grid>
-          </Paper>
+				<Grid size={{ xs: 6 }}>
+				  <TextField
+					type="time"
+					fullWidth
+					label="Orario"
+					name="time"
+					InputLabelProps={{ shrink: true }}
+					value={formData.time}
+					onChange={handleChange}
+				  />
+				</Grid>
+			  </Grid>
+			</Paper>
 
           {/* ================= INVENTARIO ================= */}
 			<InventorySelector

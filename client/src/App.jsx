@@ -10,7 +10,7 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import LogoutIcon from '@mui/icons-material/Logout';
-import LockResetIcon from '@mui/icons-material/LockReset'; // <--- NUOVA ICONA
+import LockResetIcon from '@mui/icons-material/LockReset'; 
 
 // PAGINE E COMPONENTI
 import Home from './pages/Home';
@@ -18,7 +18,8 @@ import Login from './pages/Login';
 import CalendarView from './components/CalendarView';
 import LeadsView from './components/LeadsView';
 import FleetView from './components/FleetView';
-import ChangePasswordModal from './components/ChangePasswordModal'; // <--- NUOVO IMPORT
+import ChangePasswordModal from './components/ChangePasswordModal'; 
+import TraslochiSalerno from './pages/TraslochiSalerno';
 
 // --- COMPONENTE ADMIN PANEL ---
 function AdminPanel() {
@@ -172,6 +173,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
+		<Route path="/traslochi-salerno" element={<TraslochiSalerno />} />
         <Route path="/login" element={<Login onLoginSuccess={() => {}} />} /> 
         <Route path="/admin" element={<AdminPanel />} />
         <Route path="*" element={<Navigate to="/" replace />} />
