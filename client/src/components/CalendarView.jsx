@@ -149,25 +149,45 @@ function CalendarView() {
     if (view.type === 'dayGridMonth' || view.type === 'timeGridWeek') {
       return (
         <div
-          style={{
-            backgroundColor: bgColor,
-            borderLeft: `4px solid ${mainColor}`,
-            padding: '2px 4px',
-            borderRadius: '3px',
-            overflow: 'hidden',
-            whiteSpace: 'nowrap',
-            textOverflow: 'ellipsis',
-            cursor: 'pointer',
-            fontSize: '0.80rem',
-            color: '#333',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px'
-          }}
-        >
-          <strong style={{ color: mainColor }}>{startTime || '24h'}</strong>
-          <span>{eventInfo.event.title}</span>
-        </div>
+		  style={{
+			display: 'flex',
+			alignItems: 'center',
+			gap: '6px',
+			padding: '3px 6px',
+			borderRadius: '6px',
+			background: bgColor,
+			borderLeft: `4px solid ${mainColor}`,
+			fontSize: '0.78rem',
+			lineHeight: 1.2,
+			overflow: 'hidden',
+			whiteSpace: 'nowrap',
+			textOverflow: 'ellipsis'
+		  }}
+		>
+		  {/* ORA */}
+		  <span
+			style={{
+			  fontWeight: 800,
+			  color: mainColor,
+			  minWidth: 38
+			}}
+		  >
+			{startTime || '—'}
+		  </span>
+
+		  {/* NOME */}
+		  <span
+			style={{
+			  fontWeight: 600,
+			  color: '#263238',
+			  overflow: 'hidden',
+			  textOverflow: 'ellipsis'
+			}}
+		  >
+			{eventInfo.event.title}
+		  </span>
+		</div>
+
       );
     }
 
