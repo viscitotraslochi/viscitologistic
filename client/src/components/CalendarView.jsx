@@ -7,6 +7,8 @@ import listPlugin from '@fullcalendar/list';
 import itLocale from '@fullcalendar/core/locales/it.js';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 
 import api from '../api/axiosConfig';
 import {
@@ -40,17 +42,28 @@ function CalendarView() {
 
   // --- 1. GESTIONE CAMBIO VISTA AUTOMATICO ---
   useEffect(() => {
-    if (calendarRef.current) {
-      const calendarApi = calendarRef.current.getApi();
-      if (isMobile) {
-        calendarApi.changeView('listWeek');
-        setCurrentView('listWeek');
-      } else {
-        calendarApi.changeView('dayGridMonth');
-        setCurrentView('dayGridMonth');
-      }
-    }
-  }, [isMobile]);
+	  const api = calendarRef.current?.getApi?.();
+	  if (!api) return;
+
+	  const targetView = isMobile ? 'listWeek' : 'dayGridMonth';
+
+	  // ✅ evita chiamate inutili
+	  if (api.view?.type === targetView) return;
+
+	  // ✅ defer: evita flushSync warning durante render/resize/rotation
+	  const id = setTimeout(() => {
+		const api2 = calendarRef.current?.getApi?.();
+		if (!api2) return;
+
+		if (api2.view?.type !== targetView) {
+		  api2.changeView(targetView);
+		  setCurrentView(targetView);
+		}
+	  }, 0);
+
+	  return () => clearTimeout(id);
+	}, [isMobile]);
+
 
   const fetchJobs = async () => {
     try {
@@ -177,44 +190,56 @@ function CalendarView() {
 		  }}
 		>
 		  {/* ORA */}
-		  <span
-			style={{
-			  fontWeight: 900,
-			  color: mainColor,
-			  minWidth: 42
-			}}
-		  >
-			{startTime || '—'}
-		  </span>
+			<span
+			  style={{
+				fontWeight: 900,
+				color: mainColor,
+				minWidth: 42
+			  }}
+			>
+			  {startTime || '—'}
+			</span>
 
-		  {/* NOME */}
-		  <span
-			style={{
-			  fontWeight: 650,
-			  color: '#263238',
-			  overflow: 'hidden',
-			  textOverflow: 'ellipsis',
-			  flex: 1
-			}}
-		  >
-			{eventInfo.event.title}
-		  </span>
+			{/* NOME */}
+			<span
+			  style={{
+				fontWeight: 650,
+				color: '#263238',
+				overflow: 'hidden',
+				textOverflow: 'ellipsis',
+				flex: 1
+			  }}
+			>
+			  {eventInfo.event.title}
+			</span>
 
-		  {/* BADGE TIPO */}
-		  <span
-			style={{
-			  padding: '1px 6px',
-			  borderRadius: 999,
-			  fontSize: '0.65rem',
-			  fontWeight: 900,
-			  letterSpacing: '0.4px',
-			  background: mainColor,
-			  color: '#fff',
-			  flexShrink: 0
-			}}
-		  >
-			{badgeText}
-		  </span>
+			{/* ICONA CON TOOLTIP */}
+			<Tooltip
+			  title={jobType === 'sopralluogo' ? 'Sopralluogo' : 'Trasloco'}
+			  arrow
+			  placement="top"
+			>
+			  <span
+				style={{
+				  display: 'flex',
+				  alignItems: 'center',
+				  justifyContent: 'center',
+				  background: mainColor,
+				  color: '#fff',
+				  borderRadius: '50%',
+				  width: 20,
+				  height: 20,
+				  flexShrink: 0,
+				  cursor: 'default'
+				}}
+			  >
+				{jobType === 'sopralluogo' ? (
+				  <VisibilityIcon sx={{ fontSize: 14 }} />
+				) : (
+				  <LocalShippingIcon sx={{ fontSize: 14 }} />
+				)}
+			  </span>
+			</Tooltip>
 		</div>
 	  );
 	}
@@ -538,12 +563,16 @@ function CalendarView() {
 				  value={typeFilter}
 				  exclusive
 				  onChange={(e, v) => {
-					if (!v) return;
-					setTypeFilter(v);
+					  if (!v) return;
+					  setTypeFilter(v);
 
-					// forza il refresh del calendario (utile in mese/settimana)
-					calendarRef.current?.getApi()?.rerenderEvents();
-				  }}
+					  // safe refresh (non crasha)
+					  setTimeout(() => {
+						const api = calendarRef.current?.getApi?.();
+						api?.updateSize?.();
+						api?.render?.();
+					  }, 0);
+					}}
 				  size="small"
 				  fullWidth={isMobile}
 				  sx={{
