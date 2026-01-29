@@ -12,11 +12,10 @@ import { useNavigate } from 'react-router-dom';
 export default function HomeHero({ scrollToForm }) {
   const navigate = useNavigate();
 
-  // --- STILE PER LO SCROLL SNAP (IDENTICO) ---
+  // stile sezione hero
   const sectionStyle = {
-    height: '100vh',
+    minHeight: '100vh',
     width: '100%',
-    scrollSnapAlign: 'start',
     display: 'flex',
     flexDirection: 'column',
     position: 'relative',
@@ -24,15 +23,31 @@ export default function HomeHero({ scrollToForm }) {
   };
 
   return (
-    <Box sx={{ ...sectionStyle }}>
+    <Box sx={sectionStyle}>
+      {/* PRELOAD LCP IMAGE (fetchpriority funziona solo su img/link) */}
+      <img
+        src="/HomeHero.webp"
+        alt=""
+        fetchpriority="high"
+        decoding="async"
+        style={{ display: 'none' }}
+      />
+
+      {/* APP BAR */}
       <AppBar position="absolute" elevation={1} sx={{ bgcolor: '#ffffff', top: 0 }}>
-        <Toolbar sx={{ py: 1, display: 'flex', justifyContent: 'space-between' }}>
+        <Toolbar
+          sx={{
+            py: 1,
+            display: 'flex',
+            justifyContent: 'space-between'
+          }}
+        >
           {/* LOGO */}
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Box
               component="img"
               src="/viscitologistic.png"
-              alt="Viscito Logistic - Traslochi e Logistica a Salerno"
+              alt="Viscito Traslochi e Logistica"
               sx={{
                 height: { xs: 35, md: 55 },
                 maxWidth: { xs: '180px', md: '250px' },
@@ -54,8 +69,7 @@ export default function HomeHero({ scrollToForm }) {
               borderRadius: 2,
               fontSize: { xs: '0.75rem', sm: '0.875rem' },
               px: { xs: 1.5, sm: 3 },
-              py: { xs: 0.5, sm: 1 },
-              minWidth: 'fit-content'
+              py: { xs: 0.5, sm: 1 }
             }}
           >
             Area Riservata
@@ -64,106 +78,101 @@ export default function HomeHero({ scrollToForm }) {
       </AppBar>
 
       {/* HERO */}
-		<Box
-		  sx={{
-			flexGrow: 1,
-			display: 'flex',
-			alignItems: 'center',
-			justifyContent: 'center',
-			textAlign: 'center',
-			color: 'white',
-			backgroundImage: 'url("/HomeHero.webp")',
-			backgroundSize: 'cover',
-			backgroundPosition: 'center',
-			position: 'relative',
-			mt: '64px'
-		  }}
-		>
-		  {/* overlay */}
-		  <Box
-			sx={{
-			  position: 'absolute',
-			  top: 0,
-			  left: 0,
-			  right: 0,
-			  bottom: 0,
-			  background: {
-  xs: 'linear-gradient(135deg, rgba(12,35,55,0.94) 0%, rgba(13,71,161,0.78) 100%)',
-  md: 'linear-gradient(135deg, rgba(12,35,55,0.90) 0%, rgba(13,71,161,0.70) 100%)'
-}
-,
-			  zIndex: 1
-			}}
-		  />
+      <Box
+        sx={{
+          flexGrow: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+          color: 'white',
+          backgroundImage: 'url("/HomeHero.webp")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          position: 'relative',
+          mt: '64px'
+        }}
+      >
+        {/* OVERLAY */}
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            background: {
+              xs: 'linear-gradient(135deg, rgba(12,35,55,0.94) 0%, rgba(13,71,161,0.78) 100%)',
+              md: 'linear-gradient(135deg, rgba(12,35,55,0.90) 0%, rgba(13,71,161,0.70) 100%)'
+            },
+            zIndex: 1
+          }}
+        />
 
-		  {/* contenuto */}
-		  <Container maxWidth="md" sx={{ position: 'relative', zIndex: 2 }}>
-			<Typography
-			  component="h1"
-			  sx={{
-				fontWeight: 800,
-				typography: { xs: 'h3', md: 'h1' },
-				mb: 2
-			  }}
-			>
-			  Traslochi professionali a Salerno <br />
-			  <Box component="span" sx={{ color: '#90caf9' }}>
-				in tutta Italia
-			  </Box>
-			</Typography>
+        {/* CONTENUTO */}
+        <Container maxWidth="md" sx={{ position: 'relative', zIndex: 2 }}>
+          <Typography
+            component="h1"
+            sx={{
+              fontWeight: 800,
+              typography: { xs: 'h3', md: 'h1' },
+              mb: 2
+            }}
+          >
+            Traslochi professionali a Salerno <br />
+            <Box component="span" sx={{ color: '#90caf9' }}>
+              in tutta Italia
+            </Box>
+          </Typography>
 
-			<Typography
-			  variant="h5"
-			  sx={{
-				mb: 5,
-				opacity: 0.9,
-				fontSize: { xs: '1.1rem', md: '1.35rem' },
-				fontWeight: 400
-			  }}
-			>
-			  Soluzioni di trasporto nazionali, montaggio arredi e depositi.
-			  Affidati all'esperienza Viscito.
-			</Typography>
+          <Typography
+            variant="h5"
+            sx={{
+              mb: 5,
+              opacity: 0.9,
+              fontSize: { xs: '1.1rem', md: '1.35rem' },
+              fontWeight: 400
+            }}
+          >
+            Soluzioni di trasporto nazionali, montaggio arredi e depositi.
+            Affidati all&apos;esperienza Viscito.
+          </Typography>
 
-			<Button
-			  variant="contained"
-			  size="large"
-			  onClick={scrollToForm}
-			  sx={{
-				bgcolor: 'white',
-				color: '#0d47a1',
-				fontSize: '1.1rem',
-				px: 5,
-				py: 1.5,
-				fontWeight: 'bold',
-				borderRadius: 2,
-				'&:hover': {
-				  bgcolor: '#f5f5f5',
-				  transform: 'translateY(-2px)'
-				}
-			  }}
-			>
-			  RICHIEDI PREVENTIVO
-			</Button>
-		  </Container>
+          <Button
+            variant="contained"
+            size="large"
+            onClick={scrollToForm}
+            sx={{
+              bgcolor: 'white',
+              color: '#0d47a1',
+              fontSize: '1.1rem',
+              px: 5,
+              py: 1.5,
+              fontWeight: 'bold',
+              borderRadius: 2,
+              '&:hover': {
+                bgcolor: '#f5f5f5',
+                transform: 'translateY(-2px)'
+              }
+            }}
+          >
+            RICHIEDI PREVENTIVO
+          </Button>
+        </Container>
 
-		  {/* freccia */}
-		  <Box
-			sx={{
-			  position: 'absolute',
-			  bottom: 20,
-			  left: 0,
-			  right: 0,
-			  display: 'flex',
-			  justifyContent: 'center',
-			  zIndex: 2,
-			  animation: 'bounce 2s infinite'
-			}}
-		  >
-			<KeyboardArrowDownIcon sx={{ color: 'white', fontSize: 40, opacity: 0.8 }} />
-		  </Box>
-		</Box>
-	</Box>
-
+        {/* FRECCIA */}
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 20,
+            left: 0,
+            right: 0,
+            display: 'flex',
+            justifyContent: 'center',
+            zIndex: 2,
+            animation: 'bounce 2s infinite'
+          }}
+        >
+          <KeyboardArrowDownIcon sx={{ color: 'white', fontSize: 40, opacity: 0.8 }} />
+        </Box>
+      </Box>
+    </Box>
   );
 }
