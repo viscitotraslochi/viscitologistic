@@ -104,9 +104,7 @@ const normalizePhone = (phone) => (phone ?? '').toString().replace(/[^\d+]/g, ''
 
 const isValidPhoneIT = (phone) => {
   const p = normalizePhone(phone);
-  if (!p) return false; // telefono lo vogliamo valido se presente/obbligatorio lato UI
-  // accetta: 10 cifre (mobile) o +39 + 10 cifre / anche 9-11 cifre generiche per fissi
-  // (è una validazione pragmatica, non perfetta E.164)
+  if (!p) return false;
   if (p.startsWith('+')) {
     return /^\+39\d{9,11}$/.test(p);
   }
@@ -334,6 +332,7 @@ useEffect(() => {
                   name="cliente_nome"
                   value={formData.cliente_nome}
                   onChange={handleChange}
+                  inputProps={{ "aria-label": "Nome e Cognome o Azienda"  }}
                   InputProps={{ startAdornment: <PersonIcon sx={{ mr: 1 }} /> }}
                 />
               </Grid>
@@ -344,6 +343,7 @@ useEffect(() => {
 				  label="Telefono"
 				  name="phone"
 				  value={formData.phone}
+                  inputProps={{ "aria-label": "Telefono"  }}
 				  onChange={(e) => {
 					handleChange(e);
 					if (errors.phone) setErrors(prev => ({ ...prev, phone: '' }));
@@ -359,6 +359,7 @@ useEffect(() => {
 				  label="Email"
 				  name="email"
 				  value={formData.email}
+                  inputProps={{ "aria-label": "Email"  }}
 				  onChange={(e) => {
 					handleChange(e);
 					if (errors.email) setErrors(prev => ({ ...prev, email: '' }));
@@ -402,17 +403,23 @@ useEffect(() => {
 						renderInput={(params) => (
 						  <TextField
 							{...params}
-							fullWidth
-							required
 							label="Indirizzo Partenza"
 							name="da_indirizzo"
+							fullWidth
+							inputProps={{
+							  ...params.inputProps,
+							  'aria-label': 'Indirizzo Partenza'
+							}}
 							InputProps={{
 							  ...params.InputProps,
-							  startAdornment: <HomeIcon sx={{ mr: 1 }} />,
 							  endAdornment: (
 								<>
 								  {params.InputProps.endAdornment}
-								  <IconButton onClick={() => openMap('da_indirizzo')}>
+								  <IconButton
+									aria-label="Apri mappa indirizzo partenza"
+									onClick={() => openMap('da_indirizzo')}
+									edge="end"
+								  >
 									<MapIcon />
 								  </IconButton>
 								</>
@@ -426,13 +433,15 @@ useEffect(() => {
 					{/* Piano Partenza */}
 					<Grid size={12}>
 					  <FormControl fullWidth size="small">
-						<InputLabel>Piano Partenza</InputLabel>
+						<InputLabel id="piano-partenza-label">Piano Partenza</InputLabel>
 						<Select
-						  name="piano_partenza"
-						  value={formData.piano_partenza}
-						  label="Piano Partenza"
-						  onChange={handleChange}
-						>
+                          labelId="piano-partenza-label"
+                          id="piano-partenza"
+                          name="piano_partenza"
+                          value={formData.piano_partenza}
+                          label="Piano Partenza"
+                          onChange={handleChange}
+                        >
 						  {PIANI.map(p => (
 							<MenuItem key={p} value={p}>
 							  {p === 0 ? 'Terra' : p}
@@ -445,13 +454,15 @@ useEffect(() => {
 					{/* Ascensore Partenza */}
 					<Grid size={12}>
 					  <FormControl fullWidth size="small">
-						<InputLabel>Ascensore Partenza</InputLabel>
+						<InputLabel id="ascensore-partenza-label">Ascensore Partenza</InputLabel>
 						<Select
-						  name="ascensore_partenza"
-						  value={formData.ascensore_partenza}
-						  label="Ascensore Partenza"
-						  onChange={handleChange}
-						>
+                          labelId="ascensore-partenza-label"
+                          id="ascensore-partenza"
+                          name="ascensore_partenza"
+                          value={formData.ascensore_partenza}
+                          label="Ascensore Partenza"
+                          onChange={handleChange}
+                        >
 						  <MenuItem value="SI">Sì</MenuItem>
 						  <MenuItem value="NO">No</MenuItem>
 						</Select>
@@ -475,21 +486,28 @@ useEffect(() => {
 						onChange={(e, newVal) => {
 						  if (typeof newVal === 'string') {
 							setFormData(prev => ({ ...prev, a_indirizzo: newVal }));
-						  }
-						}}
+						  }}
+						}
 						renderInput={(params) => (
 						  <TextField
 							{...params}
-							fullWidth
 							label="Indirizzo Arrivo"
 							name="a_indirizzo"
+							fullWidth
+							inputProps={{
+							  ...params.inputProps,
+							  'aria-label': 'Indirizzo Arrivo'
+							}}
 							InputProps={{
 							  ...params.InputProps,
-							  startAdornment: <LocationOnIcon sx={{ mr: 1 }} />,
 							  endAdornment: (
 								<>
 								  {params.InputProps.endAdornment}
-								  <IconButton onClick={() => openMap('a_indirizzo')}>
+								  <IconButton
+									aria-label="Apri mappa indirizzo arrivo"
+									onClick={() => openMap('a_indirizzo')}
+									edge="end"
+								  >
 									<MapIcon />
 								  </IconButton>
 								</>
@@ -503,13 +521,15 @@ useEffect(() => {
 					{/* Piano Arrivo */}
 					<Grid size={12}>
 					  <FormControl fullWidth size="small">
-						<InputLabel>Piano Arrivo</InputLabel>
+						<InputLabel id="piano-arrivo-label">Piano Arrivo</InputLabel>
 						<Select
-						  name="piano_arrivo"
-						  value={formData.piano_arrivo}
-						  label="Piano Arrivo"
-						  onChange={handleChange}
-						>
+                          labelId="piano-arrivo-label"
+                          id="piano-arrivo"
+                          name="piano_arrivo"
+                          value={formData.piano_arrivo}
+                          label="Piano Arrivo"
+                          onChange={handleChange}
+                        >
 						  {PIANI.map(p => (
 							<MenuItem key={p} value={p}>
 							  {p === 0 ? 'Terra' : p}
@@ -522,13 +542,15 @@ useEffect(() => {
 					{/* Ascensore Arrivo */}
 					<Grid size={12}>
 					  <FormControl fullWidth size="small">
-						<InputLabel>Ascensore Arrivo</InputLabel>
+						<InputLabel id="ascensore-arrivo-label">Ascensore Arrivo</InputLabel>
 						<Select
-						  name="ascensore_arrivo"
-						  value={formData.ascensore_arrivo}
-						  label="Ascensore Arrivo"
-						  onChange={handleChange}
-						>
+                          labelId="ascensore-arrivo-label"
+                          id="ascensore-arrivo"
+                          name="ascensore_arrivo"
+                          value={formData.ascensore_arrivo}
+                          label="Ascensore Arrivo"
+                          onChange={handleChange}
+                        >
 						  <MenuItem value="SI">Sì</MenuItem>
 						  <MenuItem value="NO">No</MenuItem>
 						</Select>
@@ -544,6 +566,7 @@ useEffect(() => {
 					fullWidth
 					label="Data Approssimativa"
 					name="date"
+                    inputProps={{ "aria-label": "Data approssimativa"  }}
 					InputLabelProps={{ shrink: true }}
 					value={formData.date}
 					onChange={handleChange}
@@ -556,6 +579,7 @@ useEffect(() => {
 					fullWidth
 					label="Orario"
 					name="time"
+                    inputProps={{ "aria-label": "Orario"  }}
 					InputLabelProps={{ shrink: true }}
 					value={formData.time}
 					onChange={handleChange}
@@ -582,6 +606,7 @@ useEffect(() => {
               name="notes"
               value={formData.notes}
               onChange={handleChange}
+              inputProps={{ "aria-label": "Note aggiuntive"  }}
             />
           </Paper>
 
@@ -636,6 +661,8 @@ useEffect(() => {
 
 			  <Box sx={{ display: 'flex', gap: 1 }}>
 				<IconButton
+				  aria-label="Facebook"
+				 
 				  size="small"
 				  sx={{ color: 'white', bgcolor: 'rgba(255,255,255,0.12)' }}
 				  component="a"
@@ -648,6 +675,12 @@ useEffect(() => {
 
 				<IconButton
 				  size="small"
+				  aria-label="Instagram Viscito Traslochi"
+				  
+				  component="a"
+			  href="https://www.instagram.com/"
+				  target="_blank"
+				  rel="noopener noreferrer"
 				  sx={{ color: 'white', bgcolor: 'rgba(255,255,255,0.12)' }}
 				>
 				  <InstagramIcon fontSize="small" />
@@ -655,6 +688,11 @@ useEffect(() => {
 
 				<IconButton
 				  size="small"
+				  aria-label="LinkedIn Viscito Traslochi"
+				  component="a"
+				  href="https://www.linkedin.com/"
+				  target="_blank"
+				  rel="noopener noreferrer"
 				  sx={{ color: 'white', bgcolor: 'rgba(255,255,255,0.12)' }}
 				>
 				  <LinkedInIcon fontSize="small" />

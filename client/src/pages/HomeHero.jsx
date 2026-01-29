@@ -164,30 +164,34 @@ export default function HomeHero({ scrollToForm }) {
 
         {/* FRECCIA → SERVIZI */}
         <Box
-          role="button"
-          aria-label="Scorri ai servizi"
-          tabIndex={0}
-          onClick={scrollToServices}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') scrollToServices();
-          }}
-          sx={{
-            position: 'absolute',
-            bottom: 20,
-            left: 0,
-            right: 0,
-            display: 'flex',
-            justifyContent: 'center',
-            zIndex: 2,
-            animation: 'bounce 2s infinite',
-            cursor: 'pointer',
-            outline: 'none'
-          }}
-        >
-          <KeyboardArrowDownIcon
-            sx={{ color: 'white', fontSize: 40, opacity: 0.8 }}
-          />
-        </Box>
+		  role="button"
+		  aria-label="Scorri ai servizi"
+		  tabIndex={0}
+		  onClick={scrollToServices}
+		  onKeyDown={(e) => {
+			if (e.key === 'Enter' || e.key === ' ') scrollToServices();
+		  }}
+		  sx={{
+			position: 'absolute',
+			bottom: 20,
+			left: 0,
+			right: 0,
+			display: 'flex',
+			justifyContent: 'center',
+			zIndex: 2,
+			animation: 'bounce 2s infinite',
+			cursor: 'pointer',
+			outline: 'none',
+			'&:focus-visible': {
+			  outline: '3px solid rgba(144,202,249,0.9)',
+			  outlineOffset: 6,
+			  borderRadius: 8
+			}
+		  }}
+		>
+		  <KeyboardArrowDownIcon sx={{ color: 'white', fontSize: 40, opacity: 0.8 }} />
+		</Box>
+
       </Box>
     </Box>
   );
