@@ -37,6 +37,7 @@ export default function Home() {
     <>
       <Helmet>
         <title>Traslochi a Salerno e in tutta Italia | Viscito Traslochi e Logistica</title>
+		<link rel="preload" as="image" href="/HomeHero.webp" />
         <meta
           name="description"
           content="Viscito Traslochi e Logistica offre traslochi professionali a Salerno e in tutta Italia. Preventivo gratuito, smontaggio mobili e logistica."

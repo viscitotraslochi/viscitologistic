@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import {
   Box,
   Container,
@@ -687,14 +687,15 @@ useEffect(() => {
 		</Box>
 
 
-
-      <MapDialog
-        mapOpen={mapOpen}
-        setMapOpen={setMapOpen}
-        currentField={currentField}
-        setFormData={setFormData}
-        setSuggestions={setSuggestions}
-      />
+		<Suspense fallback={null}>
+		  <MapDialog
+			mapOpen={mapOpen}
+			setMapOpen={setMapOpen}
+			currentField={currentField}
+			setFormData={setFormData}
+			setSuggestions={setSuggestions}
+		  />
+		</Suspense>
     </Box>
   );
 }
