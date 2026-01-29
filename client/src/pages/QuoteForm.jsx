@@ -248,6 +248,14 @@ useEffect(() => {
     try {
       await api.post('/leads', dataToSend);
 	  
+	  	if (typeof window.gtag === 'function') {
+		  window.gtag('event', 'generate_lead', {
+			event_category: 'lead',
+			event_label: 'preventivo',
+			value: 1
+		  });
+		}
+	  
 	  // GA4 / GTM event (se usi dataLayer)
 		window.dataLayer = window.dataLayer || [];
 		window.dataLayer.push({
@@ -309,13 +317,7 @@ useEffect(() => {
 
       <Container maxWidth="md" sx={{ mb: 8 }}>
         <form onSubmit={handleSubmit}>
-		if (typeof window.gtag === 'function') {
-		  window.gtag('event', 'generate_lead', {
-			event_category: 'lead',
-			event_label: 'preventivo',
-			value: 1
-		  });
-		}
+
 		<Typography
 		  component="h2"
 		  variant="h4"
