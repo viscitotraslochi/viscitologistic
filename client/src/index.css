@@ -25,6 +25,11 @@ body {
   letter-spacing: -0.5px;
 }
 
+/* Nascondi il footer SEO solo nella Home */
+body.is-home .seo-footer {
+  display: none !important;
+}
+
 /* Header della tabella (lun, mar, mer...) */
 .fc-col-header-cell-cushion {
   color: #555;
@@ -196,3 +201,4 @@ body {
         font-weight: 500;
     }
 }
+

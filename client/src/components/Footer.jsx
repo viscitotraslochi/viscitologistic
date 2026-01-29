@@ -5,6 +5,7 @@ export default function Footer() {
   return (
     <Box
       component="footer"
+      className="seo-footer"   // 👈 AGGIUNTO
       sx={{
         mt: 6,
         py: 4,

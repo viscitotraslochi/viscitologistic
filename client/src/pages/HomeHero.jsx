@@ -12,19 +12,26 @@ import { useNavigate } from 'react-router-dom';
 export default function HomeHero({ scrollToForm }) {
   const navigate = useNavigate();
 
-  // stile sezione hero
-  const sectionStyle = {
-    minHeight: '100vh',
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    position: 'relative',
-    overflow: 'hidden'
+  // scroll alla sezione servizi
+  const scrollToServices = () => {
+    const el = document.getElementById('servizi');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   return (
-    <Box sx={sectionStyle}>
-      {/* PRELOAD LCP IMAGE (fetchpriority funziona solo su img/link) */}
+    <Box
+      sx={{
+        minHeight: '100vh',
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
+        overflow: 'hidden'
+      }}
+    >
+      {/* PRELOAD LCP IMAGE */}
       <img
         src="/HomeHero.webp"
         alt=""
@@ -157,8 +164,11 @@ export default function HomeHero({ scrollToForm }) {
           </Button>
         </Container>
 
-        {/* FRECCIA */}
+        {/* FRECCIA → SERVIZI */}
         <Box
+          role="button"
+          aria-label="Scorri ai servizi"
+          onClick={scrollToServices}
           sx={{
             position: 'absolute',
             bottom: 20,
@@ -167,10 +177,13 @@ export default function HomeHero({ scrollToForm }) {
             display: 'flex',
             justifyContent: 'center',
             zIndex: 2,
-            animation: 'bounce 2s infinite'
+            animation: 'bounce 2s infinite',
+            cursor: 'pointer'
           }}
         >
-          <KeyboardArrowDownIcon sx={{ color: 'white', fontSize: 40, opacity: 0.8 }} />
+          <KeyboardArrowDownIcon
+            sx={{ color: 'white', fontSize: 40, opacity: 0.8 }}
+          />
         </Box>
       </Box>
     </Box>
