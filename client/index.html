@@ -2,40 +2,60 @@
 <html lang="it">
   <head>
     <meta charset="UTF-8" />
-
-    <!-- FAVICON -->
-	<link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
-	<link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
-	<link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
-
-	<!-- APPLE -->
-	<link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png">
-
-	<!-- ANDROID / PWA -->
-	<link rel="manifest" href="/favicon/site.webmanifest">
-	<link rel="preload" as="image" href="/HomeHero.webp" fetchpriority="high">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- SEO base -->
     <title>Traslochi e Logistica a Salerno | Viscito Logistic</title>
-	
-	<!-- Google Analytics -->
-	  <!-- Google tag (gtag.js) -->
-	  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NSGKGNFY58"></script>
-	  <script>
-		window.dataLayer = window.dataLayer || [];
-		function gtag(){dataLayer.push(arguments);}
-		gtag('js', new Date());
-		gtag('config', 'G-NSGKGNFY58');
-	  </script>
     <meta
       name="description"
       content="Traslochi nazionali da Salerno, montaggio mobili, logistica e depositi. Richiedi un preventivo gratuito online con Viscito Logistic."
     />
     <link rel="canonical" href="https://www.viscitotraslochi.com/" />
 
-    <!-- Open Graph -->
+    <!-- ========================= -->
+    <!-- FAVICON -->
+    <!-- ========================= -->
+    <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png" />
+    <link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" />
+    <link rel="manifest" href="/favicon/site.webmanifest" />
+
+    <!-- ========================= -->
+    <!-- PRELOAD LCP IMAGE -->
+    <!-- ========================= -->
+    <link rel="preload" as="image" href="/HomeHero.webp" fetchpriority="high" />
+
+    <!-- ========================= -->
+    <!-- GOOGLE CONSENT MODE v2 -->
+    <!-- DEFAULT: NO CONSENT -->
+    <!-- ========================= -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('consent', 'default', {
+        ad_storage: 'denied',
+        analytics_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied'
+      });
+    </script>
+
+    <!-- ========================= -->
+    <!-- GOOGLE ANALYTICS GA4 -->
+    <!-- ========================= -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NSGKGNFY58"></script>
+    <script>
+      gtag('js', new Date());
+      gtag('config', 'G-NSGKGNFY58', {
+        anonymize_ip: true
+      });
+    </script>
+
+    <!-- ========================= -->
+    <!-- OPEN GRAPH -->
+    <!-- ========================= -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Traslochi e Logistica a Salerno | Viscito Logistic" />
     <meta
@@ -45,65 +65,77 @@
     <meta property="og:url" content="https://www.viscitotraslochi.com/" />
     <meta property="og:image" content="https://www.viscitotraslochi.com/viscitologistic.png" />
 
-    <!-- Twitter -->
+    <!-- ========================= -->
+    <!-- TWITTER -->
+    <!-- ========================= -->
     <meta name="twitter:card" content="summary_large_image" />
 
-    <!-- Theme -->
+    <!-- ========================= -->
+    <!-- THEME COLOR -->
+    <!-- ========================= -->
     <meta name="theme-color" content="#1976d2" />
 
-    <!-- Structured Data: LocalBusiness -->
-	<script type="application/ld+json">
-	{
-	  "@context": "https://schema.org",
-	  "@type": "MovingCompany",
-	  "name": "Viscito Traslochi e Logistica",
-	  "url": "https://www.viscitotraslochi.com/",
-	  "logo": "https://www.viscitotraslochi.com/viscitologistic.png",
-	  "image": "https://www.viscitotraslochi.com/viscitologistic.png",
-	  "priceRange": "€€",
-	  "address": {
-		"@type": "PostalAddress",
-		"addressLocality": "Salerno",
-		"addressRegion": "Campania",
-		"addressCountry": "IT"
-	  },
-	  "areaServed": [
-		{ "@type": "City", "name": "Salerno" },
-		{ "@type": "AdministrativeArea", "name": "Campania" },
-		{ "@type": "Country", "name": "Italia" }
-	  ],
-	  "openingHoursSpecification": [
-		{
-		  "@type": "OpeningHoursSpecification",
-		  "dayOfWeek": [
-			"Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"
-		  ],
-		  "opens": "08:00",
-		  "closes": "20:00"
-		}
-	  ],
-	  "contactPoint": [
-		{
-		  "@type": "ContactPoint",
-		  "telephone": "+393663370679",
-		  "contactType": "customer service",
-		  "areaServed": "IT",
-		  "availableLanguage": ["it"]
-		},
-		{
-		  "@type": "ContactPoint",
-		  "telephone": "+393397882956",
-		  "contactType": "customer service",
-		  "areaServed": "IT",
-		  "availableLanguage": ["it"]
-		}
-	  ],
-	  "sameAs": [
-		"https://www.facebook.com/p/Viscito-Traslochi-Servizi-100050365226297/"
-	  ]
-	}
-	</script>
+    <!-- ========================= -->
+    <!-- STRUCTURED DATA -->
+    <!-- ========================= -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "MovingCompany",
+      "name": "Viscito Traslochi e Logistica",
+      "url": "https://www.viscitotraslochi.com/",
+      "logo": "https://www.viscitotraslochi.com/viscitologistic.png",
+      "image": "https://www.viscitotraslochi.com/viscitologistic.png",
+      "priceRange": "€€",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Salerno",
+        "addressRegion": "Campania",
+        "addressCountry": "IT"
+      },
+      "areaServed": [
+        { "@type": "City", "name": "Salerno" },
+        { "@type": "AdministrativeArea", "name": "Campania" },
+        { "@type": "Country", "name": "Italia" }
+      ],
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday"
+          ],
+          "opens": "08:00",
+          "closes": "20:00"
+        }
+      ],
+      "contactPoint": [
+        {
+          "@type": "ContactPoint",
+          "telephone": "+393663370679",
+          "contactType": "customer service",
+          "areaServed": "IT",
+          "availableLanguage": ["it"]
+        },
+        {
+          "@type": "ContactPoint",
+          "telephone": "+393397882956",
+          "contactType": "customer service",
+          "areaServed": "IT",
+          "availableLanguage": ["it"]
+        }
+      ],
+      "sameAs": [
+        "https://www.facebook.com/p/Viscito-Traslochi-Servizi-100050365226297/"
+      ]
+    }
+    </script>
   </head>
+
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
