@@ -39,19 +39,18 @@ export default function HomeHero({ scrollToForm }) {
           }}
         >
           {/* LOGO */}
-          <Box
-			  component="img"
-			  src="/viscitologistic-181x55.webp"
-			  srcSet="/viscitologistic-181x55.webp 1x, /viscitologistic-362x110.webp 2x"
-			  alt="Viscito Traslochi e Logistica"
-			  width="181"
-			  height="55"
-			  decoding="async"
-			  loading="eager"
-			  fetchpriority="high"
-			  style={{ cursor: 'pointer' }}
-			  onClick={() => navigate('/')}
-			/>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box
+              component="img"
+              src="/viscitologistic-181x55.webp"
+              srcSet="/viscitologistic-181x55.webp 1x, /viscitologistic-362x110.webp 2x"
+              alt="Viscito Traslochi e Logistica"
+              width="181"
+              height="55"
+              decoding="async"
+              style={{ cursor: 'pointer' }}
+              onClick={() => navigate('/')}
+            />
           </Box>
 
           {/* AREA RISERVATA */}
