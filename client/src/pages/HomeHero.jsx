@@ -29,15 +29,6 @@ export default function HomeHero({ scrollToForm }) {
         overflow: 'hidden'
       }}
     >
-      {/* PRELOAD LCP IMAGE */}
-      <img
-        src="/HomeHero.webp"
-        alt=""
-        fetchpriority="high"
-        decoding="async"
-        style={{ display: 'none' }}
-      />
-
       {/* APP BAR */}
       <AppBar position="absolute" elevation={1} sx={{ bgcolor: '#ffffff', top: 0 }}>
         <Toolbar
@@ -91,13 +82,29 @@ export default function HomeHero({ scrollToForm }) {
           justifyContent: 'center',
           textAlign: 'center',
           color: 'white',
-          backgroundImage: 'url("/HomeHero.webp")',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
           position: 'relative',
           mt: '64px'
         }}
       >
+        {/* HERO IMAGE — LCP REALE */}
+        <Box
+          component="img"
+          src="/HomeHero.webp"
+          alt="Traslochi professionali a Salerno in tutta Italia"
+          fetchpriority="high"
+          loading="eager"
+          decoding="async"
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center',
+            zIndex: 0
+          }}
+        />
+
         {/* OVERLAY */}
         <Box
           sx={{
@@ -122,9 +129,9 @@ export default function HomeHero({ scrollToForm }) {
             }}
           >
             Traslochi professionali a Salerno <br />
-            <Box component="span" sx={{ color: '#90caf9' }}>
+            <span style={{ color: '#90caf9' }}>
               in tutta Italia
-            </Box>
+            </span>
           </Typography>
 
           <Typography
@@ -164,34 +171,33 @@ export default function HomeHero({ scrollToForm }) {
 
         {/* FRECCIA → SERVIZI */}
         <Box
-		  role="button"
-		  aria-label="Scorri ai servizi"
-		  tabIndex={0}
-		  onClick={scrollToServices}
-		  onKeyDown={(e) => {
-			if (e.key === 'Enter' || e.key === ' ') scrollToServices();
-		  }}
-		  sx={{
-			position: 'absolute',
-			bottom: 20,
-			left: 0,
-			right: 0,
-			display: 'flex',
-			justifyContent: 'center',
-			zIndex: 2,
-			animation: 'bounce 2s infinite',
-			cursor: 'pointer',
-			outline: 'none',
-			'&:focus-visible': {
-			  outline: '3px solid rgba(144,202,249,0.9)',
-			  outlineOffset: 6,
-			  borderRadius: 8
-			}
-		  }}
-		>
-		  <KeyboardArrowDownIcon sx={{ color: 'white', fontSize: 40, opacity: 0.8 }} />
-		</Box>
-
+          role="button"
+          aria-label="Scorri ai servizi"
+          tabIndex={0}
+          onClick={scrollToServices}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') scrollToServices();
+          }}
+          sx={{
+            position: 'absolute',
+            bottom: 20,
+            left: 0,
+            right: 0,
+            display: 'flex',
+            justifyContent: 'center',
+            zIndex: 2,
+            animation: 'bounce 2s infinite',
+            cursor: 'pointer',
+            outline: 'none',
+            '&:focus-visible': {
+              outline: '3px solid rgba(144,202,249,0.9)',
+              outlineOffset: 6,
+              borderRadius: 8
+            }
+          }}
+        >
+          <KeyboardArrowDownIcon sx={{ color: 'white', fontSize: 40, opacity: 0.8 }} />
+        </Box>
       </Box>
     </Box>
   );
