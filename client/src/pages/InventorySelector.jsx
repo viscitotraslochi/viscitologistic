@@ -216,9 +216,15 @@ export default function InventorySelector({ inventoryList, setInventoryList, for
                 <RemoveCircleOutlineIcon />
               </IconButton>
               <Typography fontWeight="bold">{item.qty}</Typography>
-              <IconButton size="small" onClick={() => handleAddItem(item.name)} color="primary">
-                <AddCircleOutlineIcon />
-              </IconButton>
+                <IconButton
+                  size="small"
+                  color="primary"
+                  aria-label={`Aggiungi ${item.name}`}
+                  title={`Aggiungi ${item.name}`}
+                  onClick={() => handleAddItem(item.name)}
+                >
+                  <AddCircleOutlineIcon />
+                </IconButton>
             </Box>
           </Paper>
         ))}
