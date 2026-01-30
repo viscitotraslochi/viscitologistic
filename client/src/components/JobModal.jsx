@@ -502,11 +502,11 @@ useEffect(() => {
 
       <DialogContent dividers>
         <Grid container spacing={2} sx={{ mt: 0.5 }}>
-          <Grid size={{ xs: 12, sm: 6 }}>
+          <Grid item xs={12} sm={6} md={4}>
             <TextField id="cliente_nome" label="Nome Cliente" name="cliente_nome" fullWidth required value={formData.cliente_nome} onChange={handleChange} />
           </Grid>
 
-          <Grid size={{ xs: 12, sm: 6 }}>
+          <Grid item xs={12} sm={6} md={2}>
             <TextField
               select
               label="Tipo Lavoro"
@@ -521,7 +521,7 @@ useEffect(() => {
               <option value="sopralluogo">Sopralluogo</option>
             </TextField>
           </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
+          <Grid item xs={12} sm={6} md={3}>
             <TextField
 			  id="phone"
 			  label="Telefono"
@@ -537,7 +537,7 @@ useEffect(() => {
 			  helperText={errors.phone || ' '}
 			/>
           </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
+          <Grid item xs={12} sm={6} md={3}>
             <TextField
 			  id="email"
 			  label="Email"
@@ -552,9 +552,9 @@ useEffect(() => {
 			  helperText={errors.email || ' '}
 			/>
           </Grid>
-          <Grid size={{ xs: 12 }}><Divider sx={{ my: 1 }} /></Grid>
+          <Grid item xs={12}><Divider sx={{ my: 1 }} /></Grid>
 
-          <Grid size={{ xs: 12, sm: 6 }}>
+          <Grid item xs={12} sm={6}>
             <Autocomplete
 			  freeSolo
 			  disablePortal
@@ -596,8 +596,9 @@ useEffect(() => {
 				/>
 			  )}
 			/>
-            <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
-              <TextField
+            <Grid container spacing={1} sx={{ mt: 1 }}>
+              <Grid item xs={12} sm={6}>
+<TextField
                 select
                 label="Piano"
                 name="piano_partenza"
@@ -611,7 +612,9 @@ useEffect(() => {
                   <option key={i} value={i}>{i === 0 ? 'Piano Terra' : `Piano ${i}`}</option>
                 ))}
               </TextField>
-              <TextField
+</Grid>
+              <Grid item xs={12} sm={6}>
+<TextField
                 select
                 label="Ascensore"
                 name="ascensore_partenza"
@@ -624,10 +627,11 @@ useEffect(() => {
                 <option value="SI">Ascensore: SI</option>
                 <option value="NO">Ascensore: NO</option>
               </TextField>
-            </Box>
+</Grid>
+            </Grid>
           </Grid>
 
-          <Grid size={{ xs: 12, sm: 6 }}>
+          <Grid item xs={12} sm={6}>
             <Autocomplete
 			  freeSolo
 			  disablePortal
@@ -670,8 +674,9 @@ useEffect(() => {
 			  )}
 			/>
 
-            <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
-              <TextField
+            <Grid container spacing={1} sx={{ mt: 1 }}>
+              <Grid item xs={12} sm={6}>
+<TextField
                 select
                 label="Piano"
                 name="piano_arrivo"
@@ -685,7 +690,9 @@ useEffect(() => {
                   <option key={i} value={i}>{i === 0 ? 'Piano Terra' : `Piano ${i}`}</option>
                 ))}
               </TextField>
-              <TextField
+</Grid>
+              <Grid item xs={12} sm={6}>
+<TextField
                 select
                 label="Ascensore"
                 name="ascensore_arrivo"
@@ -698,16 +705,17 @@ useEffect(() => {
                 <option value="SI">Ascensore: SI</option>
                 <option value="NO">Ascensore: NO</option>
               </TextField>
-            </Box>
+</Grid>
+            </Grid>
           </Grid>
 
-          <Grid size={{ xs: 12 }}>
+          <Grid item xs={12}>
             <Typography variant="subtitle2" sx={{ mt: 2, mb: 1, color: '#666', fontWeight: 'bold', textTransform: 'uppercase' }}>
               Pianificazione
             </Typography>
             <Paper variant="outlined" sx={{ p: 2, mb: 2, bgcolor: '#f8fafc', borderColor: '#e2e8f0' }}>
               <Grid container spacing={2}>
-                <Grid size={{ xs: 12, sm: 6 }}>
+                <Grid item xs={12} sm={6}>
                   <Box sx={{ mb: 1 }}>
                     <Typography variant="caption" fontWeight="bold" color="primary">INIZIO</Typography>
                   </Box>
@@ -716,7 +724,7 @@ useEffect(() => {
                     <TextField type="time" name="startTime" value={formData.startTime} onChange={handleChange} fullWidth size="small" />
                   </Box>
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
+                <Grid item xs={12} sm={6}>
                   <Box sx={{ mb: 1 }}>
                     <Typography variant="caption" fontWeight="bold" color="error">FINE</Typography>
                   </Box>
@@ -730,7 +738,7 @@ useEffect(() => {
           </Grid>
 
           {/* INVENTARIO */}
-          <Grid size={{ xs: 12 }}>
+          <Grid item xs={12}>
             <Paper variant="outlined" sx={{ p: 2, bgcolor: '#f8f9fa', borderRadius: 2 }}>
               <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 'bold', color: 'text.secondary' }}>
                 AGGIUNTA RAPIDA
@@ -850,7 +858,7 @@ useEffect(() => {
             </Paper>
           </Grid>
 
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid item xs={12} md={4}>
             <TextField
               id="notes"
               label="Note"
@@ -863,7 +871,7 @@ useEffect(() => {
             />
           </Grid>
 
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid item xs={12} md={4}>
             <TextField
               id="price"
               label="Prezzo Pattuito (€)"
@@ -875,7 +883,7 @@ useEffect(() => {
             />
           </Grid>
 
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid item xs={12} md={4}>
             <TextField
               id="deposit"
               label="Acconto (€)"
