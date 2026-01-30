@@ -101,7 +101,7 @@ export default function HomeHero({ scrollToForm }) {
             /HomeHero-960.webp 960w,
             /HomeHero-1280.webp 1280w
           "
-          sizes="(max-width: 600px) 100vw, (max-width: 1200px) 90vw, 1200px"
+          sizes="100vw"
           alt="Traslochi professionali a Salerno in tutta Italia"
           width="1600"
           height="1200"
