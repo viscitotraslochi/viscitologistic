@@ -384,8 +384,12 @@ useEffect(() => {
 			<Paper elevation={3} sx={{ p: { xs: 3, md: 4 }, mb: 4, borderRadius: 4 }}>
 			  <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
 				<LocalShippingIcon color="primary" sx={{ mr: 1, fontSize: 28 }} />
-				<Typography variant="h5" sx={{ fontWeight: 800, color: '#102a43' }}>
-				  Dove e Quando
+				<Typography
+				variant="h5"  
+				component="h3"   
+				sx={{ fontWeight: 800, color: '#102a43' }} 
+				>
+				Dove e Quando
 				</Typography>
 			  </Box>
 
