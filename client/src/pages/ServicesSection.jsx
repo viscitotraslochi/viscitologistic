@@ -90,7 +90,11 @@ export default function ServicesSection({ isMobile, scrollToForm }) {
                 </Box>
 
                 <CardContent sx={{ p: 0 }}>
-                  <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+                  <Typography
+                    variant="h6"
+                    component="h3"
+                    sx={{ fontWeight: 700, mb: 1 }}
+                  >
                     {srv.title}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">

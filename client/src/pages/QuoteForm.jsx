@@ -322,7 +322,13 @@ useEffect(() => {
           <Paper elevation={3} sx={{ p: { xs: 3, md: 4 }, mb: 4, borderRadius: 4 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
               <PublicIcon color="primary" sx={{ mr: 1, fontSize: 28 }} />
-              <Typography variant="h5" sx={{ fontWeight: 800, color: '#102a43' }}>I tuoi Dati</Typography>
+              <Typography
+				variant="h5"    
+				component="h3" 
+				sx={{ fontWeight: 800, color: '#102a43' }}
+				>
+				I tuoi Dati
+				</Typography>
             </Box>
             <Grid container spacing={3}>
               <Grid size={{ xs: 12 }}>
