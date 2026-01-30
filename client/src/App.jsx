@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 // PAGINE
 import Home from './pages/Home';
 import Login from './pages/Login';
-import Privacy from "./pages/Privacy";
 
 import TraslochiSalerno from './pages/TraslochiSalerno';
 import TraslochiNapoli from './pages/TraslochiNapoli';
@@ -13,10 +12,10 @@ import TraslochiAvellino from './pages/TraslochiAvellino';
 import TraslochiCaserta from './pages/TraslochiCaserta';
 import TraslochiBenevento from './pages/TraslochiBenevento';
 
-
-
-// ✅ Admin lazy: non entra nel bundle iniziale
 const AdminPanel = lazy(() => import('./pages/AdminPanel'));
+
+const Privacy = lazy(() => import("./pages/Privacy"));
+
 
 function App() {
   return (
@@ -30,9 +29,17 @@ function App() {
         <Route path="/traslochi-avellino" element={<TraslochiAvellino />} />
         <Route path="/traslochi-caserta" element={<TraslochiCaserta />} />
         <Route path="/traslochi-benevento" element={<TraslochiBenevento />} />
-		<Route path="/privacy" element={<Privacy />} />
-        <Route path="/login" element={<Login onLoginSuccess={() => {}} />} />
 
+        <Route path="/login" element={<Login onLoginSuccess={() => {}} />} />
+          
+        <Route
+          path="/privacy"
+          element={
+            <Suspense fallback={null}>
+              <Privacy />
+            </Suspense>
+          }
+        />
         <Route
           path="/admin"
           element={

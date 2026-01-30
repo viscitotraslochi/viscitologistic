@@ -48,11 +48,22 @@
     <!-- ========================= -->
     <!-- GOOGLE ANALYTICS GA4 -->
     <!-- ========================= -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NSGKGNFY58"></script>
     <script>
-      gtag('js', new Date());
-      gtag('config', 'G-NSGKGNFY58', {
-        anonymize_ip: true
+      window.addEventListener("load", () => {
+        const loadGA = () => {
+          const s = document.createElement("script");
+          s.async = true;
+          s.src = "https://www.googletagmanager.com/gtag/js?id=G-NSGKGNFY58";
+          document.head.appendChild(s);
+
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag("js", new Date());
+          gtag("config", "G-NSGKGNFY58");
+        };
+
+        if ("requestIdleCallback" in window) requestIdleCallback(loadGA, { timeout: 2000 });
+        else setTimeout(loadGA, 1500);
       });
     </script>
 

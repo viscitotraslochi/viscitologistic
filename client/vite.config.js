@@ -5,19 +5,35 @@ export default defineConfig({
   plugins: [react()],
 
   build: {
-    // 1️⃣ alza la soglia del warning (non è un errore)
     chunkSizeWarningLimit: 1200,
 
-    // 2️⃣ split intelligente dei bundle
+    // Split più granulare = meno JS “inutile” nella prima pagina
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes("node_modules")) {
-            if (id.includes("@fullcalendar")) return "fullcalendar";
-            if (id.includes("@mui")) return "mui";
-            if (id.includes("date-fns")) return "datefns";
-            return "vendor";
-          }
+          if (!id.includes("node_modules")) return;
+
+          // UI
+          if (id.includes("@mui")) return "mui";
+          if (id.includes("@emotion")) return "emotion";
+
+          // Calendar
+          if (id.includes("@fullcalendar")) return "fullcalendar";
+
+          // Date utils
+          if (id.includes("date-fns")) return "datefns";
+
+          // Routing
+          if (id.includes("react-router")) return "router";
+
+          // Map / geocoding (se li usi)
+          if (id.includes("leaflet") || id.includes("react-leaflet")) return "leaflet";
+
+          // Common heavy utils (se presenti)
+          if (id.includes("lodash")) return "lodash";
+
+          // Fallback
+          return "vendor";
         },
       },
     },

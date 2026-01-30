@@ -1,5 +1,5 @@
-import React from "react";
 import { Container, Box, Typography, Divider, Link as MuiLink } from "@mui/material";
+
 import { Link } from "react-router-dom";
 
 export default function Privacy() {
