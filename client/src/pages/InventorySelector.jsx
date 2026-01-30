@@ -151,44 +151,61 @@ export default function InventorySelector({ inventoryList, setInventoryList, for
       <Divider sx={{ my: 2 }} />
 
       {/* AUTOCOMPLETE + BUTTON ADD */}
-      <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start', width: '100%', mt: 1 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          gap: 1,
+          alignItems: 'flex-start',
+          width: '100%',
+          mt: 1
+        }}
+      >
         <Autocomplete
-		  freeSolo
-		  disablePortal
-		  sx={{ flexGrow: 1 }}
-		  options={EXTENDED_ITEMS}
-		  value={selectedValue}          // ✅ CONTROLLED
-		  inputValue={inputValue}
-		  onInputChange={(e, newInputValue) => setInputValue(newInputValue)}
-		  onChange={(e, newValue) => {
-			if (newValue) handleAddItem(newValue);
-		  }}
-		  renderInput={(params) => (
-			<TextField
-			  {...params}
-			  label="Cerca o scrivi oggetto..."
-			  size="small"
-			  fullWidth
-			  onKeyDown={(e) => {
-				if (e.key === 'Enter') {
-				  e.preventDefault();
-				  handleAddItem(inputValue);
-				}
-			  }}
-			/>
-		  )}
-		/>
-
+          freeSolo
+          disablePortal
+          sx={{ flexGrow: 1 }}
+          options={EXTENDED_ITEMS}
+          value={selectedValue} // ✅ CONTROLLED
+          inputValue={inputValue}
+          onInputChange={(e, newInputValue) =>
+            setInputValue(newInputValue)
+          }
+          onChange={(e, newValue) => {
+            if (newValue) {
+              handleAddItem(newValue);
+            }
+          }}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Cerca o scrivi oggetto..."
+              size="small"
+              fullWidth
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAddItem(inputValue);
+                }
+              }}
+            />
+          )}
+        />
 
         <Button
           variant="contained"
+          aria-label="Aggiungi elemento"
+          title="Aggiungi elemento"
           onClick={() => handleAddItem(inputValue)}
-          sx={{ height: '40px', minWidth: '48px', p: 0 }}
+          sx={{
+            height: '40px',
+            minWidth: '48px',
+            p: 0
+          }}
         >
           <AddCircleOutlineIcon />
         </Button>
       </Box>
-
+      
       {/* CURRENT INVENTORY */}
       <Typography variant="subtitle2" sx={{ mt: 2, mb: 1, fontWeight: 'bold', color: '#1976d2' }}>
         INVENTARIO CORRENTE:
