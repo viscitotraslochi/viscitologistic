@@ -78,25 +78,28 @@ const EXTENDED_ITEMS = [
 
 export default function InventorySelector({ inventoryList, setInventoryList, formData, setFormData }) {
   const [inputValue, setInputValue] = useState('');
+  const [selectedValue, setSelectedValue] = useState(null);
 
   const handleAddItem = (itemName) => {
-    const name = (typeof itemName === 'string' ? itemName : itemName?.label)?.trim();
-    if (!name) return;
+	  const name = (typeof itemName === 'string' ? itemName : itemName)?.trim();
+	  if (!name) return;
 
-    setInventoryList(prev => {
-      const existing = prev.find(i => i.name.toLowerCase() === name.toLowerCase());
-      if (existing) {
-        return prev.map(i =>
-          i.name.toLowerCase() === name.toLowerCase()
-            ? { ...i, qty: i.qty + 1 }
-            : i
-        );
-      }
-      return [...prev, { name, qty: 1 }];
-    });
+	  setInventoryList(prev => {
+		const existing = prev.find(i => i.name.toLowerCase() === name.toLowerCase());
+		if (existing) {
+		  return prev.map(i =>
+			i.name.toLowerCase() === name.toLowerCase()
+			  ? { ...i, qty: i.qty + 1 }
+			  : i
+		  );
+		}
+		return [...prev, { name, qty: 1 }];
+	  });
 
-    setInputValue('');
-  };
+	  // ✅ RESET COMPLETO
+	  setInputValue('');
+	  setSelectedValue(null);
+	};
 
   const handleRemoveItem = (itemName) => {
     setInventoryList(prev => {
@@ -150,35 +153,32 @@ export default function InventorySelector({ inventoryList, setInventoryList, for
       {/* AUTOCOMPLETE + BUTTON ADD */}
       <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start', width: '100%', mt: 1 }}>
         <Autocomplete
-          freeSolo
-          disablePortal
-          sx={{ flexGrow: 1 }}
-          options={EXTENDED_ITEMS}
-          inputValue={inputValue}
-          filterOptions={(options, params) => filter(options, params)}
-          onInputChange={(event, newInputValue) => setInputValue(newInputValue)}
-          onChange={(event, newValue) => {
-            if (newValue) handleAddItem(newValue);
-          }}
-          selectOnFocus
-          clearOnBlur
-          handleHomeEndKeys
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label="Cerca o scrivi oggetto..."
-              size="small"
-              fullWidth
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  if (inputValue.trim() !== '') handleAddItem(inputValue);
-                }
-              }}
-            />
-          )}
-        />
+		  freeSolo
+		  disablePortal
+		  sx={{ flexGrow: 1 }}
+		  options={EXTENDED_ITEMS}
+		  value={selectedValue}          // ✅ CONTROLLED
+		  inputValue={inputValue}
+		  onInputChange={(e, newInputValue) => setInputValue(newInputValue)}
+		  onChange={(e, newValue) => {
+			if (newValue) handleAddItem(newValue);
+		  }}
+		  renderInput={(params) => (
+			<TextField
+			  {...params}
+			  label="Cerca o scrivi oggetto..."
+			  size="small"
+			  fullWidth
+			  onKeyDown={(e) => {
+				if (e.key === 'Enter') {
+				  e.preventDefault();
+				  handleAddItem(inputValue);
+				}
+			  }}
+			/>
+		  )}
+		/>
+
 
         <Button
           variant="contained"
