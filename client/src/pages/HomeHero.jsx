@@ -45,8 +45,8 @@ export default function HomeHero({ scrollToForm }) {
               src="/viscitologistic-181x55.webp"
               srcSet="/viscitologistic-181x55.webp 1x, /viscitologistic-362x110.webp 2x"
               alt="Viscito Traslochi e Logistica"
-              width="181"
-              height="55"
+              width={181}
+              height={55}
               decoding="async"
               style={{ cursor: 'pointer' }}
               onClick={() => navigate('/')}
@@ -95,8 +95,8 @@ export default function HomeHero({ scrollToForm }) {
           srcSet="/HomeHero-640.webp 640w, /HomeHero-960.webp 960w, /HomeHero-1280.webp 1280w"
           sizes="100vw"
           alt="Traslochi professionali a Salerno in tutta Italia"
-          width="1600"
-          height="1200"
+          width={1600} 
+          height={1200}
           fetchpriority="high" 
           loading="eager"
           style={{
