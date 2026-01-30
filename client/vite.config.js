@@ -3,11 +3,13 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-
   build: {
+    modulePreload: {
+      resolveDependencies: (filename, deps, { hostId }) => {
+        return deps; 
+      },
+    },
     chunkSizeWarningLimit: 1200,
-
-    // Split più granulare = meno JS “inutile” nella prima pagina
     rollupOptions: {
       output: {
         manualChunks(id) {
