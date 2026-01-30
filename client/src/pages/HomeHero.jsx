@@ -88,19 +88,25 @@ export default function HomeHero({ scrollToForm }) {
         {/* HERO IMAGE — LCP REALE */}
         <Box
           component="img"
-          src="/HomeHero.webp"
+          src="/HomeHero-960.webp"  // fallback
+          srcSet="
+            /HomeHero-640.webp 640w,
+            /HomeHero-960.webp 960w,
+            /HomeHero-1280.webp 1280w
+          "
+          sizes="(max-width: 600px) 100vw, (max-width: 1200px) 90vw, 1200px"
           alt="Traslochi professionali a Salerno in tutta Italia"
           fetchpriority="high"
           loading="eager"
           decoding="async"
           sx={{
-            position: 'absolute',
+            position: "absolute",
             inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            objectPosition: 'center',
-            zIndex: 0
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "center",
+            zIndex: 0,
           }}
         />
 
