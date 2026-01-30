@@ -136,10 +136,18 @@ export default function InventorySelector({ inventoryList, setInventoryList, for
       </Typography>
 
       {/* QUICK CHIPS */}
-      <Typography variant="subtitle2" sx={{ mb: 1.5, fontWeight: 'bold', color: 'text.secondary' }}>
+      <Typography
+        variant="subtitle2"
+        component="span"
+        sx={{
+          mb: 1.5,
+          fontWeight: 'bold',
+          color: 'text.secondary'
+        }}
+      >
         AGGIUNTA RAPIDA
       </Typography>
-
+      
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
         {QUICK_ITEMS.map((item) => (
           <Chip
