@@ -97,9 +97,8 @@ export default function HomeHero({ scrollToForm }) {
           alt="Traslochi professionali a Salerno in tutta Italia"
           width="1600"
           height="1200"
-          fetchPriority="high"
+          fetchpriority="high" 
           loading="eager"
-          decoding="async"
           style={{
             position: "absolute",
             inset: 0,
