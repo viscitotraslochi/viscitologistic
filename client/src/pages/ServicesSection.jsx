@@ -48,7 +48,7 @@ export default function ServicesSection({ isMobile, scrollToForm }) {
         <Box sx={{ textAlign: 'center', mb: { xs: 4, md: 8 } }}>
           <Typography
             variant="overline"
-            sx={{ color: '#1976d2', fontWeight: 'bold', letterSpacing: 2 }}
+            sx={{ color: '#1565c0', fontWeight: 'bold', letterSpacing: 2 }} // più scuro = contrast OK
           >
             COSA FACCIAMO
           </Typography>
@@ -60,7 +60,7 @@ export default function ServicesSection({ isMobile, scrollToForm }) {
             I Nostri Servizi
           </Typography>
         </Box>
-        
+
         {/* CARD SERVIZI */}
         <Grid container spacing={4} justifyContent="center">
           {services.map((srv, i) => (
@@ -185,15 +185,14 @@ export default function ServicesSection({ isMobile, scrollToForm }) {
           </Box>
 
           {/* MICRO-COPY */}
-          <Box
-            sx={{
-              display: 'flex',
-              gap: 1,
-              flexWrap: 'wrap',
-              justifyContent: 'center',
-              opacity: 0.85
-            }}
-          >
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 1,
+                flexWrap: 'wrap',
+                justifyContent: 'center'
+              }}
+            >
             <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary' }}>
               Risposta rapida
             </Typography>
