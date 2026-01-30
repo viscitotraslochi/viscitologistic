@@ -649,19 +649,29 @@ useEffect(() => {
 		  >
 			{/* COLONNA 1 – BRAND / AZIENDA */}
 			<Box>
-			  <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
-				Viscito Traslochi e Logistica
-			  </Typography>
+				<Typography
+					variant="h6"
+					component="h3"
+					sx={{ fontWeight: 700, mb: 1 }}
+				>
+					Viscito Traslochi e Logistica
+				</Typography>
 
-			  <Typography variant="body2" sx={{ opacity: 0.75, lineHeight: 1.7 }}>
-				Azienda specializzata in traslochi per privati e aziende.
-				Operiamo a Salerno, in Campania e in tutta Italia con servizi
-				professionali, rapidi e senza stress.
-			  </Typography>
+				<Typography
+					variant="body2"
+					sx={{ opacity: 0.75, lineHeight: 1.7 }}
+				>
+					Azienda specializzata in traslochi per privati e aziende.
+					Operiamo a Salerno, in Campania e in tutta Italia con servizi
+					professionali, rapidi e senza stress.
+				</Typography>
 
-			  <Typography variant="body2" sx={{ opacity: 0.6, mt: 2 }}>
-				© 2026 Viscito Logistic – Salerno
-			  </Typography>
+				<Typography
+					variant="body2"
+					sx={{ opacity: 0.6, mt: 2 }}
+				>
+					© 2026 Viscito Logistic – Salerno
+				</Typography>
 			</Box>
 
 			{/* COLONNA 2 – SOCIAL / AFFIDABILITÀ */}
