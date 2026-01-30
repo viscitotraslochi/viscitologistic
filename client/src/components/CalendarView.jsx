@@ -623,7 +623,9 @@ function CalendarView() {
             list: 'Lista'
           }}
           events={filteredEvents}
-          height="100%"
+          height="auto" 
+          handleWindowResize={true}
+          stickyHeaderDates={true}
           datesSet={(arg) => setCurrentView(arg.view.type)}
           dateClick={handleDateClick}
           eventClick={handleEventClick}
