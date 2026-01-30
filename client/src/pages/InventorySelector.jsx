@@ -122,7 +122,11 @@ export default function InventorySelector({ inventoryList, setInventoryList, for
     <Paper elevation={3} sx={{ p: { xs: 3, md: 4 }, mb: 4, borderRadius: 4, bgcolor: '#fff' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
         <HandymanIcon color="primary" sx={{ mr: 1, fontSize: 28 }} />
-        <Typography variant="h5" sx={{ fontWeight: 800, color: '#102a43' }}>
+        <Typography
+          variant="h5"    
+          component="h3"   
+          sx={{ fontWeight: 800, color: '#102a43' }}
+        >
           Cosa Trasportiamo?
         </Typography>
       </Box>
@@ -205,7 +209,7 @@ export default function InventorySelector({ inventoryList, setInventoryList, for
           <AddCircleOutlineIcon />
         </Button>
       </Box>
-      
+
       {/* CURRENT INVENTORY */}
       <Typography variant="subtitle2" sx={{ mt: 2, mb: 1, fontWeight: 'bold', color: '#1976d2' }}>
         INVENTARIO CORRENTE:
