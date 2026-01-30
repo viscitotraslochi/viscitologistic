@@ -53,13 +53,14 @@ export default function ServicesSection({ isMobile, scrollToForm }) {
             COSA FACCIAMO
           </Typography>
           <Typography
-            variant={isMobile ? 'h4' : 'h3'}
+            variant={isMobile ? 'h4' : 'h3'} // stile visivo
+            component="h2"                   // semantica corretta
             sx={{ fontWeight: 800, color: '#1a202c' }}
           >
             I Nostri Servizi
           </Typography>
         </Box>
-
+        
         {/* CARD SERVIZI */}
         <Grid container spacing={4} justifyContent="center">
           {services.map((srv, i) => (
