@@ -82,11 +82,12 @@ export default function HomeHero({ scrollToForm }) {
           textAlign: "center",
           color: "white",
           position: "relative",
-          mt: "64px",
           width: "100%",
-          aspectRatio: "4 / 3", // 1600x1200 = 4:3
-          minHeight: { xs: 360, sm: 420, md: 520 },
           overflow: "hidden",
+
+          // FIX: niente aspectRatio su desktop
+          pt: { xs: "56px", sm: "64px" },
+          minHeight: { xs: "calc(100vh - 56px)", sm: "calc(100vh - 64px)" },
         }}
       >
         {/* HERO IMAGE — LCP REALE */}
