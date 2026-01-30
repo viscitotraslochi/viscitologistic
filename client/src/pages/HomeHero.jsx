@@ -82,9 +82,16 @@ export default function HomeHero({ scrollToForm }) {
           textAlign: 'center',
           color: 'white',
           position: 'relative',
-          mt: '64px'
+          mt: '64px',
+
+          // ✅ FIX CLS/LCP: riserva spazio prima che l'immagine carichi
+          width: '100%',
+          aspectRatio: '4 / 3',              // 1600x1200 = 4:3
+          minHeight: { xs: 360, sm: 420, md: 520 },
+          overflow: 'hidden',
         }}
       >
+
         {/* HERO IMAGE — LCP REALE */}
         <Box
           component="img"
@@ -111,7 +118,7 @@ export default function HomeHero({ scrollToForm }) {
             zIndex: 0,
           }}
         />
-        
+
         {/* OVERLAY */}
         <Box
           sx={{
