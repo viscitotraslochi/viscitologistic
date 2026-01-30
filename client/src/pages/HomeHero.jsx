@@ -134,7 +134,8 @@ export default function HomeHero({ scrollToForm }) {
           </Typography>
 
           <Typography
-            variant="h5"
+            variant="h5"    
+            component="p"     
             sx={{
               mb: 5,
               opacity: 0.9,
