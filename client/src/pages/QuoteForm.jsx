@@ -676,9 +676,13 @@ useEffect(() => {
 
 			{/* COLONNA 2 – SOCIAL / AFFIDABILITÀ */}
 			<Box>
-			  <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
-				Seguici
-			  </Typography>
+				<Typography
+					variant="subtitle1"
+					component="span"
+					sx={{ fontWeight: 600, mb: 1 }}
+					>
+					Seguici
+				</Typography>
 
 			  <Box sx={{ display: 'flex', gap: 1 }}>
 				<IconButton
