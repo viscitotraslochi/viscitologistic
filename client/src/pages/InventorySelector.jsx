@@ -147,7 +147,7 @@ export default function InventorySelector({ inventoryList, setInventoryList, for
       >
         AGGIUNTA RAPIDA
       </Typography>
-      
+
       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
         {QUICK_ITEMS.map((item) => (
           <Chip
@@ -219,7 +219,16 @@ export default function InventorySelector({ inventoryList, setInventoryList, for
       </Box>
 
       {/* CURRENT INVENTORY */}
-      <Typography variant="subtitle2" sx={{ mt: 2, mb: 1, fontWeight: 'bold', color: '#1976d2' }}>
+      <Typography
+        variant="subtitle2"
+        component="span"
+        sx={{
+          mt: 2,
+          mb: 1,
+          fontWeight: 'bold',
+          color: '#1976d2'
+        }}
+      >
         INVENTARIO CORRENTE:
       </Typography>
 
