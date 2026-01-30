@@ -76,31 +76,23 @@ export default function HomeHero({ scrollToForm }) {
       <Box
         sx={{
           flexGrow: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          textAlign: 'center',
-          color: 'white',
-          position: 'relative',
-          mt: '64px',
-
-          // ✅ FIX CLS/LCP: riserva spazio prima che l'immagine carichi
-          width: '100%',
-          aspectRatio: '4 / 3',              // 1600x1200 = 4:3
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          color: "white",
+          position: "relative",
+          mt: "64px",
+          width: "100%",
+          aspectRatio: "4 / 3", // 1600x1200 = 4:3
           minHeight: { xs: 360, sm: 420, md: 520 },
-          overflow: 'hidden',
+          overflow: "hidden",
         }}
       >
-
         {/* HERO IMAGE — LCP REALE */}
-        <Box
-          component="img"
+        <img
           src="/HomeHero-960.webp"
-          srcSet="
-            /HomeHero-640.webp 640w,
-            /HomeHero-960.webp 960w,
-            /HomeHero-1280.webp 1280w
-          "
+          srcSet="/HomeHero-640.webp 640w, /HomeHero-960.webp 960w, /HomeHero-1280.webp 1280w"
           sizes="100vw"
           alt="Traslochi professionali a Salerno in tutta Italia"
           width="1600"
@@ -108,7 +100,7 @@ export default function HomeHero({ scrollToForm }) {
           fetchPriority="high"
           loading="eager"
           decoding="async"
-          sx={{
+          style={{
             position: "absolute",
             inset: 0,
             width: "100%",
@@ -116,6 +108,7 @@ export default function HomeHero({ scrollToForm }) {
             objectFit: "cover",
             objectPosition: "center",
             zIndex: 0,
+            display: "block",
           }}
         />
 
