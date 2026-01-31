@@ -287,15 +287,14 @@
       });
     </script>
 
-    <link
-      rel="preload"
-      as="image"
-      href="/HomeHero-960.webp"
-      imagesrcset="/HomeHero-640.webp 640w, /HomeHero-960.webp 960w, /HomeHero-1280.webp 1280w"
-      imagesizes="100vw"
-      type="image/webp"
-      fetchpriority="high"
-    />
+	<img
+	  src="/HomeHero-960.webp"
+	  srcSet="/HomeHero-640.webp 640w, /HomeHero-960.webp 960w, /HomeHero-1280.webp 1280w"
+	  sizes="100vw"
+	  alt="Traslochi professionali a Salerno in tutta Italia"
+	  fetchPriority="high"
+	  decoding="async"
+	/>
 
     <!-- ========================= -->
     <!-- OPEN GRAPH -->
@@ -323,70 +322,108 @@
     <!-- STRUCTURED DATA -->
     <!-- ========================= -->
     <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "MovingCompany",
-        "@id": "https://www.viscitotraslochi.com/#business",
+	{
+	  "@context": "https://schema.org",
+	  "@type": "MovingCompany",
+	  "@id": "https://www.viscitotraslochi.com/#business",
 
-        "name": "Viscito Traslochi e Logistica",
-        "url": "https://www.viscitotraslochi.com/",
-        "logo": "https://www.viscitotraslochi.com/viscitologistic.png",
-        "image": "https://www.viscitotraslochi.com/viscitologistic.png",
-        "priceRange": "€€",
+	  "name": "Viscito Traslochi e Logistica",
+	  "url": "https://www.viscitotraslochi.com/",
+	  "logo": "https://www.viscitotraslochi.com/viscitologistic.png",
+	  "image": "https://www.viscitotraslochi.com/viscitologistic.png",
+	  "priceRange": "€€",
+	  "slogan": "Traslochi e logistica professionali in Campania e in tutta Italia",
 
-        "address": {
-          "@type": "PostalAddress",
-          "addressLocality": "Salerno",
-          "addressRegion": "Campania",
-          "addressCountry": "IT"
-        },
+	  "address": {
+		"@type": "PostalAddress",
+		"streetAddress": "Via Martin Luther King 5",
+		"postalCode": "84132",
+		"addressLocality": "Salerno",
+		"addressRegion": "Campania",
+		"addressCountry": "IT"
+	  },
 
-        "areaServed": [
-          { "@type": "City", "name": "Salerno" },
-          { "@type": "AdministrativeArea", "name": "Campania" },
-          { "@type": "Country", "name": "Italia" }
-        ],
+	  "hasMap": "https://www.google.com/maps?q=Via+Martin+Luther+King+5,+84132+Salerno+Italia",
 
-        "openingHoursSpecification": [
-          {
-            "@type": "OpeningHoursSpecification",
-            "dayOfWeek": [
-              "Monday",
-              "Tuesday",
-              "Wednesday",
-              "Thursday",
-              "Friday",
-              "Saturday"
-            ],
-            "opens": "08:00",
-            "closes": "20:00"
-          }
-        ],
+	  "geo": {
+		"@type": "GeoCoordinates",
+		"latitude": 40.6829,
+		"longitude": 14.7681
+	  },
 
-        "contactPoint": [
-          {
-            "@type": "ContactPoint",
-            "telephone": "+393663370679",
-            "email": "viscitotraslochi@gmail.com",
-            "contactType": "customer service",
-            "areaServed": "IT",
-            "availableLanguage": ["it"]
-          },
-          {
-            "@type": "ContactPoint",
-            "telephone": "+393397882956",
-            "contactType": "customer service",
-            "areaServed": "IT",
-            "availableLanguage": ["it"]
-          }
-        ],
+	  "areaServed": [
+		{ "@type": "City", "name": "Salerno" },
+		{ "@type": "City", "name": "Napoli" },
+		{ "@type": "City", "name": "Caserta" },
+		{ "@type": "City", "name": "Benevento" },
+		{ "@type": "City", "name": "Avellino" },
+		{ "@type": "AdministrativeArea", "name": "Campania" },
+		{ "@type": "Country", "name": "Italia" }
+	  ],
 
-        "sameAs": [
-          "https://www.facebook.com/p/Viscito-Traslochi-Servizi-100050365226297/"
-        ]
-      }
-      </script>
+	  "openingHoursSpecification": [
+		{
+		  "@type": "OpeningHoursSpecification",
+		  "dayOfWeek": [
+			"Monday",
+			"Tuesday",
+			"Wednesday",
+			"Thursday",
+			"Friday",
+			"Saturday"
+		  ],
+		  "opens": "08:00",
+		  "closes": "20:00"
+		}
+	  ],
 
+	  "contactPoint": [
+		{
+		  "@type": "ContactPoint",
+		  "telephone": "+393663370679",
+		  "email": "viscitotraslochi@gmail.com",
+		  "contactType": "customer service",
+		  "areaServed": "IT",
+		  "availableLanguage": ["it"]
+		},
+		{
+		  "@type": "ContactPoint",
+		  "telephone": "+393397882956",
+		  "contactType": "customer service",
+		  "areaServed": "IT",
+		  "availableLanguage": ["it"]
+		}
+	  ],
+
+	  "makesOffer": [
+		{
+		  "@type": "Offer",
+		  "itemOffered": {
+			"@type": "Service",
+			"name": "Traslochi locali e nazionali"
+		  }
+		},
+		{
+		  "@type": "Offer",
+		  "itemOffered": {
+			"@type": "Service",
+			"name": "Traslochi internazionali"
+		  }
+		},
+		{
+		  "@type": "Offer",
+		  "itemOffered": {
+			"@type": "Service",
+			"name": "Servizi di logistica e deposito"
+		  }
+		}
+	  ],
+
+	  "sameAs": [
+		"https://www.facebook.com/p/Viscito-Traslochi-Servizi-100050365226297/"
+	  ]
+	}
+    </script>
   </head>
 
   <body>
