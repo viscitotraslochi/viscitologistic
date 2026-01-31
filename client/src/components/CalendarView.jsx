@@ -599,13 +599,14 @@ function CalendarView() {
 		<Box
 		  sx={{
 			flexGrow: 1,
-			minHeight: 0, // ✅ fondamentale in layout flex per non tagliare lo scroll interno
+			minHeight: 0,
 			height: { xs: 'calc(100vh - 140px)', md: 'calc(100vh - 180px)' },
-			overflow: 'hidden',
+			overflow: 'auto', // ✅ invece di hidden -> scrollbar VISIBILE
 			bgcolor: '#fff',
 			p: isMobile ? 0 : 2,
 			borderRadius: 3,
 			boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+			WebkitOverflowScrolling: 'touch',
 		  }}
 		>
 		  <FullCalendar
@@ -613,12 +614,10 @@ function CalendarView() {
 			plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
 			locale={itLocale}
 			initialView={isMobile ? 'listWeek' : 'dayGridMonth'}
-
 			slotMinTime="06:00:00"
 			slotMaxTime="21:00:00"
 			allDaySlot={false}
 			nowIndicator={true}
-
 			headerToolbar={{
 			  left: isMobile ? 'prev,next' : 'prev,next today',
 			  center: 'title',
@@ -631,24 +630,21 @@ function CalendarView() {
 			  day: 'Giorno',
 			  list: 'Lista',
 			}}
-
 			events={filteredEvents}
 
-			height="100%"
+			height="auto"        // ✅ importante con container scroll
 			contentHeight="auto"
-			expandRows={true}
+			expandRows={false}   // ✅ evita che “strizzi” le ore per farle entrare
+
 			handleWindowResize={true}
 			stickyHeaderDates={true}
-
 			datesSet={(arg) => setCurrentView(arg.view.type)}
 			dateClick={handleDateClick}
 			eventClick={handleEventClick}
 			eventContent={renderEventContent}
-
 			dayMaxEvents={3}
 			allDayText="Tutto"
 			navLinks={!isMobile}
-
 			listDayFormat={{ weekday: 'long', day: 'numeric', month: 'long' }}
 			listDaySideFormat={false}
 		  />
