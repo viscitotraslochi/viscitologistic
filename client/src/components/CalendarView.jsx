@@ -596,47 +596,63 @@ function CalendarView() {
       </Box>
 
       {/* Contenitore Calendario */}
-      <Box sx={{
-        flexGrow: 1,
-        overflow: 'hidden',
-        bgcolor: '#fff',
-        p: isMobile ? 0 : 2,
-        borderRadius: 3,
-        boxShadow: '0 4px 20px rgba(0,0,0,0.05)'
-      }}>
+		<Box
+		  sx={{
+			flexGrow: 1,
+			height: 'calc(100vh - 180px)', 
+			minHeight: 600,
+			overflow: 'hidden',
+			bgcolor: '#fff',
+			p: isMobile ? 0 : 2,
+			borderRadius: 3,
+			boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+		  }}
+		>
         <FullCalendar
-          ref={calendarRef}
-          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
-          locale={itLocale}
-          initialView={isMobile ? 'listWeek' : 'dayGridMonth'}
-          slotMinTime="06:00:00"
-          slotMaxTime="21:00:00"
-          headerToolbar={{
-            left: isMobile ? 'prev,next' : 'prev,next today',
-            center: 'title',
-            right: isMobile ? '' : 'dayGridMonth,timeGridWeek,listWeek'
-          }}
-          buttonText={{
-            today: 'Oggi',
-            month: 'Mese',
-            week: 'Settimana',
-            day: 'Giorno',
-            list: 'Lista'
-          }}
-          events={filteredEvents}
-          height="auto" 
-          handleWindowResize={true}
-          stickyHeaderDates={true}
-          datesSet={(arg) => setCurrentView(arg.view.type)}
-          dateClick={handleDateClick}
-          eventClick={handleEventClick}
-          eventContent={renderEventContent}
-          dayMaxEvents={3}
-          allDayText="Tutto"
-          navLinks={!isMobile}
-          listDayFormat={{ weekday: 'long', day: 'numeric', month: 'long' }}
-          listDaySideFormat={false}
-        />
+		  ref={calendarRef}
+		  plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
+		  locale={itLocale}
+		  initialView={isMobile ? 'listWeek' : 'dayGridMonth'}
+
+		  slotMinTime="06:00:00"
+		  slotMaxTime="21:00:00"
+		  allDaySlot={false}
+		  nowIndicator={true}
+
+		  headerToolbar={{
+			left: isMobile ? 'prev,next' : 'prev,next today',
+			center: 'title',
+			right: isMobile ? '' : 'dayGridMonth,timeGridWeek,listWeek'
+		  }}
+		  buttonText={{
+			today: 'Oggi',
+			month: 'Mese',
+			week: 'Settimana',
+			day: 'Giorno',
+			list: 'Lista'
+		  }}
+
+		  events={filteredEvents}
+
+		  height="100%"
+		  contentHeight="auto"
+		  expandRows={true}
+		  handleWindowResize={true}
+		  stickyHeaderDates={true}
+
+		  datesSet={(arg) => setCurrentView(arg.view.type)}
+		  dateClick={handleDateClick}
+		  eventClick={handleEventClick}
+		  eventContent={renderEventContent}
+
+		  dayMaxEvents={3}
+		  allDayText="Tutto"
+		  navLinks={!isMobile}
+
+		  listDayFormat={{ weekday: 'long', day: 'numeric', month: 'long' }}
+		  listDaySideFormat={false}
+		/>
+
       </Box>
 
       <JobModal
