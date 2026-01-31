@@ -17,6 +17,7 @@ import {
   createFilterOptions
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
+import { generateQuotePdf } from "../utils/generateQuotePdf";
 
 // --- ICONE ---
 import SaveIcon from '@mui/icons-material/Save';
@@ -908,6 +909,18 @@ useEffect(() => {
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Button onClick={handleSafeClose} color="inherit">Annulla</Button>
           <Button onClick={handleSubmit} variant="contained" startIcon={<SaveIcon />}>Salva</Button>
+          <Button
+            variant="outlined"
+            onClick={() =>
+              generateQuotePdf({
+                formData,
+                inventoryList,
+                // opzionale: logoDataUrl (se vuoi, lo aggiungiamo dopo)
+              })
+            }
+          >
+            Scarica Preventivo PDF
+          </Button>        
         </Box>
       </DialogActions>
 
