@@ -287,8 +287,6 @@
       });
     </script>
 
-
-
     <!-- ========================= -->
     <!-- OPEN GRAPH -->
     <!-- ========================= -->
@@ -515,7 +513,15 @@
 
 <script>
   (function () {
-    const KEY = 'cookie_consent_v1'; // puoi cambiare versione se aggiorni banner
+    if (window.location.pathname.startsWith("/admin")) {
+      const manageBtn = document.getElementById("cookie-manage");
+      const banner = document.getElementById("cookie-banner");
+      if (manageBtn) manageBtn.style.display = "none";
+      if (banner) banner.style.display = "none";
+      return; // ⛔ esce subito
+    }
+
+    const KEY = 'cookie_consent_v1';
     const banner = document.getElementById('cookie-banner');
     const manageBtn = document.getElementById('cookie-manage');
     const acceptBtn = document.getElementById('cookie-accept');
@@ -532,9 +538,6 @@
     }
 
     function applyConsent(choice) {
-      // Consent Mode v2:
-      // - ads restano denied (non fai ads/remarketing)
-      // - analytics granted solo se accetta
       if (typeof gtag === 'function') {
         if (choice === 'accepted') {
           gtag('consent', 'update', {
@@ -566,10 +569,8 @@
     const current = get();
     if (current === 'accepted' || current === 'rejected') {
       applyConsent(current);
-      // Mostra solo il pulsante gestione
       manageBtn.style.display = 'block';
     } else {
-      // Nessuna scelta: mostra banner
       showBanner();
     }
 
@@ -589,13 +590,13 @@
       showBanner();
     });
 
-    // Espone un metodo per eventuale link "Revoca consenso" in futuro
     window.__cookieConsentReset = function () {
       try { localStorage.removeItem(KEY); } catch (e) {}
       showBanner();
     };
   })();
 </script>
+
 
   </body>
 </html>
