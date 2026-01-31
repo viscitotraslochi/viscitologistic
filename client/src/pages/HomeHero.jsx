@@ -90,28 +90,27 @@ export default function HomeHero({ scrollToForm }) {
           minHeight: { xs: "calc(100vh - 56px)", sm: "calc(100vh - 64px)" },
         }}
       >
-        {/* HERO IMAGE — LCP REALE */}
-        <img
-          src="/HomeHero-960.webp"
-          srcSet="/HomeHero-640.webp 640w, /HomeHero-960.webp 960w, /HomeHero-1280.webp 1280w"
-          sizes="100vw"
-          alt="Traslochi professionali a Salerno in tutta Italia"
-          width={1600} 
-          height={1200}
-          fetchpriority="high" 
-          loading="eager"
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            objectPosition: "center",
-            zIndex: 0,
-            display: "block",
-          }}
-        />
-
+         {/* HERO IMAGE — LCP REALE */}
+		  <img
+			src="/HomeHero-960.webp"
+			srcSet="/HomeHero-640.webp 640w, /HomeHero-960.webp 960w, /HomeHero-1280.webp 1280w"
+			sizes="100vw"
+			alt="Traslochi professionali a Salerno in tutta Italia"
+			width={1600}
+			height={1200}
+			loading="eager"
+			decoding="async"
+			style={{
+			  position: "absolute",
+			  inset: 0,
+			  width: "100%",
+			  height: "100%",
+			  objectFit: "cover",
+			  objectPosition: "center",
+			  zIndex: 0,
+			  display: "block",
+			}}
+		  />
         {/* OVERLAY */}
         <Box
           sx={{
