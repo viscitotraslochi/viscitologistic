@@ -654,9 +654,6 @@ function CalendarView() {
 		  />
 		</Box>
 
-
-      </Box>
-
       <JobModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
